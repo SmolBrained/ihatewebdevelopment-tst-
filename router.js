@@ -1,17 +1,17 @@
 const siteRouter = {
     pages: {
-        "home": "/",
-        "about": "/about.html",
-        "news": "/news.html",
-        "the-team": "/team.html",
-        "contact": "/contact.html",
-        "receive-tutoring": "/receive-tutoring.html",
-        "become-a-tutor": "/become-a-tutor.html",
-        "support": "/support.html",
-        "articles": "/articles.html",
-        "lessons": "/lessons.html",
-        "report-time": "/report-time.html",
-        "member": "/members.html"
+        "home": "index.html",
+        "about": "about.html",
+        "news": "news.html",
+        "the-team": "team.html",
+        "contact": "contact.html",
+        "receive-tutoring": "receive-tutoring.html",
+        "become-a-tutor": "become-a-tutor.html",
+        "support": "support.html",
+        "articles": "articles.html",
+        "lessons": "lessons.html",
+        "report-time": "report-time.html",
+        "member": "members.html"
     },
     members: {
         "alejandra-perry000": {
