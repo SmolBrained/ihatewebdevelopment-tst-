@@ -362,28 +362,6 @@ const siteRouter = {
             }
         });
 
-        document.querySelectorAll('.desktop-nav .dropdown-toggle').forEach(toggle => {
-            toggle.addEventListener('click', function(e) {
-                e.preventDefault();
-                const parentItem = this.parentElement;
-                const wasOpen = parentItem.classList.contains('is-open');
-                document.querySelectorAll('.desktop-nav .nav-item.dropdown').forEach(item => {
-                    item.classList.remove('is-open');
-                });
-                if (!wasOpen) {
-                    parentItem.classList.add('is-open');
-                }
-            });
-        });
-
-        document.addEventListener('click', function(e) {
-            if (!e.target.closest('.desktop-nav .nav-item.dropdown')) {
-                document.querySelectorAll('.desktop-nav .nav-item.dropdown.is-open').forEach(item => {
-                    item.classList.remove('is-open');
-                });
-            }
-        });
-
         const setLanguage = (lang) => {
             document.querySelectorAll('[data-en], [data-es]').forEach(el => {
                 const text = el.dataset[lang];
