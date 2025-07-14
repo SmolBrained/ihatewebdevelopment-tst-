@@ -246,7 +246,7 @@ const siteRouter = {
                 <a data-page-id="home" class="logo nav-link"><img src="https://i.imgur.com/vyE0G43.png" alt="Literary Speaking Logo" class="logo-unscrolled"><img src="https://i.imgur.com/UnpZvgZ.png" alt="Literary Speaking Logo" class="logo-scrolled"></a>
                 <nav class="desktop-nav">
                     <div class="nav-item dropdown">
-                        <a data-page-id="about" class="lang-switch nav-link" data-page-group="get-to-know-us" data-en="Get to Know Us" data-es="Conócenos"></a>
+                        <div class="nav-link dropdown-toggle lang-switch" data-page-group="get-to-know-us" data-en="Get to Know Us" data-es="Conócenos"></div>
                         <div class="dropdown-menu">
                             <a data-page-id="about" class="lang-switch nav-link" data-en="About Us" data-es="Sobre Nosotros"></a>
                             <a data-page-id="the-team" class="lang-switch nav-link" data-en="The Team" data-es="El Equipo"></a>
@@ -255,7 +255,7 @@ const siteRouter = {
                         </div>
                     </div>
                     <div class="nav-item dropdown">
-                        <a data-page-id="become-a-tutor" class="lang-switch nav-link" data-page-group="get-involved" data-en="Get Involved" data-es="Involúcrate"></a>
+                        <div class="nav-link dropdown-toggle lang-switch" data-page-group="get-involved" data-en="Get Involved" data-es="Involúcrate"></div>
                         <div class="dropdown-menu">
                             <a data-page-id="receive-tutoring" class="lang-switch nav-link" data-en="Receive Tutoring" data-es="Recibir Tutoría"></a>
                             <a data-page-id="become-a-tutor" class="lang-switch nav-link" data-en="Become a Tutor" data-es="Conviértete en Tutor"></a>
@@ -263,7 +263,7 @@ const siteRouter = {
                         </div>
                     </div>
                     <div class="nav-item dropdown">
-                         <a data-page-id="articles" class="lang-switch nav-link" data-page-group="resources" data-en="Resources" data-es="Recursos"></a>
+                         <div class="nav-link dropdown-toggle lang-switch" data-page-group="resources" data-en="Resources" data-es="Recursos"></div>
                         <div class="dropdown-menu">
                             <a data-page-id="articles" class="lang-switch nav-link" data-en="Articles" data-es="Artículos"></a>
                             <a data-page-id="lessons" class="lang-switch nav-link" data-en="Lessons" data-es="Lecciones"></a>
@@ -275,31 +275,21 @@ const siteRouter = {
                 <button class="menu-toggle" aria-label="Toggle navigation"><span></span><span></span><span></span></button>
             </div>
             <nav class="mobile-nav">
-                <div class="nav-item-mobile">
-                    <a class="lang-switch mobile-main-link" data-en="Get to Know Us" data-es="Conócenos"></a>
-                    <div class="mobile-dropdown">
-                        <a data-page-id="about" class="lang-switch nav-link" data-en="About Us" data-es="Sobre Nosotros"></a>
-                        <a data-page-id="the-team" class="lang-switch nav-link" data-en="The Team" data-es="El Equipo"></a>
-                        <a data-page-id="news" class="lang-switch nav-link" data-en="News" data-es="Noticias"></a>
-                        <a data-page-id="contact" class="lang-switch nav-link" data-en="Contact" data-es="Contacto"></a>
-                    </div>
-                </div>
-                <div class="nav-item-mobile">
-                   <a class="lang-switch mobile-main-link" data-en="Get Involved" data-es="Involúcrate"></a>
-                    <div class="mobile-dropdown">
-                        <a data-page-id="receive-tutoring" class="lang-switch nav-link" data-en="Receive Tutoring" data-es="Recibir Tutoría"></a>
-                        <a data-page-id="become-a-tutor" class="lang-switch nav-link" data-en="Become a Tutor" data-es="Conviértete en Tutor"></a>
-                        <a data-page-id="support" class="lang-switch nav-link" data-en="Support Us" data-es="Apóyanos"></a>
-                    </div>
-                </div>
-                <div class="nav-item-mobile">
-                    <a class="lang-switch mobile-main-link" data-en="Resources" data-es="Recursos"></a>
-                    <div class="mobile-dropdown">
-                        <a data-page-id="articles" class="lang-switch nav-link" data-en="Articles" data-es="Artículos"></a>
-                        <a data-page-id="lessons" class="lang-switch nav-link" data-en="Lessons" data-es="Lecciones"></a>
-                        <a data-page-id="report-time" class="lang-switch nav-link" data-en="Report Time" data-es="Reportar Horas"></a>
-                    </div>
-                </div>
+                <h3 class="lang-switch mobile-nav-title" data-en="Get to Know Us" data-es="Conócenos"></h3>
+                <a data-page-id="about" class="lang-switch nav-link" data-en="About Us" data-es="Sobre Nosotros"></a>
+                <a data-page-id="the-team" class="lang-switch nav-link" data-en="The Team" data-es="El Equipo"></a>
+                <a data-page-id="news" class="lang-switch nav-link" data-en="News" data-es="Noticias"></a>
+                <a data-page-id="contact" class="lang-switch nav-link" data-en="Contact" data-es="Contacto"></a>
+
+                <h3 class="lang-switch mobile-nav-title" data-en="Get Involved" data-es="Involúcrate"></h3>
+                <a data-page-id="receive-tutoring" class="lang-switch nav-link" data-en="Receive Tutoring" data-es="Recibir Tutoría"></a>
+                <a data-page-id="become-a-tutor" class="lang-switch nav-link" data-en="Become a Tutor" data-es="Conviértete en Tutor"></a>
+                <a data-page-id="support" class="lang-switch nav-link" data-en="Support Us" data-es="Apóyanos"></a>
+
+                <h3 class="lang-switch mobile-nav-title" data-en="Resources" data-es="Recursos"></h3>
+                <a data-page-id="articles" class="lang-switch nav-link" data-en="Articles" data-es="Artículos"></a>
+                <a data-page-id="lessons" class="lang-switch nav-link" data-en="Lessons" data-es="Lecciones"></a>
+                <a data-page-id="report-time" class="lang-switch nav-link" data-en="Report Time" data-es="Reportar Horas"></a>
             </nav>
         `;
 
@@ -372,7 +362,7 @@ const siteRouter = {
             }
         });
 
-        document.querySelectorAll('.desktop-nav .nav-item.dropdown > a').forEach(toggle => {
+        document.querySelectorAll('.desktop-nav .dropdown-toggle').forEach(toggle => {
             toggle.addEventListener('click', function(e) {
                 e.preventDefault();
                 const parentItem = this.parentElement;
@@ -387,19 +377,11 @@ const siteRouter = {
         });
 
         document.addEventListener('click', function(e) {
-            if (!e.target.closest('.desktop-nav')) {
+            if (!e.target.closest('.desktop-nav .nav-item.dropdown')) {
                 document.querySelectorAll('.desktop-nav .nav-item.dropdown.is-open').forEach(item => {
                     item.classList.remove('is-open');
                 });
             }
-        });
-
-        document.querySelectorAll('.nav-item-mobile .mobile-main-link').forEach(mainLink => {
-            mainLink.addEventListener('click', (e) => {
-                e.preventDefault();
-                const parent = mainLink.parentElement;
-                parent.classList.toggle('open');
-            });
         });
 
         const setLanguage = (lang) => {
@@ -447,7 +429,7 @@ const siteRouter = {
             });
             const currentGroup = pageGroups[currentPage];
             if (currentGroup) {
-                document.querySelectorAll(`.nav-link[data-page-group="${currentGroup}"]`).forEach(link => {
+                document.querySelectorAll(`.dropdown-toggle[data-page-group="${currentGroup}"]`).forEach(link => {
                     link.classList.add('active-page-link');
                 });
             }
