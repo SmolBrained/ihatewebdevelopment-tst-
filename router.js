@@ -2,12 +2,11 @@ const siteRouter = {
     pages: {
         "home": "/",
         "about": "/about",
-        "the-team": "/team",
         "news": "/news",
+        "the-team": "/team",
         "contact": "/contact",
-        "get-involved": "/get-involved",
         "receive-tutoring": "/receive-tutoring",
-        "become-a-tutor": "/get-involved",
+        "become-a-tutor": "/become-a-tutor",
         "support": "/support",
         "articles": "/articles",
         "lessons": "/lessons",
@@ -247,18 +246,19 @@ const siteRouter = {
                 <a data-page-id="home" class="logo nav-link"><img src="https://i.imgur.com/vyE0G43.png" alt="Literary Speaking Logo" class="logo-unscrolled"><img src="https://i.imgur.com/UnpZvgZ.png" alt="Literary Speaking Logo" class="logo-scrolled"></a>
                 <nav class="desktop-nav">
                     <div class="nav-item dropdown">
-                        <a data-page-id="about" class="lang-switch nav-link" data-page-group="about" data-en="About Us" data-es="Sobre Nosotros"></a>
+                        <a data-page-id="about" class="lang-switch nav-link" data-page-group="get-to-know-us" data-en="Get to Know Us" data-es="Conócenos"></a>
                         <div class="dropdown-menu">
+                            <a data-page-id="about" class="lang-switch nav-link" data-en="About Us" data-es="Sobre Nosotros"></a>
                             <a data-page-id="the-team" class="lang-switch nav-link" data-en="The Team" data-es="El Equipo"></a>
                             <a data-page-id="news" class="lang-switch nav-link" data-en="News" data-es="Noticias"></a>
                             <a data-page-id="contact" class="lang-switch nav-link" data-en="Contact" data-es="Contacto"></a>
                         </div>
                     </div>
                     <div class="nav-item dropdown">
-                        <a data-page-id="get-involved" class="lang-switch nav-link" data-page-group="get-involved" data-en="Get Involved" data-es="Involúcrate"></a>
+                        <a data-page-id="become-a-tutor" class="lang-switch nav-link" data-page-group="get-involved" data-en="Get Involved" data-es="Involúcrate"></a>
                         <div class="dropdown-menu">
                             <a data-page-id="receive-tutoring" class="lang-switch nav-link" data-en="Receive Tutoring" data-es="Recibir Tutoría"></a>
-                            <a data-page-id="get-involved" class="lang-switch nav-link" data-en="Become a Tutor" data-es="Conviértete en Tutor"></a>
+                            <a data-page-id="become-a-tutor" class="lang-switch nav-link" data-en="Become a Tutor" data-es="Conviértete en Tutor"></a>
                             <a data-page-id="support" class="lang-switch nav-link" data-en="Support Us" data-es="Apóyanos"></a>
                         </div>
                     </div>
@@ -276,7 +276,7 @@ const siteRouter = {
             </div>
             <nav class="mobile-nav">
                 <div class="nav-item-mobile">
-                    <a class="lang-switch mobile-main-link" data-en="About Us" data-es="Sobre Nosotros"></a>
+                    <a class="lang-switch mobile-main-link" data-en="Get to Know Us" data-es="Conócenos"></a>
                     <div class="mobile-dropdown">
                         <a data-page-id="about" class="lang-switch nav-link" data-en="About Us" data-es="Sobre Nosotros"></a>
                         <a data-page-id="the-team" class="lang-switch nav-link" data-en="The Team" data-es="El Equipo"></a>
@@ -288,7 +288,7 @@ const siteRouter = {
                    <a class="lang-switch mobile-main-link" data-en="Get Involved" data-es="Involúcrate"></a>
                     <div class="mobile-dropdown">
                         <a data-page-id="receive-tutoring" class="lang-switch nav-link" data-en="Receive Tutoring" data-es="Recibir Tutoría"></a>
-                        <a data-page-id="get-involved" class="lang-switch nav-link" data-en="Become a Tutor" data-es="Conviértete en Tutor"></a>
+                        <a data-page-id="become-a-tutor" class="lang-switch nav-link" data-en="Become a Tutor" data-es="Conviértete en Tutor"></a>
                         <a data-page-id="support" class="lang-switch nav-link" data-en="Support Us" data-es="Apóyanos"></a>
                     </div>
                 </div>
@@ -308,7 +308,8 @@ const siteRouter = {
                 <a data-page-id="home" class="nav-link"><img src="https://i.imgur.com/vyE0G43.png" alt="Literary Speaking Footer Logo" class="scroll-animated"></a>
                 <div class="footer-grid">
                     <div class="footer-col">
-                        <h3 class="lang-switch" data-en="About Us" data-es="Sobre Nosotros"></h3>
+                        <h3 class="lang-switch" data-en="Get to Know Us" data-es="Conócenos"></h3>
+                        <a data-page-id="about" class="lang-switch nav-link" data-en="About Us" data-es="Sobre Nosotros"></a>
                         <a data-page-id="the-team" class="lang-switch nav-link" data-en="The Team" data-es="El Equipo"></a>
                         <a data-page-id="news" class="lang-switch nav-link" data-en="News" data-es="Noticias"></a>
                         <a data-page-id="contact" class="lang-switch nav-link" data-en="Contact" data-es="Contacto"></a>
@@ -316,7 +317,7 @@ const siteRouter = {
                     <div class="footer-col">
                         <h3 class="lang-switch" data-en="Get Involved" data-es="Involúcrate"></h3>
                         <a data-page-id="receive-tutoring" class="lang-switch nav-link" data-en="Receive Tutoring" data-es="Recibir Tutoría"></a>
-                        <a data-page-id="get-involved" class="lang-switch nav-link" data-en="Become a Tutor" data-es="Conviértete en Tutor"></a>
+                        <a data-page-id="become-a-tutor" class="lang-switch nav-link" data-en="Become a Tutor" data-es="Conviértete en Tutor"></a>
                         <a data-page-id="support" class="lang-switch nav-link" data-en="Support Us" data-es="Apóyanos"></a>
                     </div>
                     <div class="footer-col">
@@ -328,7 +329,7 @@ const siteRouter = {
                         </div>
                     </div>
                 </div>
-                <p class="copyright lang-switch" data-en="Copyright © 2025 Literary Speaking Tutoring" data-es="Copyright © 2025 Tutoría de Literary Speaking"></p>
+                <p class="copyright lang-switch" data-en="Copyright © 2025 Literary Speaking Tutoring | Privacy Policy" data-es="Copyright © 2025 Tutoría de Literary Speaking | Política de Privacidad"></p>
             </div>
         `;
 
@@ -405,12 +406,12 @@ const siteRouter = {
         document.querySelectorAll('.lang-switcher').forEach(el => el.addEventListener('click', toggleLanguage));
 
         const pageGroups = {
-            'about': 'about',
-            'the-team': 'about',
-            'news': 'about',
-            'contact': 'about',
-            'get-involved': 'get-involved',
+            'about': 'get-to-know-us',
+            'the-team': 'get-to-know-us',
+            'news': 'get-to-know-us',
+            'contact': 'get-to-know-us',
             'receive-tutoring': 'get-involved',
+            'become-a-tutor': 'get-involved',
             'support': 'get-involved',
             'articles': 'resources',
             'lessons': 'resources',
