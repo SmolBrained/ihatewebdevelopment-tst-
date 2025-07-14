@@ -258,7 +258,7 @@ const siteRouter = {
                         <div class="nav-link dropdown-toggle lang-switch" data-page-group="get-involved" data-en="Get Involved" data-es="Involúcrate"></div>
                         <div class="dropdown-menu">
                             <a data-page-id="receive-tutoring" class="lang-switch nav-link" data-en="Receive Tutoring" data-es="Recibir Tutoría"></a>
-                            <a data-page-id="become-a-tutor" class="lang-switch nav-link" data-en="Become a Tutor" data-es="Conviértete en Tutor"></a>
+                            <a data-page-id="become-a-tutor" class="lang-switch nav-link" data-en="This button is for testing" data-es="Este boton es de pruebas"></a>
                             <a data-page-id="support" class="lang-switch nav-link" data-en="Support Us" data-es="Apóyanos"></a>
                         </div>
                     </div>
