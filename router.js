@@ -1,10 +1,10 @@
 const siteRouter = {
     pages: {
         "home": "/",
-        "about": "/about",
-        "news": "/news",
-        "the-team": "/team",
-        "contact": "/contact",
+        "about": "about.html",
+        "news": "news.html",
+        "the-team": "team.html",
+        "contact": "contact.html",
         "receive-tutoring": "/receive-tutoring",
         "become-a-tutor": "/become-a-tutor",
         "support": "/support",
