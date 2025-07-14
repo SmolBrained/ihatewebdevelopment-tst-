@@ -362,6 +362,12 @@ const siteRouter = {
             }
         });
 
+        document.querySelectorAll('.desktop-nav .dropdown-toggle').forEach(toggle => {
+            toggle.addEventListener('click', (e) => {
+                e.preventDefault();
+            });
+        });
+
         const setLanguage = (lang) => {
             document.querySelectorAll('[data-en], [data-es]').forEach(el => {
                 const text = el.dataset[lang];
