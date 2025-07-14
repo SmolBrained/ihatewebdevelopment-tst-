@@ -101,9 +101,9 @@
         .section-theme-blue > .container > p{margin-top:30px;color:var(--color-blue-dark)}
         .section-theme-beige{--section-bg:var(--color-beige);--section-main-color:var(--color-beige-dark);padding:65px 0}
         .quote-container{position:relative;display:inline-block;margin:0}
-        .quote-container::before,.quote-container::after{font-family:serif;font-size:9rem;font-weight:900;line-height:0;position:absolute;color:var(--section-main-color)}
-        .quote-container::before{content:'“';top:40px;left:-25px}
-        .quote-container::after{content:'”';bottom:40px;right:-25px}
+        .quote-container::before,.quote-container::after{font-family:serif;font-size:6rem;font-weight:900;line-height:1;position:absolute;color:var(--section-main-color)}
+        .quote-container::before{content:'“';top:0;left:-40px}
+        .quote-container::after{content:'”';bottom:-0.2em;right:-40px}
         .section-theme-beige .quote{font-size:3rem;font-weight:700;color:var(--section-main-color);display:inline-block;background-color:rgba(255,255,255,.5);padding:40px 70px;border-radius:16px}
         .section-theme-purple{--section-bg:var(--color-purple);--section-main-color:var(--color-purple-dark)}
         #receive-tutoring .section-subtitle{margin-top:40px}
@@ -164,8 +164,8 @@
         .stat-card .stat-desc{font-size:.9rem}
         .section-theme-beige .quote{font-size:2.5rem;padding:30px 20px;max-width:90vw}
         .quote-container::before,.quote-container::after{font-size:6rem}
-        .quote-container::before{top:25px;left:0}
-        .quote-container::after{bottom:25px;right:0}
+        .quote-container::before{top:0;left:-20px}
+        .quote-container::after{bottom:-0.2em;right:-20px}
         .card-grid,.image-grid-2,.social-grid,.section-blue-2 .card-grid,.site-footer .footer-grid{grid-template-columns:1fr}
         .site-footer .footer-col, .site-footer .social-icons{text-align:center;justify-content:center;}}
     </style>
@@ -185,7 +185,7 @@
             <div class="container">
                 <div class="card-grid">
                     <div class="stat-card scroll-animated">
-                        <p class="stat-label lang-switch" data-en="ELL* and Low-Income students are" data-es="Estudiantes ELL* y de bajos ingresos son"></p>
+                        <p class="stat-label lang-switch" data-en="ELL<sup>*</sup> and Low-Income students are" data-es="Estudiantes ELL<sup>*</sup> y de bajos ingresos son"></p>
                         <div class="big-number">50</div>
                         <p class="stat-desc"><span class="lang-switch" data-en="Percent less likely to take advanced math courses in high school compared nationally" data-es="Porciento menos propensos a tomar cursos de matemáticas avanzadas en la escuela secundaria en comparación a nivel nacional"></span><br><a href="https://www.sciencedirect.com/science/article/abs/pii/S0361476X24000572" target="_blank" rel="noopener noreferrer" class="lang-switch" data-en="Learn more" data-es="Aprende más"></a></p>
                     </div>
@@ -195,12 +195,12 @@
                         <p class="stat-desc"><span class="lang-switch" data-en="Percent are proficient in math versus 31% nationally" data-es="Porciento son competentes en matemáticas versus 31% a nivel nacional"></span><br><a href="https://www.letsgolearn.com/education-reform/poverty-impacts-educational-outcomes/" target="_blank" rel="noopener noreferrer" class="lang-switch" data-en="Learn more" data-es="Aprende más"></a></p>
                     </div>
                     <div class="stat-card scroll-animated">
-                        <p class="stat-label lang-switch" data-en="Of ELL* 8th graders," data-es="De estudiantes ELL* de 8º grado,"></p>
+                        <p class="stat-label lang-switch" data-en="Of ELL<sup>*</sup> 8th graders," data-es="De estudiantes ELL<sup>*</sup> de 8º grado,"></p>
                         <div class="big-number">5</div>
                          <p class="stat-desc"><span class="lang-switch" data-en="Percent are proficient in Reading versus 33% nationally" data-es="Porciento son competentes en lectura versus 33% a nivel nacional"></span><br><a href="https://www.edweek.org/teaching-learning/nations-report-card-how-ells-fared-in-2011/2011/11" target="_blank" rel="noopener noreferrer" class="lang-switch" data-en="Learn more" data-es="Aprende más"></a></p>
                     </div>
                 </div>
-                <p class="scroll-animated lang-switch" data-en='* "ELL" means "English language learner"' data-es='* "ELL" significa "aprendiz del idioma inglés"'></p>
+                <p class="scroll-animated lang-switch" data-en='<sup>*</sup> "ELL" means "English language learner"' data-es='<sup>*</sup> "ELL" significa "aprendiz del idioma inglés"'></p>
             </div>
         </section>
         <section class="section section-theme-beige"><div class="container scroll-animated"><div class="quote-container"><h2 class="quote lang-switch" data-en="What do we do?" data-es="¿Qué Hacemos?"></h2></div></div></section>
@@ -325,7 +325,7 @@
                 const final = parseInt(el.dataset.final, 10);
                 if (isNaN(final)) return;
                 let start = null;
-                const duration = 1200;
+                const duration = 800;
                 const step = (timestamp) => {
                     if (!start) start = timestamp;
                     const progress = Math.min((timestamp - start) / duration, 1);
