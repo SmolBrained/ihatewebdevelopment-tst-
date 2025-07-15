@@ -33,8 +33,7 @@ const siteRouter = {
             window.location.href = this.pages['home'];
         }
     },
-    async init() {
-        await this.loadMembers();
+    init() {
         const headerContainer = document.getElementById('header');
         const footerContainer = document.querySelector('.site-footer');
 
@@ -117,7 +116,7 @@ const siteRouter = {
                         </div>
                     </div>
                 </div>
-                <p class="copyright lang-switch" data-en="Copyright © 2025 Literary Speaking Tutoring | Privacy Policy" data-es="Copyright © 2025 Tutoría de Literary Speaking | Política de Privacidad"></p>
+                <p class="copyright lang-switch scroll-animated" data-en="Copyright © 2025 Literary Speaking Tutoring | Privacy Policy" data-es="Copyright © 2025 Tutoría de Literary Speaking | Política de Privacidad"></p>
             </div>
         `;
 
@@ -170,14 +169,18 @@ const siteRouter = {
             document.querySelectorAll('[data-en], [data-es]').forEach(el => {
                 const text = el.dataset[lang];
                 if (text) {
-                    el.innerHTML = text;
+                     if (el.tagName === 'UL') {
+                        el.innerHTML = text;
+                    } else {
+                        el.innerHTML = text;
+                    }
                 }
             });
             localStorage.setItem('language', lang);
+            document.documentElement.lang = lang;
             const isEn = lang === 'en';
             document.querySelectorAll('#lang-en-btn, #lang-en-btn-mobile').forEach(btn => btn.classList.toggle('active', isEn));
             document.querySelectorAll('#lang-es-btn, #lang-es-btn-mobile').forEach(btn => btn.classList.toggle('active', !isEn));
-            document.documentElement.lang = lang;
         };
 
         const toggleLanguage = () => {
@@ -188,30 +191,30 @@ const siteRouter = {
         document.querySelectorAll('.lang-switcher').forEach(el => el.addEventListener('click', toggleLanguage));
 
         const pageGroups = {
-            'about': 'get-to-know-us',
-            'the-team': 'get-to-know-us',
-            'news': 'get-to-know-us',
-            'contact': 'get-to-know-us',
-            'receive-tutoring': 'get-involved',
-            'become-a-tutor': 'get-involved',
-            'support': 'get-involved',
-            'articles': 'resources',
-            'lessons': 'resources',
-            'report-time': 'resources'
+            'about': 'get-to-know-us', 'the-team': 'get-to-know-us', 'news': 'get-to-know-us', 'contact': 'get-to-know-us',
+            'receive-tutoring': 'get-involved', 'become-a-tutor': 'get-involved', 'support': 'get-involved',
+            'articles': 'resources', 'lessons': 'resources', 'report-time': 'resources'
         };
 
         const currentPage = document.body.dataset.currentPage;
         if (currentPage) {
-            document.querySelectorAll(`.nav-link[data-page-id="${currentPage}"]`).forEach(link => {
-                link.classList.add('active-page-link');
-            });
+            document.querySelectorAll(`.nav-link[data-page-id="${currentPage}"]`).forEach(link => link.classList.add('active-page-link'));
             const currentGroup = pageGroups[currentPage];
             if (currentGroup) {
-                document.querySelectorAll(`.dropdown-toggle[data-page-group="${currentGroup}"]`).forEach(link => {
-                    link.classList.add('active-page-link');
-                });
+                document.querySelectorAll(`.dropdown-toggle[data-page-group="${currentGroup}"]`).forEach(link => link.classList.add('active-page-link'));
             }
         }
+        
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('is-visible');
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.1 });
+
+        document.querySelectorAll('.site-footer .scroll-animated').forEach(el => observer.observe(el));
         
         setLanguage(localStorage.getItem('language') || 'en');
     }
