@@ -208,14 +208,8 @@
                 });
             }, { threshold: 0.1 });
 
-            document.querySelectorAll('.scroll-animated').forEach(el => {
-                if ('IntersectionObserver' in window) {
-                    observer.observe(el);
-                } else {
-                    el.classList.add('is-visible');
-                    const counter = el.querySelector('.big-number');
-                    if(counter) counter.textContent = counter.dataset.final;
-                }
+            document.querySelectorAll('main .scroll-animated').forEach(el => {
+                observer.observe(el);
             });
         });
     </script>
