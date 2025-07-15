@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Receive Tutoring - Literary Speaking</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .hero-banner{height:60vh;min-height:400px;display:flex;align-items:center;justify-content:center;color:#fff;text-align:center;position:relative;padding:0 20px;background-image:url(https://i.imgur.com/UnO3ioP.jpeg);background-attachment:fixed;background-position:center;background-repeat:no-repeat;background-size:cover}
+        .hero-banner .overlay{position:absolute;top:0;left:0;width:100%;height:100%;background-color:rgba(0,0,0,.5);z-index:2}
+        .hero-banner .content{position:relative;z-index:3}
+        .hero-banner h1{font-size:3.8rem;font-weight:900;margin:0;line-height:1.2}
+        .opportunity-section{padding:50px 0; border-bottom: 1px solid #eee;}
+        .opportunity-section:last-of-type{border-bottom: none;}
+        .opportunity-grid{display:grid;grid-template-columns:repeat(auto-fit, minmax(300px, 1fr));gap:40px;align-items:flex-start; margin-top: 30px;}
+        .opportunity-grid.single-item{grid-template-columns: 1fr; max-width: 550px; margin-left: auto; margin-right: auto;}
+        .opportunity-card{background-color:#fff;border-radius:12px;overflow:hidden;text-align:left;}
+        .opportunity-card img{width:100%;height:auto;aspect-ratio: 16/9; object-fit: cover;}
+        .opportunity-content{padding:25px;}
+        .opportunity-content h3{font-size:1.5rem;font-weight:700;margin:0 0 15px}
+        .opportunity-content ul{list-style:none;padding:0;margin:0 0 20px;line-height:1.8;}
+        .opportunity-content ul li{padding-left:25px;position:relative; margin-bottom: 10px;}
+        .opportunity-content ul li::before{content:'\2713';color:var(--color-green-dark);position:absolute;left:0;font-weight:bold}
+        .opportunity-section .section-title{margin-bottom: 20px;}
+        .cta-section{background-color:var(--color-purple);padding:60px 0}
+        .cta-section h2{font-size:2rem;font-weight:700;margin:0 0 10px}
+        .cta-section p{font-size:1.2rem;margin:0 auto 30px;max-width:600px}
+        @media (max-width:768px){
+        .hero-banner{background-attachment:scroll}
+        .hero-banner h1{font-size:2.2rem}
+        .btn{padding:16px 28px;font-size:1rem}
+        .opportunity-grid{grid-template-columns: 1fr;}
+        }
+    </style>
+</head>
+<body data-current-page="receive-tutoring">
+    <header class="site-header" id="header"></header>
+
+    <main>
+        <section class="hero-banner">
+            <div class="overlay"></div>
+            <div class="content scroll-animated">
+                <h1 class="lang-switch" data-en="Receive Tutoring" data-es="Recibir Tutoría"></h1>
+            </div>
+        </section>
+
+        <div style="--section-bg: #e6f7ff;">
+            <section class="section opportunity-section">
+                <div class="container">
+                    <h2 class="section-title lang-switch" data-en="In-Person Tutoring" data-es="Tutoría En Persona"></h2>
+                    <div class="opportunity-grid">
+                        <div class="opportunity-card scroll-animated">
+                            <img src="https://i.imgur.com/b6jswtH.jpeg" alt="Tutoring at Miami Coral Park Senior High School">
+                            <div class="opportunity-content">
+                                <h3 class="lang-switch" data-en="Miami Coral Park Senior High School" data-es="Escuela Secundaria Miami Coral Park"></h3>
+                                <p>8865 SW 16th St, Miami, FL 33165</p>
+                                <ul>
+                                    <li class="lang-switch" data-en="Receive individual tutoring in the Student Services Office (A190) from 10:40 to 11:10 (during lunch)." data-es="Recibe tutoría individual en la Oficina de Servicios Estudiantiles (A190) de 10:40 a 11:10 (durante el almuerzo)."></li>
+                                    <li class="lang-switch" data-en="Assistance with coursework and English language skills for ELL students." data-es="Asistencia con el trabajo de curso y habilidades en el idioma inglés para estudiantes ELL."></li>
+                                    <li class="lang-switch" data-en="Must currently attend Miami Coral Park Senior High School." data-es="Debe asistir a la escuela secundaria Miami Coral Park."></li>
+                                </ul>
+                                <a href="https://docs.google.com/forms/d/e/1FAIpQLSdT5_sP5bHv69pMezbkuSbEv8WQdp-tBgUMBycHfiK_rejZKw/viewform?usp=header" target="_blank" class="btn lang-switch" data-en="Sign Up" data-es="Inscríbete"></a>
+                            </div>
+                        </div>
+                        <div class="opportunity-card scroll-animated">
+                            <img src="https://i.imgur.com/Mz0mFnB.jpeg" alt="Tutoring at Paul W. Bell Middle School">
+                            <div class="opportunity-content">
+                                <h3 class="lang-switch" data-en="Paul W. Bell Middle School" data-es="Escuela Intermedia Paul W. Bell"></h3>
+                                <p>11800 NW 2nd Street Miami, FL 33182</p>
+                                <ul>
+                                    <li class="lang-switch" data-en="Receive individual or group tutoring from 4:00 to 5:00." data-es="Recibe tutoría individual o en grupo de 4:00 a 5:00."></li>
+                                    <li class="lang-switch" data-en="Assistance with coursework and English language skills for ELL students." data-es="Asistencia con las tareas y habilidades en el idioma inglés para estudiantes ELL."></li>
+                                    <li class="lang-switch" data-en="Must currently attend Paul W. Bell Middle School." data-es="Debe asistir a la escuela intermedia Paul W. Bell."></li>
+                                </ul>
+                                <a href="https://docs.google.com/forms/d/e/1FAIpQLSe7yvrEuvtxTIVCN7CWy97XO86FCixMM1_TL5-SOYh_0Q8iOA/viewform?usp=header" target="_blank" class="btn lang-switch" data-en="Sign Up" data-es="Inscríbete"></a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <div style="--section-bg: #f0e6fa;">
+            <section class="section opportunity-section">
+                <div class="container">
+                     <h2 class="section-title lang-switch" data-en="Online Tutoring" data-es="Tutoría en Línea"></h2>
+                    <div class="opportunity-grid">
+                        <div class="opportunity-card scroll-animated">
+                            <img src="https://i.imgur.com/DQv7eY6.jpeg" alt="Online Homework Help">
+                            <div class="opportunity-content">
+                                <h3 class="lang-switch" data-en="Online Homework Help" data-es="Ayuda con Tareas en Línea"></h3>
+                                <ul>
+                                    <li class="lang-switch" data-en="Receive weekly homework help and test preparation in various subjects to students (elementary to high school)." data-es="Recibe ayuda semanal con las tareas y preparación para exámenes en varias materias para estudiantes (de primaria a secundaria)."></li>
+                                    <li class="lang-switch" data-en="Times vary based on availability." data-es="Los horarios varían según la disponibilidad."></li>
+                                </ul>
+                                <a href="https://docs.google.com/forms/d/e/1FAIpQLSe06QJj76jJ536rwy3A5EMthAD4TTwG_XFGp_TdkNzevnMXTw/viewform?usp=header" target="_blank" class="btn lang-switch" data-en="Sign Up" data-es="Inscríbete"></a>
+                            </div>
+                        </div>
+                        <div class="opportunity-card scroll-animated">
+                            <img src="https://i.imgur.com/s2LQf5Q.jpeg" alt="Online English Language Learners Help">
+                            <div class="opportunity-content">
+                                <h3 class="lang-switch" data-en="Online English Language Learners Help" data-es="Ayuda en línea para aprendices de inglés"></h3>
+                                <ul>
+                                    <li class="lang-switch" data-en="Weekly assistance learning English, focusing on writing, reading, and speaking." data-es="Tutoría semanal para aprender inglés, enfocándose en la escritura, la lectura y el habla."></li>
+                                    <li class="lang-switch" data-en="Time vary based on availability." data-es="El tiempo varía según la disponibilidad."></li>
+                                </ul>
+                                <a href="https://docs.google.com/forms/d/e/1FAIpQLSe06QJj76jJ536rwy3A5EMthAD4TTwG_XFGp_TdkNzevnMXTw/viewform?usp=header" target="_blank" class="btn lang-switch" data-en="Sign Up" data-es="Inscríbete"></a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <div style="--section-bg: #fff0f5;">
+             <section class="section opportunity-section">
+                <div class="container">
+                    <h2 class="section-title lang-switch" data-en="College and Essay Advising" data-es="Asesoría Universitaria y de Ensayos"></h2>
+                    <div class="opportunity-grid single-item">
+                        <div class="opportunity-card scroll-animated">
+                            <img src="https://i.imgur.com/XhBRVvf.jpeg" alt="College and Essay Advising">
+                            <div class="opportunity-content">
+                                <h3 class="lang-switch" data-en="College and Essay Advising" data-es="Asesoría Universitaria y de Ensayos"></h3>
+                                <ul>
+                                    <li class="lang-switch" data-en="Receive online guidance and mentorship regarding the college application process, including applying to scholarships and financial aid." data-es="Recibe orientación y mentoría en línea sobre el proceso de solicitud a la universidad, incluyendo la solicitud de becas y ayuda financiera."></li>
+                                    <li class="lang-switch" data-en="Receive assistance with editing essays and resumes." data-es="Recibe asistencia con la edición de ensayos y currículums."></li>
+                                </ul>
+                                <a href="https://docs.google.com/forms/d/e/1FAIpQLSdSZoFeQ3KODY1lN8wsCuOxRPD4satVRbmoUhuOBmDGXEMv2g/viewform?usp=header" target="_blank" class="btn lang-switch" data-en="Sign Up" data-es="Inscríbete"></a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <section class="section cta-section">
+            <div class="container scroll-animated">
+                <h2 class="lang-switch" data-en="Do you want to be a volunteer?" data-es="¿Quieres ser voluntario?"></h2>
+                <p class="lang-switch" data-en="Help students in our community." data-es="Ayuda a los estudiantes de nuestra comunidad."></p>
+                <a data-page-id="become-a-tutor" class="btn lang-switch nav-link" data-en="Learn More" data-es="Aprende Más"></a>
+            </div>
+        </section>
+    </main>
+
+    <footer class="site-footer"></footer>
+
+    <script src="router.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('is-visible');
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, { threshold: 0.1 });
+
+            document.querySelectorAll('main .scroll-animated').forEach(el => {
+                observer.observe(el);
+            });
+        });
+    </script>
+</body>
+</html>
