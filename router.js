@@ -1,12 +1,13 @@
 const siteRouter = {
     pages: {
-        "home": "index.html",
+        "home": "./index.html",
         "about": "about.html",
         "news": "news.html",
         "the-team": "team.html",
         "contact": "contact.html",
         "receive-tutoring": "receive-tutoring.html",
         "become-a-tutor": "become-a-tutor.html",
+        "become-a-volunteer": "become-a-volunteer.html",
         "support": "support.html",
         "articles": "articles.html",
         "article-single": "article-single.html",
@@ -14,7 +15,6 @@ const siteRouter = {
         "report-time": "report-time.html",
         "member": "members.html"
     },
-    // ... rest of your router.js file remains the same
     members: {},
     async loadMembers() {
         try {
@@ -58,6 +58,7 @@ const siteRouter = {
                         <div class="dropdown-menu">
                             <a data-page-id="receive-tutoring" class="lang-switch nav-link" data-en="Receive Tutoring" data-es="Recibir Tutoría"></a>
                             <a data-page-id="become-a-tutor" class="lang-switch nav-link" data-en="Become a Tutor" data-es="Conviértete en Tutor"></a>
+                            <a data-page-id="become-a-volunteer" class="lang-switch nav-link" data-en="Become a Volunteer" data-es="Conviértete en Voluntario"></a>
                             <a data-page-id="support" class="lang-switch nav-link" data-en="Support Us" data-es="Apóyanos"></a>
                         </div>
                     </div>
@@ -83,6 +84,7 @@ const siteRouter = {
                 <h3 class="lang-switch mobile-nav-title" data-en="Get Involved" data-es="Involúcrate"></h3>
                 <a data-page-id="receive-tutoring" class="lang-switch nav-link" data-en="Receive Tutoring" data-es="Recibir Tutoría"></a>
                 <a data-page-id="become-a-tutor" class="lang-switch nav-link" data-en="Become a Tutor" data-es="Conviértete en Tutor"></a>
+                <a data-page-id="become-a-volunteer" class="lang-switch nav-link" data-en="Become a Volunteer" data-es="Conviértete en Voluntario"></a>
                 <a data-page-id="support" class="lang-switch nav-link" data-en="Support Us" data-es="Apóyanos"></a>
 
                 <h3 class="lang-switch mobile-nav-title" data-en="Resources" data-es="Recursos"></h3>
@@ -107,6 +109,7 @@ const siteRouter = {
                         <h3 class="lang-switch" data-en="Get Involved" data-es="Involúcrate"></h3>
                         <a data-page-id="receive-tutoring" class="lang-switch nav-link" data-en="Receive Tutoring" data-es="Recibir Tutoría"></a>
                         <a data-page-id="become-a-tutor" class="lang-switch nav-link" data-en="Become a Tutor" data-es="Conviértete en Tutor"></a>
+                        <a data-page-id="become-a-volunteer" class="lang-switch nav-link" data-en="Become a Volunteer" data-es="Conviértete en Voluntario"></a>
                         <a data-page-id="support" class="lang-switch nav-link" data-en="Support Us" data-es="Apóyanos"></a>
                     </div>
                     <div class="footer-col">
@@ -194,7 +197,7 @@ const siteRouter = {
 
         const pageGroups = {
             'about': 'get-to-know-us', 'the-team': 'get-to-know-us', 'news': 'get-to-know-us', 'contact': 'get-to-know-us',
-            'receive-tutoring': 'get-involved', 'become-a-tutor': 'get-involved', 'support': 'get-involved',
+            'receive-tutoring': 'get-involved', 'become-a-tutor': 'get-involved', 'become-a-volunteer': 'get-involved', 'support': 'get-involved',
             'articles': 'resources', 'lessons': 'resources', 'report-time': 'resources'
         };
 
