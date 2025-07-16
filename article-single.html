@@ -78,7 +78,10 @@
                 `;
 
                 const contentContainer = document.getElementById('article-content');
-                const formattedContent = article[`content_${lang}`].split('\\n\\n').map(p => `<p>${p}</p>`).join('');
+                const formattedContent = article[`content_${lang}`]
+                    .split('\n\n')
+                    .map(p => `<p>${p.replace(/\n/g, '<br>')}</p>`)
+                    .join('');
                 contentContainer.innerHTML = formattedContent;
 
                 document.querySelectorAll('#article-meta .nav-link').forEach(link => {
