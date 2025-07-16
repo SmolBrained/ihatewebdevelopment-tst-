@@ -33,9 +33,10 @@
         .sidebar-widget{margin-bottom:40px;}
         .sidebar-widget-title{font-size:1.3rem;font-weight:700;margin-bottom:15px;border-bottom:2px solid var(--color-purple);padding-bottom:10px;}
         .sidebar-widget ul{list-style:none;padding:0;margin:0;}
-        .sidebar-widget ul li{margin-bottom:10px;}
-        .sidebar-widget ul li a{text-decoration:none;color:var(--color-text-light);font-weight:500;cursor:pointer;}
-        .sidebar-widget ul li a:hover, .sidebar-widget ul li a.active-filter{color:var(--color-purple-dark);}
+        .sidebar-widget ul li{margin-bottom:12px;}
+        .sidebar-widget ul li a{text-decoration:none;color:var(--color-text-light);font-weight:500;cursor:pointer;font-size:1rem;}
+        .sidebar-widget ul li a:hover{color:var(--color-purple-dark);}
+        .sidebar-widget ul li a.active-filter{color:var(--color-purple-dark);font-weight:700;}
 
         @media (max-width:900px){.articles-layout{grid-template-columns:1fr;}.sidebar{position:static;margin-top:60px;}}
         @media (max-width:768px){.hero-banner{background-attachment:scroll;}.hero-banner h1{font-size:2.2rem;}.article-grid{grid-template-columns:1fr;}}
@@ -55,7 +56,7 @@
         <section class="section">
             <div class="container">
                 <div class="articles-layout">
-                    <div class="articles-main article-grid" id="article-grid-container">
+                    <div class="article-grid" id="article-grid-container">
                     </div>
                     <aside class="sidebar scroll-animated" id="sidebar-container">
                     </aside>
@@ -73,7 +74,8 @@
             const articles = await fetch('articles.json').then(res => res.json());
             const gridContainer = document.getElementById('article-grid-container');
             const sidebarContainer = document.getElementById('sidebar-container');
-            const currentLang = localStorage.getItem('language') || 'en';
+            
+            let currentFilters = { author: 'all', archive: 'all', category: 'all' };
 
             if (!gridContainer || !articles || !sidebarContainer) return;
 
@@ -87,13 +89,20 @@
             }, { threshold: 0.1 });
             
             const getUniqueSidebarData = (lang) => {
-                const authors = new Set();
+                const authors = new Map();
                 const archives = new Map();
-                const categories = new Set();
+                const categories = new Map();
 
                 articles.forEach(article => {
-                    authors.add(article.author_id);
-                    categories.add(article[`category_${lang}`]);
+                    if (!authors.has(article.author_id)) {
+                        const author = siteRouter.members[article.author_id];
+                        if (author) authors.set(article.author_id, author.name);
+                    }
+                    
+                    const categoryKey = article.category_en;
+                    if (!categories.has(categoryKey)) {
+                        categories.set(categoryKey, { en: article.category_en, es: article.category_es });
+                    }
                     
                     const date = new Date(article.date);
                     const yearMonth = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
@@ -122,31 +131,24 @@
                     </div>
                 `;
 
-                const authorsList = document.getElementById('authors-list');
-                authors.forEach(authorId => {
-                    const author = siteRouter.members[authorId];
-                    if (author) {
-                        authorsList.innerHTML += `<li><a href="#" data-filter-type="author" data-filter-value="${authorId}">${author.name}</a></li>`;
-                    }
-                });
-
-                const archivesList = document.getElementById('archives-list');
-                archives.forEach((monthName, yearMonth) => {
-                    archivesList.innerHTML += `<li><a href="#" data-filter-type="archive" data-filter-value="${yearMonth}">${monthName}</a></li>`;
-                });
-
-                const categoriesList = document.getElementById('categories-list');
-                categoriesList.innerHTML = `<li><a href="#" class="active-filter" data-filter-type="category" data-filter-value="all">${lang === 'es' ? 'Todo' : 'All'}</a></li>`;
-                categories.forEach(category => {
-                    categoriesList.innerHTML += `<li><a href="#" data-filter-type="category" data-filter-value="${category}">${category}</a></li>`;
-                });
+                const createList = (listId, data, type, nameField) => {
+                    const list = document.getElementById(listId);
+                    list.innerHTML = `<li><a href="#" class="active-filter" data-filter-type="${type}" data-filter-value="all">${lang === 'es' ? 'Todo' : 'All'}</a></li>`;
+                    data.forEach((value, key) => {
+                        list.innerHTML += `<li><a href="#" data-filter-type="${type}" data-filter-value="${key}">${nameField ? value[nameField] : value}</a></li>`;
+                    });
+                };
                 
+                createList('authors-list', authors, 'author');
+                createList('archives-list', archives, 'archive');
+                createList('categories-list', categories, 'category', lang);
+
                 sidebarContainer.querySelectorAll('a[data-filter-type]').forEach(link => {
                     link.addEventListener('click', handleFilterClick);
                 });
             };
 
-            const populateGrid = (lang, filter = { type: 'category', value: 'all' }) => {
+            const populateGrid = (lang) => {
                 gridContainer.innerHTML = '';
                 articles.forEach(article => {
                     const author = siteRouter.members[article.author_id];
@@ -161,10 +163,12 @@
                     card.dataset.articleId = article.id;
                     card.dataset.author = article.author_id;
                     card.dataset.archive = archiveKey;
-                    card.dataset.category = article[`category_${lang}`];
+                    card.dataset.category = article.category_en;
                     
-                    const isVisible = filter.value === 'all' || card.dataset[filter.type] === filter.value;
-                    if (!isVisible) card.style.display = 'none';
+                    const authorMatch = currentFilters.author === 'all' || card.dataset.author === currentFilters.author;
+                    const archiveMatch = currentFilters.archive === 'all' || card.dataset.archive === currentFilters.archive;
+                    const categoryMatch = currentFilters.category === 'all' || card.dataset.category === currentFilters.category;
+                    card.style.display = (authorMatch && archiveMatch && categoryMatch) ? 'flex' : 'none';
 
                     card.innerHTML = `
                         <div class="article-card-image-wrapper">
@@ -196,15 +200,18 @@
                 const filterType = link.dataset.filterType;
                 const filterValue = link.dataset.filterValue;
 
+                currentFilters[filterType] = filterValue;
+
                 const parentWidget = link.closest('.sidebar-widget');
                 parentWidget.querySelectorAll('a').forEach(l => l.classList.remove('active-filter'));
                 link.classList.add('active-filter');
                 
-                populateGrid(document.documentElement.lang, { type: filterType, value: filterValue });
+                populateGrid(document.documentElement.lang);
             };
 
-            populateSidebar(currentLang);
-            populateGrid(currentLang);
+            const initialLang = localStorage.getItem('language') || 'en';
+            populateSidebar(initialLang);
+            populateGrid(initialLang);
 
             const langObserver = new MutationObserver(() => {
                 const lang = document.documentElement.lang;
