@@ -1,6 +1,6 @@
 const siteRouter = {
     pages: {
-        "home": "index.html",
+        "home": "./index.html",
         "about": "about.html",
         "news": "news.html",
         "the-team": "team.html",
@@ -9,10 +9,12 @@ const siteRouter = {
         "become-a-tutor": "become-a-tutor.html",
         "support": "support.html",
         "articles": "articles.html",
+        "article-single": "article-single.html",
         "lessons": "lessons.html",
         "report-time": "report-time.html",
         "member": "members.html"
     },
+    // ... rest of your router.js file remains the same
     members: {},
     async loadMembers() {
         try {
@@ -25,7 +27,7 @@ const siteRouter = {
     navigateTo(pageId, params = null) {
         let url = this.pages[pageId];
         if (url) {
-            if (pageId === 'member' && params) {
+            if ((pageId === 'member' || pageId === 'article-single') && params) {
                 url += `?id=${params}`;
             }
             window.location.href = url;
