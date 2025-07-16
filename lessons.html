@@ -11,15 +11,22 @@
         .hero-banner .overlay{position:absolute;top:0;left:0;width:100%;height:100%;background-color:rgba(0,0,0,.5);z-index:2}
         .hero-banner .content{position:relative;z-index:3}
         .hero-banner h1{font-size:3.8rem;font-weight:900;margin:0;line-height:1.2}
-        .lesson-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:30px;margin-top:50px}
-        .lesson-card{background-color:#fff;border-radius:12px;overflow:hidden;text-align:center;box-shadow:0 5px 15px rgba(0,0,0,.08)}
-        .lesson-card img{width:100%;height:auto;aspect-ratio:16/9;object-fit:cover}
-        .lesson-card-title{font-size:1.5rem;font-weight:700;padding:20px;margin:0}
-        .resources-section{text-align:left;max-width:800px;margin:0 auto}
-        .resources-section h3{font-size:1.8rem;font-weight:700;margin:40px 0 20px;text-align:center}
-        .resources-section ul{list-style:disc;padding-left:25px;line-height:1.8}
-        .resources-section ul li{margin-bottom:10px}
-        .resources-section a{color:var(--color-purple-dark);font-weight:500;text-decoration:underline}
+        
+        .lesson-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:30px;margin-top:50px}
+        .lesson-card{background-color:#fff;border-radius:16px;overflow:hidden;text-align:left;box-shadow:0 8px 24px rgba(0,0,0,0.08);transition:transform .3s ease, box-shadow .3s ease; display:flex; flex-direction:column; text-decoration: none;}
+        .lesson-card:hover{transform:translateY(-8px);box-shadow:0 12px 32px rgba(0,0,0,0.12);}
+        .lesson-card-image-wrapper{width:100%;aspect-ratio:16/9;overflow:hidden;}
+        .lesson-card-image{width:100%;height:100%;object-fit:cover;}
+        .lesson-card-content{padding:25px;flex-grow:1;}
+        .lesson-card-title{font-size:1.5rem;font-weight:700;margin:0;color:var(--color-text);}
+        
+        .resources-section{background-color:var(--color-pink); --section-text:var(--color-pink-dark);}
+        .resource-grid{display:grid;grid-template-columns:repeat(auto-fit, minmax(280px, 1fr));gap:25px;text-align:left;margin-top:40px;}
+        .resource-card{background-color:rgba(255,255,255,0.7);padding:25px;border-radius:12px;text-decoration:none;color:var(--color-pink-dark);transition:background-color .3s ease, transform .3s ease;}
+        .resource-card:hover{background-color:#fff;transform:translateY(-5px);}
+        .resource-card h4{margin:0 0 10px;font-size:1.2rem;font-weight:700;}
+        .resource-card p{margin:0;line-height:1.5;font-size:0.95rem;}
+        
         @media (max-width:768px){.hero-banner{background-attachment:scroll}.hero-banner h1{font-size:2.2rem}}
     </style>
 </head>
@@ -38,46 +45,68 @@
             <div class="container">
                 <h2 class="section-title lang-switch" data-en="More Coming Soon!" data-es="¡Pronto Habrá Más!"></h2>
                 <div class="lesson-grid">
-                    <div class="lesson-card scroll-animated">
-                        <img src="https://i.imgur.com/WEjnuyf.png" alt="Biology Lesson">
-                        <h3 class="lesson-card-title lang-switch" data-en="Biology" data-es="Biología"></h3>
-                    </div>
-                    <div class="lesson-card scroll-animated">
-                        <img src="https://i.imgur.com/zDNSXdb.png" alt="Math Lesson">
-                        <h3 class="lesson-card-title lang-switch" data-en="Math" data-es="Matemáticas"></h3>
-                    </div>
-                    <div class="lesson-card scroll-animated">
-                        <img src="https://i.imgur.com/LV7iu0S.png" alt="Physics Lesson">
-                        <h3 class="lesson-card-title lang-switch" data-en="Physics" data-es="Física"></h3>
-                    </div>
-                    <div class="lesson-card scroll-animated">
-                        <img src="https://i.imgur.com/Po9o3Rn.png" alt="Chemistry Lesson">
-                        <h3 class="lesson-card-title lang-switch" data-en="Chemistry" data-es="Química"></h3>
-                    </div>
+                    <a href="#" class="lesson-card scroll-animated">
+                        <div class="lesson-card-image-wrapper"><img src="https://i.imgur.com/WEjnuyf.png" alt="Biology Lesson" class="lesson-card-image"></div>
+                        <div class="lesson-card-content"><h3 class="lesson-card-title lang-switch" data-en="Biology" data-es="Biología"></h3></div>
+                    </a>
+                    <a href="#" class="lesson-card scroll-animated">
+                        <div class="lesson-card-image-wrapper"><img src="https://i.imgur.com/zDNSXdb.png" alt="Math Lesson" class="lesson-card-image"></div>
+                        <div class="lesson-card-content"><h3 class="lesson-card-title lang-switch" data-en="Math" data-es="Matemáticas"></h3></div>
+                    </a>
+                    <a href="#" class="lesson-card scroll-animated">
+                        <div class="lesson-card-image-wrapper"><img src="https://i.imgur.com/LV7iu0S.png" alt="Physics Lesson" class="lesson-card-image"></div>
+                        <div class="lesson-card-content"><h3 class="lesson-card-title lang-switch" data-en="Physics" data-es="Física"></h3></div>
+                    </a>
+                    <a href="#" class="lesson-card scroll-animated">
+                        <div class="lesson-card-image-wrapper"><img src="https://i.imgur.com/Po9o3Rn.png" alt="Chemistry Lesson" class="lesson-card-image"></div>
+                        <div class="lesson-card-content"><h3 class="lesson-card-title lang-switch" data-en="Chemistry" data-es="Química"></h3></div>
+                    </a>
                 </div>
             </div>
         </section>
 
-        <section class="section" style="--section-bg: var(--color-pink); --section-text: #4b0082;">
+        <section class="section resources-section">
             <div class="container">
-                <div class="resources-section scroll-animated">
-                    <h2 class="section-title lang-switch" data-en="Additional Resources" data-es="Recursos Adicionales"></h2>
-                    
-                    <h3 class="lang-switch" data-en="FAST Exams and State Standards" data-es="Exámenes FAST y Estándares Estatales"></h3>
-                    <ul>
-                        <li><a href="http://flfast.org/families.html" target="_blank" class="lang-switch" data-en="Florida Dept. of Education: State Exam Standards" data-es="Dept. de Educación de Florida: Estándares de Exámenes Estatales"></a></li>
-                        <li><a href="https://www.floridastudents.org/" target="_blank" class="lang-switch" data-en="Florida CPALMS: Learning Resources by Grade Level" data-es="CPALMS de Florida: Recursos de aprendizaje por nivel de grado"></a></li>
-                        <li><a href="http://flfast.org/families.html" target="_blank" class="lang-switch" data-en="FAST Website: Practice Questions and Answers" data-es="Sitio Web de FAST: Preguntas y respuestas de práctica"></a></li>
-                    </ul>
+                <h2 class="section-title lang-switch" data-en="Additional Resources" data-es="Recursos Adicionales"></h2>
+                
+                <h3 class="section-subtitle lang-switch" data-en="FAST Exams and State Standards" data-es="Exámenes FAST y Estándares Estatales"></h3>
+                <div class="resource-grid">
+                    <a href="http://flfast.org/families.html" target="_blank" class="resource-card scroll-animated">
+                        <h4 class="lang-switch" data-en="Florida Dept. of Education" data-es="Dept. de Educación de Florida"></h4>
+                        <p class="lang-switch" data-en="Official information on state exam standards." data-es="Información oficial sobre los estándares de los exámenes estatales."></p>
+                    </a>
+                    <a href="https://www.floridastudents.org/" target="_blank" class="resource-card scroll-animated">
+                        <h4 class="lang-switch" data-en="Florida CPALMS" data-es="CPALMS de Florida"></h4>
+                        <p class="lang-switch" data-en="Learning resources and tutorials sorted by grade level." data-es="Recursos de aprendizaje y tutoriales ordenados por nivel de grado."></p>
+                    </a>
+                    <a href="http://flfast.org/families.html" target="_blank" class="resource-card scroll-animated">
+                        <h4 class="lang-switch" data-en="FAST Website" data-es="Sitio Web de FAST"></h4>
+                        <p class="lang-switch" data-en="Practice questions and answers for state assessments." data-es="Preguntas y respuestas de práctica para las evaluaciones estatales."></p>
+                    </a>
+                </div>
 
-                    <h3 class="lang-switch" data-en="General Help with Learning English" data-es="Ayuda General para Aprender Inglés"></h3>
-                    <ul>
-                        <li><a href="http://khanacademy.org/" target="_blank" class="lang-switch" data-en="Khan Academy: Lessons by Subject" data-es="Khan Academy: Lecciones por tema"></a></li>
-                        <li><a href="https://www.esolcourses.com/" target="_blank" class="lang-switch" data-en="English Lessons for Reading, Writing, and Listening" data-es="Clases de inglés para leer, escribir y escuchar"></a></li>
-                        <li><a href="https://www.grammarbank.com/beginners-grammar-worksheets.html" target="_blank" class="lang-switch" data-en="General Knowledge and English Grammar Lessons" data-es="Lecciones de conocimientos generales y gramática de inglés"></a></li>
-                        <li><a href="https://www.englishclub.com/?utm_source=EClogo" target="_blank" class="lang-switch" data-en="English Club: English Lessons and Quizzes" data-es="English Club: Lecciones y exámenes de inglés"></a></li>
-                        <li><a href="http://poorvucenter.yale.edu/graduate-students/writing-resources-tutorials/downloadable-english-grammar-tutorials" target="_blank" class="lang-switch" data-en="English Writing Lessons" data-es="Lecciones de escritura en inglés"></a></li>
-                    </ul>
+                <h3 class="section-subtitle lang-switch" style="margin-top: 60px;" data-en="General Help with Learning English" data-es="Ayuda General para Aprender Inglés"></h3>
+                <div class="resource-grid">
+                    <a href="http://khanacademy.org/" target="_blank" class="resource-card scroll-animated">
+                        <h4>Khan Academy</h4>
+                        <p class="lang-switch" data-en="Comprehensive lessons and exercises for all subjects." data-es="Lecciones y ejercicios completos para todas las materias."></p>
+                    </a>
+                    <a href="https://www.esolcourses.com/" target="_blank" class="resource-card scroll-animated">
+                        <h4>ESOL Courses</h4>
+                        <p class="lang-switch" data-en="Free English lessons for reading, writing, and listening." data-es="Clases de inglés gratuitas para leer, escribir y escuchar."></p>
+                    </a>
+                    <a href="https://www.grammarbank.com/beginners-grammar-worksheets.html" target="_blank" class="resource-card scroll-animated">
+                        <h4>GrammarBank</h4>
+                        <p class="lang-switch" data-en="General knowledge and English grammar lessons." data-es="Lecciones de conocimientos generales y gramática inglesa."></p>
+                    </a>
+                    <a href="https://www.englishclub.com/?utm_source=EClogo" target="_blank" class="resource-card scroll-animated">
+                        <h4>EnglishClub</h4>
+                        <p class="lang-switch" data-en="A wide variety of English lessons and quizzes." data-es="Una amplia variedad de lecciones y cuestionarios de inglés."></p>
+                    </a>
+                    <a href="http://poorvucenter.yale.edu/graduate-students/writing-resources-tutorials/downloadable-english-grammar-tutorials" target="_blank" class="resource-card scroll-animated">
+                        <h4>Yale Poorvu Center</h4>
+                        <p class="lang-switch" data-en="Downloadable English grammar and writing tutorials." data-es="Tutoriales descargables de gramática y escritura en inglés."></p>
+                    </a>
                 </div>
             </div>
         </section>
