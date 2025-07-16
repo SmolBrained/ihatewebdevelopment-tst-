@@ -177,7 +177,7 @@
                 const final = parseInt(el.dataset.final, 10);
                 if (isNaN(final)) return;
                 let start = null;
-                const duration = 1000;
+                const duration = 800;
                 const step = (timestamp) => {
                     if (!start) start = timestamp;
                     const progress = Math.min((timestamp - start) / duration, 1);
