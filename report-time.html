@@ -11,16 +11,14 @@
         .hero-banner .overlay{position:absolute;top:0;left:0;width:100%;height:100%;background-color:rgba(0,0,0,.5);z-index:2}
         .hero-banner .content{position:relative;z-index:3}
         .hero-banner h1{font-size:3.8rem;font-weight:900;margin:0;line-height:1.2}
-        .report-time-layout{display:grid;grid-template-columns:1fr 2fr;gap:50px;align-items:center;margin-top:50px}
-        .report-time-image-container img{max-width:100%;height:auto}
+        .report-time-form-container{max-width:800px; margin: 40px auto 0;}
         .report-time-form-container iframe{
             width: 100%;
-            height: 1280px;
+            height: 1300px;
             border-radius:12px;
             box-shadow:0 5px 15px rgba(0,0,0,.1);
             border: none;
         }
-        @media (max-width:900px){.report-time-layout{grid-template-columns:1fr}.report-time-image-container{max-width:300px;margin:0 auto 40px}}
         @media (max-width:768px){.hero-banner{background-attachment:scroll}.hero-banner h1{font-size:2.2rem}}
     </style>
 </head>
@@ -39,13 +37,8 @@
             <div class="container">
                 <h2 class="section-title lang-switch" data-en="Report Your Time" data-es="Reporta Tus Horas"></h2>
                 <p class="section-subtitle lang-switch" data-en="Have you volunteered with Literary Speaking? Report your time below." data-es="¿Has sido voluntario con Literary Speaking? Reporta tu tiempo a continuación."></p>
-                <div class="report-time-layout">
-                    <div class="report-time-image-container scroll-animated">
-                        <img src="https://i.imgur.com/WPy5YDY.png" alt="Report Time Graphic">
-                    </div>
-                    <div class="report-time-form-container scroll-animated">
-                        <iframe src="https://docs.google.com/forms/d/e/1FAIpQLSepYvMXIJLKUDRzMvFyjyP92UnoECTUE98S-X370GGXEGJo4A/viewform?embedded=true">Loading…</iframe>
-                    </div>
+                <div class="report-time-form-container scroll-animated">
+                    <iframe src="https://docs.google.com/forms/d/e/1FAIpQLSepYvMXIJLKUDRzMvFyjyP92UnoECTUE98S-X370GGXEGJo4A/viewform?embedded=true">Loading…</iframe>
                 </div>
             </div>
         </section>
