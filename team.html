@@ -155,7 +155,7 @@ Tutoría y Mentoría de Literary Speaking"></p>
                 });
             }, { threshold: 0.1 });
 
-            const populateTeamSection = (containerSelector, membersList) => {
+            const populateTeamSection = (containerSelector, membersList, lang) => {
                 const grid = document.querySelector(containerSelector);
                 if (!grid || !siteRouter.members) return;
                 grid.innerHTML = '';
@@ -173,7 +173,8 @@ Tutoría y Mentoría de Literary Speaking"></p>
 
                     let titleHTML = '';
                     if (hasTitle) {
-                        titleHTML = `<p class="team-member-title lang-switch" data-en="${item.title_en}" data-es="${item.title_es}"></p>`;
+                        const title = item[`title_${lang}`] || item.title_en;
+                        titleHTML = `<p class="team-member-title">${title}</p>`;
                     }
 
                     memberEl.innerHTML = `
@@ -189,12 +190,13 @@ Tutoría y Mentoría de Literary Speaking"></p>
                 });
             };
             
-            populateTeamSection('#pwb-board-grid', pwbBoard);
-            populateTeamSection('#mcp-board-grid', mcpBoard);
-            populateTeamSection('#newsletter-grid', newsletterTeam);
-            populateTeamSection('#tutors-grid', tutors);
-            populateTeamSection('#outreach-grid', outreachTeam);
-            populateTeamSection('#previous-volunteers-grid', previousVolunteers);
+            const currentLang = localStorage.getItem('language') || 'en';
+            populateTeamSection('#pwb-board-grid', pwbBoard, currentLang);
+            populateTeamSection('#mcp-board-grid', mcpBoard, currentLang);
+            populateTeamSection('#newsletter-grid', newsletterTeam, currentLang);
+            populateTeamSection('#tutors-grid', tutors, currentLang);
+            populateTeamSection('#outreach-grid', outreachTeam, currentLang);
+            populateTeamSection('#previous-volunteers-grid', previousVolunteers, currentLang);
             
             document.querySelectorAll('.scroll-animated:not(.team-member)').forEach(el => observer.observe(el));
         });
