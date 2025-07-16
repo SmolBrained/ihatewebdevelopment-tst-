@@ -37,6 +37,9 @@
         .sidebar-widget ul li a{text-decoration:none;color:var(--color-text-light);font-weight:500;cursor:pointer;font-size:1rem;}
         .sidebar-widget ul li a:hover{color:var(--color-purple-dark);}
         .sidebar-widget ul li a.active-filter{color:var(--color-purple-dark);font-weight:700;}
+        
+        .filter-title {text-align:left;font-size:1.5rem;font-weight:700;margin-bottom:30px;border-bottom:1px solid #eee;padding-bottom:15px;}
+        .filter-title span {font-weight:400;color:var(--color-text-light);}
 
         @media (max-width:900px){.articles-layout{grid-template-columns:1fr;}.sidebar{position:static;margin-top:60px;}}
         @media (max-width:768px){.hero-banner{background-attachment:scroll;}.hero-banner h1{font-size:2.2rem;}.article-grid{grid-template-columns:1fr;}}
@@ -56,7 +59,9 @@
         <section class="section">
             <div class="container">
                 <div class="articles-layout">
-                    <div class="article-grid" id="article-grid-container">
+                    <div class="articles-main">
+                        <div id="filter-title-container"></div>
+                        <div class="article-grid" id="article-grid-container"></div>
                     </div>
                     <aside class="sidebar scroll-animated" id="sidebar-container">
                     </aside>
@@ -74,6 +79,7 @@
             const articles = await fetch('articles.json').then(res => res.json());
             const gridContainer = document.getElementById('article-grid-container');
             const sidebarContainer = document.getElementById('sidebar-container');
+            const filterTitleContainer = document.getElementById('filter-title-container');
             
             let currentFilters = { author: 'all', archive: 'all', category: 'all' };
 
@@ -107,7 +113,10 @@
                     const date = new Date(article.date);
                     const yearMonth = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
                     if (!archives.has(yearMonth)) {
-                        const monthName = date.toLocaleDateString(lang.startsWith('es') ? 'es-ES' : 'en-US', { month: 'long', year: 'numeric' });
+                        let monthName = date.toLocaleDateString(lang.startsWith('es') ? 'es-ES' : 'en-US', { month: 'long', year: 'numeric' });
+                        if (lang.startsWith('es')) {
+                            monthName = monthName.charAt(0).toUpperCase() + monthName.slice(1);
+                        }
                         archives.set(yearMonth, monthName);
                     }
                 });
@@ -146,6 +155,22 @@
                 sidebarContainer.querySelectorAll('a[data-filter-type]').forEach(link => {
                     link.addEventListener('click', handleFilterClick);
                 });
+            };
+
+            const updateFilterTitle = (lang) => {
+                let title = '';
+                if (currentFilters.author !== 'all') {
+                    const authorName = siteRouter.members[currentFilters.author]?.name || '';
+                    title = `<h2 class="filter-title">${lang === 'es' ? 'Autor' : 'Author'}: <span>${authorName}</span></h2>`;
+                } else if (currentFilters.archive !== 'all') {
+                    const archives = getUniqueSidebarData(lang).archives;
+                    title = `<h2 class="filter-title">${lang === 'es' ? 'Archivo' : 'Archive'}: <span>${archives.get(currentFilters.archive)}</span></h2>`;
+                } else if (currentFilters.category !== 'all') {
+                    const categories = getUniqueSidebarData(lang).categories;
+                    const categoryName = categories.get(currentFilters.category)?.[lang] || '';
+                    title = `<h2 class="filter-title">${lang === 'es' ? 'Categoría' : 'Category'}: <span>${categoryName}</span></h2>`;
+                }
+                filterTitleContainer.innerHTML = title;
             };
 
             const populateGrid = (lang) => {
@@ -192,6 +217,7 @@
                     observer.observe(card);
                     card.addEventListener('click', () => siteRouter.navigateTo('article-single', article.id));
                 });
+                updateFilterTitle(lang);
             };
 
             const handleFilterClick = (event) => {
@@ -200,11 +226,14 @@
                 const filterType = link.dataset.filterType;
                 const filterValue = link.dataset.filterValue;
 
+                currentFilters = { author: 'all', archive: 'all', category: 'all' };
                 currentFilters[filterType] = filterValue;
 
-                const parentWidget = link.closest('.sidebar-widget');
-                parentWidget.querySelectorAll('a').forEach(l => l.classList.remove('active-filter'));
-                link.classList.add('active-filter');
+                sidebarContainer.querySelectorAll('a').forEach(l => l.classList.remove('active-filter'));
+                
+                document.querySelectorAll(`#authors-list a[data-filter-value="${currentFilters.author}"]`).forEach(l => l.classList.add('active-filter'));
+                document.querySelectorAll(`#archives-list a[data-filter-value="${currentFilters.archive}"]`).forEach(l => l.classList.add('active-filter'));
+                document.querySelectorAll(`#categories-list a[data-filter-value="${currentFilters.category}"]`).forEach(l => l.classList.add('active-filter'));
                 
                 populateGrid(document.documentElement.lang);
             };
