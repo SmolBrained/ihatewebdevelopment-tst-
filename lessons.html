@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lessons - Literary Speaking</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .hero-banner{height:60vh;min-height:400px;display:flex;align-items:center;justify-content:center;color:#fff;text-align:center;position:relative;padding:0 20px;background-image:url(https://i.imgur.com/f9KmpRG.jpeg);background-attachment:fixed;background-position:center;background-repeat:no-repeat;background-size:cover}
+        .hero-banner .overlay{position:absolute;top:0;left:0;width:100%;height:100%;background-color:rgba(0,0,0,.5);z-index:2}
+        .hero-banner .content{position:relative;z-index:3}
+        .hero-banner h1{font-size:3.8rem;font-weight:900;margin:0;line-height:1.2}
+        .lesson-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:30px;margin-top:50px}
+        .lesson-card{background-color:#fff;border-radius:12px;overflow:hidden;text-align:center;box-shadow:0 5px 15px rgba(0,0,0,.08)}
+        .lesson-card img{width:100%;height:auto;aspect-ratio:16/9;object-fit:cover}
+        .lesson-card-title{font-size:1.5rem;font-weight:700;padding:20px;margin:0}
+        .resources-section{text-align:left;max-width:800px;margin:0 auto}
+        .resources-section h3{font-size:1.8rem;font-weight:700;margin:40px 0 20px;text-align:center}
+        .resources-section ul{list-style:disc;padding-left:25px;line-height:1.8}
+        .resources-section ul li{margin-bottom:10px}
+        .resources-section a{color:var(--color-purple-dark);font-weight:500;text-decoration:underline}
+        @media (max-width:768px){.hero-banner{background-attachment:scroll}.hero-banner h1{font-size:2.2rem}}
+    </style>
+</head>
+<body data-current-page="lessons">
+    <header class="site-header" id="header"></header>
+
+    <main>
+        <section class="hero-banner">
+            <div class="overlay"></div>
+            <div class="content scroll-animated">
+                <h1 class="lang-switch" data-en="Lessons" data-es="Lecciones"></h1>
+            </div>
+        </section>
+
+        <section class="section" style="--section-bg: #e6f2ff;">
+            <div class="container">
+                <h2 class="section-title lang-switch" data-en="More Coming Soon!" data-es="¡Pronto Habrá Más!"></h2>
+                <div class="lesson-grid">
+                    <div class="lesson-card scroll-animated">
+                        <img src="https://i.imgur.com/WEjnuyf.png" alt="Biology Lesson">
+                        <h3 class="lesson-card-title lang-switch" data-en="Biology" data-es="Biología"></h3>
+                    </div>
+                    <div class="lesson-card scroll-animated">
+                        <img src="https://i.imgur.com/zDNSXdb.png" alt="Math Lesson">
+                        <h3 class="lesson-card-title lang-switch" data-en="Math" data-es="Matemáticas"></h3>
+                    </div>
+                    <div class="lesson-card scroll-animated">
+                        <img src="https://i.imgur.com/LV7iu0S.png" alt="Physics Lesson">
+                        <h3 class="lesson-card-title lang-switch" data-en="Physics" data-es="Física"></h3>
+                    </div>
+                    <div class="lesson-card scroll-animated">
+                        <img src="https://i.imgur.com/Po9o3Rn.png" alt="Chemistry Lesson">
+                        <h3 class="lesson-card-title lang-switch" data-en="Chemistry" data-es="Química"></h3>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="section" style="--section-bg: var(--color-pink); --section-text: #4b0082;">
+            <div class="container">
+                <div class="resources-section scroll-animated">
+                    <h2 class="section-title lang-switch" data-en="Additional Resources" data-es="Recursos Adicionales"></h2>
+                    
+                    <h3 class="lang-switch" data-en="FAST Exams and State Standards" data-es="Exámenes FAST y Estándares Estatales"></h3>
+                    <ul>
+                        <li><a href="http://flfast.org/families.html" target="_blank" class="lang-switch" data-en="Florida Dept. of Education: State Exam Standards" data-es="Dept. de Educación de Florida: Estándares de Exámenes Estatales"></a></li>
+                        <li><a href="https://www.floridastudents.org/" target="_blank" class="lang-switch" data-en="Florida CPALMS: Learning Resources by Grade Level" data-es="CPALMS de Florida: Recursos de aprendizaje por nivel de grado"></a></li>
+                        <li><a href="http://flfast.org/families.html" target="_blank" class="lang-switch" data-en="FAST Website: Practice Questions and Answers" data-es="Sitio Web de FAST: Preguntas y respuestas de práctica"></a></li>
+                    </ul>
+
+                    <h3 class="lang-switch" data-en="General Help with Learning English" data-es="Ayuda General para Aprender Inglés"></h3>
+                    <ul>
+                        <li><a href="http://khanacademy.org/" target="_blank" class="lang-switch" data-en="Khan Academy: Lessons by Subject" data-es="Khan Academy: Lecciones por tema"></a></li>
+                        <li><a href="https://www.esolcourses.com/" target="_blank" class="lang-switch" data-en="English Lessons for Reading, Writing, and Listening" data-es="Clases de inglés para leer, escribir y escuchar"></a></li>
+                        <li><a href="https://www.grammarbank.com/beginners-grammar-worksheets.html" target="_blank" class="lang-switch" data-en="General Knowledge and English Grammar Lessons" data-es="Lecciones de conocimientos generales y gramática de inglés"></a></li>
+                        <li><a href="https://www.englishclub.com/?utm_source=EClogo" target="_blank" class="lang-switch" data-en="English Club: English Lessons and Quizzes" data-es="English Club: Lecciones y exámenes de inglés"></a></li>
+                        <li><a href="http://poorvucenter.yale.edu/graduate-students/writing-resources-tutorials/downloadable-english-grammar-tutorials" target="_blank" class="lang-switch" data-en="English Writing Lessons" data-es="Lecciones de escritura en inglés"></a></li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="site-footer"></footer>
+
+    <script src="router.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('is-visible');
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, { threshold: 0.1 });
+
+            document.querySelectorAll('main .scroll-animated').forEach(el => {
+                observer.observe(el);
+            });
+        });
+    </script>
+</body>
+</html>
