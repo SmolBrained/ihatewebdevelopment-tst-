@@ -79,8 +79,8 @@
 
                 const contentContainer = document.getElementById('article-content');
                 const formattedContent = article[`content_${lang}`]
-                    .split(/\n+/)
-                    .map(p => `<p>${p.trim()}</p>`)
+                    .split('\n\n')
+                    .map(paragraph => `<p>${paragraph.replace(/\n/g, '<br>')}</p>`)
                     .join('');
                 contentContainer.innerHTML = formattedContent;
 
