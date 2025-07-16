@@ -12,7 +12,13 @@
         .hero-banner h1{font-size:3.8rem;font-weight:900;margin:0;line-height:1.2}
         .report-time-layout{display:grid;grid-template-columns:1fr 2fr;gap:50px;align-items:center;margin-top:50px}
         .report-time-image-container img{max-width:100%;height:auto}
-        .report-time-form-container iframe{border-radius:12px;box-shadow:0 5px 15px rgba(0,0,0,.1);width:100%;}
+        .report-time-form-container iframe{
+            width: 100%;
+            height: 1800px; /* A large, fixed height to ensure all content is visible */
+            border-radius:12px;
+            box-shadow:0 5px 15px rgba(0,0,0,.1);
+            border: none;
+        }
         @media (max-width:900px){.report-time-layout{grid-template-columns:1fr}.report-time-image-container{max-width:300px;margin:0 auto 40px}}
         @media (max-width:768px){.hero-banner{background-attachment:scroll}.hero-banner h1{font-size:2.2rem}}
     </style>
@@ -37,7 +43,7 @@
                         <img src="https://i.imgur.com/WPy5YDY.png" alt="Report Time Graphic">
                     </div>
                     <div class="report-time-form-container scroll-animated">
-                        <iframe id="google-form" src="https://docs.google.com/forms/d/e/1FAIpQLSepYvMXIJLKUDRzMvFyjyP92UnoECTUE98S-X370GGXEGJo4A/viewform?embedded=true" frameborder="0" marginheight="0" marginwidth="0">Loading…</iframe>
+                        <iframe src="https://docs.google.com/forms/d/e/1FAIpQLSepYvMXIJLKUDRzMvFyjyP92UnoECTUE98S-X370GGXEGJo4A/viewform?embedded=true">Loading…</iframe>
                     </div>
                 </div>
             </div>
@@ -61,18 +67,6 @@
             document.querySelectorAll('main .scroll-animated').forEach(el => {
                 observer.observe(el);
             });
-
-            const googleForm = document.getElementById('google-form');
-            if (googleForm) {
-                window.addEventListener('message', (event) => {
-                    if (event.origin.includes('google.com')) {
-                        const data = JSON.parse(event.data);
-                        if (data.type === 'resize' && data.height) {
-                            googleForm.style.height = `${data.height}px`;
-                        }
-                    }
-                });
-            }
         });
     </script>
 </body>
