@@ -37,9 +37,6 @@
         .sidebar-widget ul li a{text-decoration:none;color:var(--color-text-light);font-weight:500;cursor:pointer;font-size:1rem;}
         .sidebar-widget ul li a:hover{color:var(--color-purple-dark);}
         .sidebar-widget ul li a.active-filter{color:var(--color-purple-dark);font-weight:700;}
-        
-        .filter-title {text-align:left;font-size:1.5rem;font-weight:700;margin-bottom:30px;border-bottom:1px solid #eee;padding-bottom:15px;}
-        .filter-title span {font-weight:400;color:var(--color-text-light);}
 
         @media (max-width:900px){.articles-layout{grid-template-columns:1fr;}.sidebar{position:static;margin-top:60px;}}
         @media (max-width:768px){.hero-banner{background-attachment:scroll;}.hero-banner h1{font-size:2.2rem;}.article-grid{grid-template-columns:1fr;}}
@@ -59,9 +56,7 @@
         <section class="section">
             <div class="container">
                 <div class="articles-layout">
-                    <div class="articles-main">
-                        <div id="filter-title-container"></div>
-                        <div class="article-grid" id="article-grid-container"></div>
+                    <div class="article-grid" id="article-grid-container">
                     </div>
                     <aside class="sidebar scroll-animated" id="sidebar-container">
                     </aside>
@@ -79,7 +74,6 @@
             const articles = await fetch('articles.json').then(res => res.json());
             const gridContainer = document.getElementById('article-grid-container');
             const sidebarContainer = document.getElementById('sidebar-container');
-            const filterTitleContainer = document.getElementById('filter-title-container');
             
             let currentFilters = { author: 'all', archive: 'all', category: 'all' };
 
@@ -142,7 +136,7 @@
 
                 const createList = (listId, data, type, nameField) => {
                     const list = document.getElementById(listId);
-                    list.innerHTML = `<li><a href="#" class="active-filter" data-filter-type="${type}" data-filter-value="all">${lang === 'es' ? 'Todo' : 'All'}</a></li>`;
+                    list.innerHTML = `<li><a href="#" data-filter-type="${type}" data-filter-value="all">${lang === 'es' ? 'Todo' : 'All'}</a></li>`;
                     data.forEach((value, key) => {
                         list.innerHTML += `<li><a href="#" data-filter-type="${type}" data-filter-value="${key}">${nameField ? value[nameField] : value}</a></li>`;
                     });
@@ -155,22 +149,14 @@
                 sidebarContainer.querySelectorAll('a[data-filter-type]').forEach(link => {
                     link.addEventListener('click', handleFilterClick);
                 });
+                updateActiveFilters();
             };
 
-            const updateFilterTitle = (lang) => {
-                let title = '';
-                if (currentFilters.author !== 'all') {
-                    const authorName = siteRouter.members[currentFilters.author]?.name || '';
-                    title = `<h2 class="filter-title">${lang === 'es' ? 'Autor' : 'Author'}: <span>${authorName}</span></h2>`;
-                } else if (currentFilters.archive !== 'all') {
-                    const archives = getUniqueSidebarData(lang).archives;
-                    title = `<h2 class="filter-title">${lang === 'es' ? 'Archivo' : 'Archive'}: <span>${archives.get(currentFilters.archive)}</span></h2>`;
-                } else if (currentFilters.category !== 'all') {
-                    const categories = getUniqueSidebarData(lang).categories;
-                    const categoryName = categories.get(currentFilters.category)?.[lang] || '';
-                    title = `<h2 class="filter-title">${lang === 'es' ? 'Categoría' : 'Category'}: <span>${categoryName}</span></h2>`;
-                }
-                filterTitleContainer.innerHTML = title;
+            const updateActiveFilters = () => {
+                sidebarContainer.querySelectorAll('a').forEach(l => l.classList.remove('active-filter'));
+                document.querySelector(`#authors-list a[data-filter-value="${currentFilters.author}"]`)?.classList.add('active-filter');
+                document.querySelector(`#archives-list a[data-filter-value="${currentFilters.archive}"]`)?.classList.add('active-filter');
+                document.querySelector(`#categories-list a[data-filter-value="${currentFilters.category}"]`)?.classList.add('active-filter');
             };
 
             const populateGrid = (lang) => {
@@ -193,31 +179,31 @@
                     const authorMatch = currentFilters.author === 'all' || card.dataset.author === currentFilters.author;
                     const archiveMatch = currentFilters.archive === 'all' || card.dataset.archive === currentFilters.archive;
                     const categoryMatch = currentFilters.category === 'all' || card.dataset.category === currentFilters.category;
-                    card.style.display = (authorMatch && archiveMatch && categoryMatch) ? 'flex' : 'none';
-
-                    card.innerHTML = `
-                        <div class="article-card-image-wrapper">
-                            <img src="${article.image}" alt="" class="article-card-image">
-                            <div class="article-card-category">${article[`category_${lang}`]}</div>
-                        </div>
-                        <div class="article-card-content">
-                            <div class="article-card-meta">
-                                <span><svg fill="currentColor" viewBox="0 0 16 16"><path d="M3 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1zm5-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6"/></svg>${authorName}</span>
-                                <span><svg fill="currentColor" viewBox="0 0 16 16"><path d="M3.5 0a.5.5 0 0 1 .5.5V1h8V.5a.5.5 0 0 1 1 0V1h1a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h1V.5a.5.5 0 0 1 .5-.5M1 4v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V4z"/></svg>${displayDate}</span>
+                    
+                    if (authorMatch && archiveMatch && categoryMatch) {
+                        card.innerHTML = `
+                            <div class="article-card-image-wrapper">
+                                <img src="${article.image}" alt="" class="article-card-image">
+                                <div class="article-card-category">${article[`category_${lang}`]}</div>
                             </div>
-                            <h3 class="article-card-title">${article[`title_${lang}`]}</h3>
-                            <p class="article-card-excerpt">${article[`excerpt_${lang}`]}</p>
-                        </div>
-                        <div class="article-card-footer">
-                            <span>${article[`read_time_${lang}`]}</span>
-                            <span class="read-more-link">${lang === 'es' ? 'Leer Más' : 'Read More'}<svg fill="currentColor" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M4 8a.5.5 0 0 1 .5-.5h5.793L8.146 5.354a.5.5 0 1 1 .708-.708l3 3a.5.5 0 0 1 0 .708l-3 3a.5.5 0 0 1-.708-.708L10.293 8.5H4.5A.5.5 0 0 1 4 8"/></svg></span>
-                        </div>
-                    `;
-                    gridContainer.appendChild(card);
-                    observer.observe(card);
-                    card.addEventListener('click', () => siteRouter.navigateTo('article-single', article.id));
+                            <div class="article-card-content">
+                                <div class="article-card-meta">
+                                    <span><svg fill="currentColor" viewBox="0 0 16 16"><path d="M3 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1zm5-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6"/></svg>${authorName}</span>
+                                    <span><svg fill="currentColor" viewBox="0 0 16 16"><path d="M3.5 0a.5.5 0 0 1 .5.5V1h8V.5a.5.5 0 0 1 1 0V1h1a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h1V.5a.5.5 0 0 1 .5-.5M1 4v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V4z"/></svg>${displayDate}</span>
+                                </div>
+                                <h3 class="article-card-title">${article[`title_${lang}`]}</h3>
+                                <p class="article-card-excerpt">${article[`excerpt_${lang}`]}</p>
+                            </div>
+                            <div class="article-card-footer">
+                                <span>${article[`read_time_${lang}`]}</span>
+                                <span class="read-more-link">${lang === 'es' ? 'Leer Más' : 'Read More'}<svg fill="currentColor" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M4 8a.5.5 0 0 1 .5-.5h5.793L8.146 5.354a.5.5 0 1 1 .708-.708l3 3a.5.5 0 0 1 0 .708l-3 3a.5.5 0 0 1-.708-.708L10.293 8.5H4.5A.5.5 0 0 1 4 8"/></svg></span>
+                            </div>
+                        `;
+                        gridContainer.appendChild(card);
+                        observer.observe(card);
+                        card.addEventListener('click', () => siteRouter.navigateTo('article-single', article.id));
+                    }
                 });
-                updateFilterTitle(lang);
             };
 
             const handleFilterClick = (event) => {
@@ -226,15 +212,8 @@
                 const filterType = link.dataset.filterType;
                 const filterValue = link.dataset.filterValue;
 
-                currentFilters = { author: 'all', archive: 'all', category: 'all' };
                 currentFilters[filterType] = filterValue;
-
-                sidebarContainer.querySelectorAll('a').forEach(l => l.classList.remove('active-filter'));
-                
-                document.querySelectorAll(`#authors-list a[data-filter-value="${currentFilters.author}"]`).forEach(l => l.classList.add('active-filter'));
-                document.querySelectorAll(`#archives-list a[data-filter-value="${currentFilters.archive}"]`).forEach(l => l.classList.add('active-filter'));
-                document.querySelectorAll(`#categories-list a[data-filter-value="${currentFilters.category}"]`).forEach(l => l.classList.add('active-filter'));
-                
+                updateActiveFilters();
                 populateGrid(document.documentElement.lang);
             };
 
