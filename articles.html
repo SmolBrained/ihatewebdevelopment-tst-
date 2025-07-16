@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Articles - Literary Speaking</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .hero-banner{height:60vh;min-height:400px;display:flex;align-items:center;justify-content:center;color:#fff;text-align:center;position:relative;padding:0 20px;background-image:url(https://i.imgur.com/f9KmpRG.jpeg);background-attachment:fixed;background-position:center;background-repeat:no-repeat;background-size:cover}
+        .hero-banner .overlay{position:absolute;top:0;left:0;width:100%;height:100%;background-color:rgba(0,0,0,.5);z-index:2}
+        .hero-banner .content{position:relative;z-index:3}
+        .hero-banner h1{font-size:3.8rem;font-weight:900;margin:0;line-height:1.2}
+        
+        .article-grid {display:grid;grid-template-columns:repeat(auto-fit, minmax(320px, 1fr));gap:30px;margin-top:40px;}
+        .article-card {background-color:#fff;border-radius:16px;overflow:hidden;box-shadow:0 8px 24px rgba(0,0,0,0.08);transition:transform .3s ease, box-shadow .3s ease;display:flex;flex-direction:column;text-align:left;cursor:pointer;}
+        .article-card:hover {transform:translateY(-8px);box-shadow:0 12px 32px rgba(0,0,0,0.12);}
+        .article-card-image-wrapper {position:relative;width:100%;aspect-ratio:16/9;}
+        .article-card-image {width:100%;height:100%;object-fit:cover;}
+        .article-card-category {position:absolute;top:15px;left:15px;background-color:var(--color-green-dark);color:white;padding:5px 12px;border-radius:100px;font-size:0.8rem;font-weight:700;}
+        .article-card-content {padding:25px;flex-grow:1;display:flex;flex-direction:column;}
+        .article-card-meta {font-size:0.9rem;color:var(--color-text-light);margin-bottom:15px;display:flex;align-items:center;gap:15px;}
+        .article-card-meta svg {width:14px;height:14px;margin-right:5px;vertical-align:middle;}
+        .article-card-title {font-size:1.4rem;font-weight:700;margin:0 0 15px;line-height:1.3;color:var(--color-text);}
+        .article-card-excerpt {font-size:1rem;line-height:1.6;color:var(--color-text-light);flex-grow:1;}
+        .article-card-footer {display:flex;justify-content:space-between;align-items:center;padding:20px 25px;border-top:1px solid #eee;font-size:0.9rem;color:var(--color-text-light);}
+        .read-more-link {color:var(--color-purple-dark);text-decoration:none;font-weight:700;display:flex;align-items:center;gap:8px;}
+        .read-more-link:hover {text-decoration:underline;}
+        .read-more-link svg {width:16px;height:16px;transition:transform .3s ease;}
+        .read-more-link:hover svg {transform:translateX(4px);}
+
+        @media (max-width:768px){.hero-banner{background-attachment:scroll}.hero-banner h1{font-size:2.2rem}}
+    </style>
+</head>
+<body data-current-page="articles">
+    <header class="site-header" id="header"></header>
+
+    <main>
+        <section class="hero-banner">
+            <div class="overlay"></div>
+            <div class="content scroll-animated">
+                <h1 class="lang-switch" data-en="Articles" data-es="Artículos"></h1>
+            </div>
+        </section>
+
+        <section class="section">
+            <div class="container">
+                <div class="article-grid" id="article-grid-container">
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="site-footer"></footer>
+
+    <script src="router.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            await siteRouter.loadMembers();
+            const articles = await fetch('articles.json').then(res => res.json());
+            const gridContainer = document.getElementById('article-grid-container');
+            const currentLang = localStorage.getItem('language') || 'en';
+
+            if (!gridContainer || !articles) return;
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('is-visible');
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, { threshold: 0.1 });
+
+            const populateGrid = (lang) => {
+                gridContainer.innerHTML = '';
+                articles.forEach(article => {
+                    const author = siteRouter.members[article.author_id];
+                    const authorName = author ? author.name : 'Anonymous';
+                    const articleDate = new Date(article.date).toLocaleDateString(lang.startsWith('es') ? 'es-ES' : 'en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+
+                    const card = document.createElement('div');
+                    card.className = 'article-card scroll-animated';
+                    card.dataset.pageId = 'article-single'; 
+                    card.dataset.articleId = article.id;
+
+                    card.innerHTML = `
+                        <div class="article-card-image-wrapper">
+                            <img src="${article.image}" alt="" class="article-card-image">
+                            <div class="article-card-category lang-switch" data-en="${article.category_en}" data-es="${article.category_es}">${article[`category_${lang}`]}</div>
+                        </div>
+                        <div class="article-card-content">
+                            <div class="article-card-meta">
+                                <span>
+                                    <svg fill="currentColor" viewBox="0 0 16 16"><path d="M3 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1zm5-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6"/></svg>
+                                    ${authorName}
+                                </span>
+                                <span>
+                                    <svg fill="currentColor" viewBox="0 0 16 16"><path d="M3.5 0a.5.5 0 0 1 .5.5V1h8V.5a.5.5 0 0 1 1 0V1h1a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h1V.5a.5.5 0 0 1 .5-.5M1 4v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V4z"/></svg>
+                                    ${articleDate}
+                                </span>
+                            </div>
+                            <h3 class="article-card-title lang-switch" data-en="${article.title_en}" data-es="${article.title_es}">${article[`title_${lang}`]}</h3>
+                            <p class="article-card-excerpt lang-switch" data-en="${article.excerpt_en}" data-es="${article.excerpt_es}">${article[`excerpt_${lang}`]}</p>
+                        </div>
+                        <div class="article-card-footer">
+                            <span class="lang-switch" data-en="${article.read_time_en}" data-es="${article.read_time_es}">${article[`read_time_${lang}`]}</span>
+                            <span class="read-more-link lang-switch" data-en="Read More" data-es="Leer Más">
+                                ${lang === 'es' ? 'Leer Más' : 'Read More'}
+                                <svg fill="currentColor" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M4 8a.5.5 0 0 1 .5-.5h5.793L8.146 5.354a.5.5 0 1 1 .708-.708l3 3a.5.5 0 0 1 0 .708l-3 3a.5.5 0 0 1-.708-.708L10.293 8.5H4.5A.5.5 0 0 1 4 8"/></svg>
+                            </span>
+                        </div>
+                    `;
+                    gridContainer.appendChild(card);
+                    observer.observe(card);
+
+                    card.addEventListener('click', () => {
+                        siteRouter.navigateTo('article-single', article.id);
+                    });
+                });
+            };
+
+            populateGrid(currentLang);
+
+            const langObserver = new MutationObserver(() => populateGrid(document.documentElement.lang));
+            langObserver.observe(document.documentElement, { attributes: true, attributeFilter: ['lang'] });
+            
+            document.querySelectorAll('main .scroll-animated').forEach(el => observer.observe(el));
+        });
+    </script>
+</body>
+</html>
