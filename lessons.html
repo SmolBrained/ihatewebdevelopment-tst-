@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" type="image/png" href="https://i.imgur.com/WPy5YDY.png">
-    <title>Lessons | Literary Speaking</title>
+    <title>Lessons - Literary Speaking</title>
     <link rel="stylesheet" href="style.css">
     <style>
         .hero-banner{height:60vh;min-height:400px;display:flex;align-items:center;justify-content:center;color:#fff;text-align:center;position:relative;padding:0 20px;background-image:url(https://i.imgur.com/f9KmpRG.jpeg);background-attachment:fixed;background-position:center;background-repeat:no-repeat;background-size:cover}
@@ -21,11 +21,13 @@
         .lesson-card-title{font-size:1.5rem;font-weight:700;margin:0;color:var(--color-text);}
         
         .resources-section{background-color:var(--color-pink); --section-text:var(--color-pink-dark);}
-        .resource-grid{display:grid;grid-template-columns:repeat(auto-fit, minmax(280px, 1fr));gap:25px;text-align:left;margin-top:40px;}
-        .resource-card{background-color:rgba(255,255,255,0.7);padding:25px;border-radius:12px;text-decoration:none;color:var(--color-pink-dark);transition:background-color .3s ease, transform .3s ease;}
+        .resource-grid{display:grid;grid-template-columns:repeat(auto-fit, minmax(320px, 1fr));gap:30px;text-align:left;margin-top:40px;}
+        .resource-card{background-color:rgba(255,255,255,0.7);padding:30px;border-radius:16px;transition:background-color .3s ease, transform .3s ease;}
         .resource-card:hover{background-color:#fff;transform:translateY(-5px);}
-        .resource-card h4{margin:0 0 10px;font-size:1.2rem;font-weight:700;}
-        .resource-card p{margin:0;line-height:1.5;font-size:0.95rem;}
+        .resource-card h3{margin:0 0 15px;font-size:1.6rem;font-weight:700;}
+        .resource-card ul{list-style:none;padding:0;margin:0;line-height:1.8;}
+        .resource-card ul li{margin-bottom:10px;}
+        .resource-card ul li a{color:var(--color-pink-dark);font-weight:500;text-decoration:underline;}
         
         @media (max-width:768px){.hero-banner{background-attachment:scroll}.hero-banner h1{font-size:2.2rem}}
     </style>
@@ -68,45 +70,25 @@
         <section class="section resources-section">
             <div class="container">
                 <h2 class="section-title lang-switch" data-en="Additional Resources" data-es="Recursos Adicionales"></h2>
-                
-                <h3 class="section-subtitle lang-switch" data-en="FAST Exams and State Standards" data-es="Exámenes FAST y Estándares Estatales"></h3>
                 <div class="resource-grid">
-                    <a href="http://flfast.org/families.html" target="_blank" class="resource-card scroll-animated">
-                        <h4 class="lang-switch" data-en="Florida Dept. of Education" data-es="Dept. de Educación de Florida"></h4>
-                        <p class="lang-switch" data-en="Official information on state exam standards." data-es="Información oficial sobre los estándares de los exámenes estatales."></p>
-                    </a>
-                    <a href="https://www.floridastudents.org/" target="_blank" class="resource-card scroll-animated">
-                        <h4 class="lang-switch" data-en="Florida CPALMS" data-es="CPALMS de Florida"></h4>
-                        <p class="lang-switch" data-en="Learning resources and tutorials sorted by grade level." data-es="Recursos de aprendizaje y tutoriales ordenados por nivel de grado."></p>
-                    </a>
-                    <a href="http://flfast.org/families.html" target="_blank" class="resource-card scroll-animated">
-                        <h4 class="lang-switch" data-en="FAST Website" data-es="Sitio Web de FAST"></h4>
-                        <p class="lang-switch" data-en="Practice questions and answers for state assessments." data-es="Preguntas y respuestas de práctica para las evaluaciones estatales."></p>
-                    </a>
-                </div>
-
-                <h3 class="section-subtitle lang-switch" style="margin-top: 60px;" data-en="General Help with Learning English" data-es="Ayuda General para Aprender Inglés"></h3>
-                <div class="resource-grid">
-                    <a href="http://khanacademy.org/" target="_blank" class="resource-card scroll-animated">
-                        <h4>Khan Academy</h4>
-                        <p class="lang-switch" data-en="Comprehensive lessons and exercises for all subjects." data-es="Lecciones y ejercicios completos para todas las materias."></p>
-                    </a>
-                    <a href="https://www.esolcourses.com/" target="_blank" class="resource-card scroll-animated">
-                        <h4>ESOL Courses</h4>
-                        <p class="lang-switch" data-en="Free English lessons for reading, writing, and listening." data-es="Clases de inglés gratuitas para leer, escribir y escuchar."></p>
-                    </a>
-                    <a href="https://www.grammarbank.com/beginners-grammar-worksheets.html" target="_blank" class="resource-card scroll-animated">
-                        <h4>GrammarBank</h4>
-                        <p class="lang-switch" data-en="General knowledge and English grammar lessons." data-es="Lecciones de conocimientos generales y gramática inglesa."></p>
-                    </a>
-                    <a href="https://www.englishclub.com/?utm_source=EClogo" target="_blank" class="resource-card scroll-animated">
-                        <h4>EnglishClub</h4>
-                        <p class="lang-switch" data-en="A wide variety of English lessons and quizzes." data-es="Una amplia variedad de lecciones y cuestionarios de inglés."></p>
-                    </a>
-                    <a href="http://poorvucenter.yale.edu/graduate-students/writing-resources-tutorials/downloadable-english-grammar-tutorials" target="_blank" class="resource-card scroll-animated">
-                        <h4>Yale Poorvu Center</h4>
-                        <p class="lang-switch" data-en="Downloadable English grammar and writing tutorials." data-es="Tutoriales descargables de gramática y escritura en inglés."></p>
-                    </a>
+                    <div class="resource-card scroll-animated">
+                        <h3 class="lang-switch" data-en="FAST Exams and State Standards" data-es="Exámenes FAST y Estándares Estatales"></h3>
+                        <ul>
+                            <li><a href="http://flfast.org/families.html" target="_blank" class="lang-switch" data-en="Florida Dept. of Education: State Exam Standards" data-es="Dept. de Educación de Florida: Estándares de Exámenes Estatales"></a></li>
+                            <li><a href="https://www.floridastudents.org/" target="_blank" class="lang-switch" data-en="Florida CPALMS: Learning Resources by Grade Level" data-es="CPALMS de Florida: Recursos de aprendizaje por nivel de grado"></a></li>
+                            <li><a href="http://flfast.org/families.html" target="_blank" class="lang-switch" data-en="FAST Website: Practice Questions and Answers" data-es="Sitio Web de FAST: Preguntas y respuestas de práctica"></a></li>
+                        </ul>
+                    </div>
+                    <div class="resource-card scroll-animated">
+                        <h3 class="lang-switch" data-en="General Help with Learning English" data-es="Ayuda General para Aprender Inglés"></h3>
+                        <ul>
+                            <li><a href="http://khanacademy.org/" target="_blank">Khan Academy</a></li>
+                            <li><a href="https://www.esolcourses.com/" target="_blank">ESOL Courses</a></li>
+                            <li><a href="https://www.grammarbank.com/beginners-grammar-worksheets.html" target="_blank">GrammarBank</a></li>
+                            <li><a href="https://www.englishclub.com/?utm_source=EClogo" target="_blank">EnglishClub</a></li>
+                            <li><a href="http://poorvucenter.yale.edu/graduate-students/writing-resources-tutorials/downloadable-english-grammar-tutorials" target="_blank">Yale Poorvu Center</a></li>
+                        </ul>
+                    </div>
                 </div>
             </div>
         </section>
