@@ -140,9 +140,12 @@ const siteRouter = {
         const header = document.getElementById('header');
         const menuToggle = document.querySelector('.menu-toggle');
         const body = document.body;
+        const currentPage = document.body.dataset.currentPage;
 
         const handleScroll = () => {
-            if (header) header.classList.toggle('scrolled', window.pageYOffset > 50);
+            if (header && currentPage !== 'article-single') {
+                header.classList.toggle('scrolled', window.pageYOffset > 50);
+            }
         };
         window.addEventListener('scroll', handleScroll);
         handleScroll();
@@ -210,7 +213,6 @@ const siteRouter = {
             'articles': 'resources', 'lessons': 'resources', 'report-time': 'resources'
         };
 
-        const currentPage = document.body.dataset.currentPage;
         if (currentPage) {
             document.querySelectorAll(`.nav-link[data-page-id="${currentPage}"]`).forEach(link => link.classList.add('active-page-link'));
             const currentGroup = pageGroups[currentPage];
