@@ -100,10 +100,17 @@ Tutoría y Mentoría de Literary Speaking"></p>
             </div>
         </section>
 
+        <section class="section" style="--section-bg: var(--color-red)">
+            <div class="container">
+                <h2 class="section-title lang-switch" data-en="Outreach/Marketing Team" data-es="Equipo de Alcance/Marketing"></h2>
+                <div class="team-grid" id="outreach-grid"></div>
+            </div>
+        </section>
+
         <section class="section" style="--section-bg: var(--color-pink)">
             <div class="container">
-                <h2 class="section-title lang-switch" data-en="Our Alumni" data-es="Nuestros Exalumnos"></h2>
-                <div class="team-grid" id="alumni-grid"></div>
+                <h2 class="section-title lang-switch" data-en="Previous Volunteers" data-es="Voluntarios Anteriores"></h2>
+                <div class="team-grid" id="previous-volunteers-grid"></div>
             </div>
         </section>
     </main>
@@ -117,8 +124,8 @@ Tutoría y Mentoría de Literary Speaking"></p>
             
             const pwbBoard = [
                 { id: 'aitana-avila000', title_en: 'Vice President', title_es: 'Vicepresidenta' },
-                { id: 'amaylor-torres000', title_en: 'Historian', title_es: 'Historiador' },
-                { id: 'amiel-cabellero000', title_en: 'Secretary', title_es: 'Secretario' }
+                { id: 'amiel-cabellero000', title_en: 'Secretary', title_es: 'Secretario' },
+                { id: 'amaylor-torres000', title_en: 'Historian', title_es: 'Historiador' }
             ];
 
             const mcpBoard = [
@@ -135,7 +142,9 @@ Tutoría y Mentoría de Literary Speaking"></p>
                 'andrew-cuellar000', 'nicolas-vilches000', 'johann-lara000', 'amelia-guerra000'
             ];
 
-            const alumni = ['stephanie-jimenez000', 'jose-unanue000', 'ilie-tornes000', 'adrian-gomez000'];
+            const outreachTeam = ['adrian-gomez000', 'jose-unanue000', 'amaylor-torres000'];
+
+            const previousVolunteers = ['stephanie-jimenez000', 'ilie-tornes000'];
 
             const observer = new IntersectionObserver((entries) => {
                 entries.forEach(entry => {
@@ -184,7 +193,8 @@ Tutoría y Mentoría de Literary Speaking"></p>
             populateTeamSection('#mcp-board-grid', mcpBoard);
             populateTeamSection('#newsletter-grid', newsletterTeam);
             populateTeamSection('#tutors-grid', tutors);
-            populateTeamSection('#alumni-grid', alumni);
+            populateTeamSection('#outreach-grid', outreachTeam);
+            populateTeamSection('#previous-volunteers-grid', previousVolunteers);
             
             document.querySelectorAll('.scroll-animated:not(.team-member)').forEach(el => observer.observe(el));
         });
