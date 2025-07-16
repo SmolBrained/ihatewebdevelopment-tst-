@@ -26,7 +26,7 @@ img{background-color:transparent}
 .site-header:not(.scrolled) .logo .logo-unscrolled{height:35px;transform:translate(0px,2px)}
 .desktop-nav{display:flex;align-items:center;height:100%}
 .desktop-nav a, .desktop-nav .dropdown-toggle{margin:0 8px;padding:5px;text-decoration:none;font-weight:500;font-size:.85rem;transition:color var(--transition-speed) ease; cursor: pointer;}
-.desktop-nav .nav-link.active-page-link, .desktop-nav .dropdown-toggle.active-page-link{font-weight:700}
+.nav-link.active-page-link, .dropdown-toggle.active-page-link{font-weight:700}
 .lang-switcher{display:flex;border:1px solid;border-radius:100px;transition:border-color var(--transition-speed) ease;cursor:pointer;-webkit-tap-highlight-color:transparent;margin-left:10px}
 .lang-switcher button{background:0 0;border:0;padding:5px 10px;font-family:var(--font-family);font-weight:700;font-size:.75rem;cursor:pointer;border-radius:100px;transition:all var(--transition-speed) ease;pointer-events:none}
 .site-header:not(.scrolled){background-color:transparent;border-bottom-color:transparent}
