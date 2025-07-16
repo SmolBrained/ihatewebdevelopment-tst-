@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Article - Literary Speaking</title>
     <link rel="icon" type="image/png" href="https://i.imgur.com/WPy5YDY.png">
-    <title>Article | Literary Speaking</title>
     <link rel="stylesheet" href="style.css">
     <style>
         .article-hero {padding-top:120px;padding-bottom:60px;text-align:center;}
@@ -47,6 +47,8 @@
     <script src="router.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', async () => {
+            document.getElementById('header')?.classList.add('scrolled');
+            
             await siteRouter.loadMembers();
             const articles = await fetch('articles.json').then(res => res.json());
 
@@ -79,16 +81,18 @@
 
                 const contentContainer = document.getElementById('article-content');
                 const formattedContent = article[`content_${lang}`]
-                    .split('\n\n')
-                    .map(paragraph => `<p>${paragraph.replace(/\n/g, '<br>')}</p>`)
+                    .split(/\n\n/)
+                    .map(p => `<p>${p.replace(/\n/g, '<br>')}</p>`)
                     .join('');
                 contentContainer.innerHTML = formattedContent;
 
-                document.querySelectorAll('#article-meta .nav-link').forEach(link => {
-                    link.addEventListener('click', (e) => {
-                        e.preventDefault();
-                        siteRouter.navigateTo(link.dataset.pageId, link.dataset.memberId);
-                    });
+                document.querySelectorAll('.nav-link').forEach(link => {
+                    if(link.closest('#article-meta')) {
+                        link.addEventListener('click', (e) => {
+                            e.preventDefault();
+                            siteRouter.navigateTo(link.dataset.pageId, link.dataset.memberId);
+                        });
+                    }
                 });
             };
             
