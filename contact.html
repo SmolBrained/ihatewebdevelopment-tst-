@@ -17,8 +17,6 @@
         .form-group input,.form-group textarea{width:100%;padding:12px 0;border:0;border-bottom:2px solid rgba(0,0,0,.2);font-family:var(--font-family);font-size:1rem;background-color:transparent;transition:border-color var(--transition-speed) ease}
         .form-group input:focus,.form-group textarea:focus{outline:0;border-color:currentColor}
         .form-group textarea{resize:vertical; min-height: 120px;}
-        .btn{display:inline-block;padding:18px 48px;border:2px solid;background-color:transparent;text-decoration:none;font-weight:700;font-size:1rem;margin:5px;transition:all var(--transition-speed) ease;cursor:pointer;color:var(--section-main-color,#333);border-color:var(--section-main-color,#333); border-radius: 8px;}
-        .btn:hover{background-color:var(--section-main-color,#333);color:var(--section-bg,white)}
         @media (max-width:768px){.hero-banner{background-attachment:scroll}.hero-banner h1{font-size:2.2rem}}
     </style>
 </head>
@@ -36,7 +34,7 @@
         <section class="section" style="--section-bg: var(--color-purple);">
             <div class="container">
                 <h2 class="section-title lang-switch" data-en="Do you have questions?" data-es="¿Tienes preguntas?"></h2>
-                <p class="section-subtitle lang-switch" data-en="Use the form below for any questions, or contact us at literaryspeakingmentoring@gmail.com." data-es="Utilice el siguiente formulario para cualquier pregunta o póngase en contacto con nosotros en literaryspeakingmentoring@gmail.com."></p>
+                <p class="section-subtitle lang-switch" data-en="Use the form below for any questions, or contact us at <a href='mailto:literaryspeakingmentoring@gmail.com'>literaryspeakingmentoring@gmail.com</a>." data-es="Utilice el siguiente formulario para cualquier pregunta o póngase en contacto con nosotros en <a href='mailto:literaryspeakingmentoring@gmail.com'>literaryspeakingmentoring@gmail.com</a>."></p>
                 <div class="form-container scroll-animated">
                     <form action="https://api.web3forms.com/submit" method="POST">
                         <input type="hidden" name="access_key" value="YOUR_ACCESS_KEY_HERE">
