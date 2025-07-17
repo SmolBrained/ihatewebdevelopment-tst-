@@ -140,9 +140,12 @@ const siteRouter = {
         const header = document.getElementById('header');
         const menuToggle = document.querySelector('.menu-toggle');
         const body = document.body;
-        const currentPage = document.body.dataset.currentPage;
+        
+        const path = window.location.pathname;
+        const isArticlePage = path.endsWith('article-single.html');
+        const isMemberPage = path.endsWith('members.html');
 
-        if (currentPage === 'article-single' || currentPage === 'member') {
+        if (isArticlePage || isMemberPage) {
             header?.classList.add('scrolled');
         } else {
             const handleScroll = () => {
@@ -214,7 +217,8 @@ const siteRouter = {
             'receive-tutoring': 'get-involved', 'become-a-tutor': 'get-involved', 'become-a-volunteer': 'get-involved', 'support': 'get-involved',
             'articles': 'resources', 'lessons': 'resources', 'report-time': 'resources'
         };
-
+        
+        const currentPage = document.body.dataset.currentPage;
         if (currentPage) {
             document.querySelectorAll(`.nav-link[data-page-id="${currentPage}"]`).forEach(link => link.classList.add('active-page-link'));
             const currentGroup = pageGroups[currentPage];
