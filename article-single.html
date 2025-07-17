@@ -47,11 +47,6 @@
     <script src="router.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', async () => {
-            const header = document.getElementById('header');
-            if (header) {
-                header.classList.add('scrolled');
-            }
-            
             await siteRouter.loadMembers();
             const articles = await fetch('articles.json').then(res => res.json());
 
