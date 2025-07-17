@@ -17,6 +17,8 @@
         .social-box{background-color:#fff0f5;padding:50px;border-radius:16px;box-shadow:0 15px 30px rgba(0,0,0,0.1);color:var(--color-purple-dark)}
         .social-box .section-title, .social-box .section-subtitle{color:var(--color-purple-dark)}
         .social-box .section-subtitle a{color:var(--color-purple-dark);font-weight:700}
+        .instagram-grid{display:grid;grid-template-columns:repeat(auto-fit, minmax(300px, 1fr));gap:20px;margin-top:40px;}
+        .instagram-grid blockquote{margin:0 !important;}
         @media (max-width:768px){
         .hero-banner{background-attachment:scroll}
         .hero-banner h1{font-size:2.2rem}
@@ -46,7 +48,14 @@
                 <div class="social-box">
                     <h2 class="section-title lang-switch" data-en="Social Media" data-es="Redes Sociales"></h2>
                     <p class="section-subtitle">Follow us <a href="https://www.instagram.com/literaryspeakingtutoring/" target="_blank" rel="noopener noreferrer">@literaryspeakingtutoring</a></p>
-                    <div id="curator-feed-default-feed-layout"></div>
+                    <div class="instagram-grid">
+                        <blockquote class="instagram-media" data-instgrm-permalink="https://www.instagram.com/p/C9G_vGzR0zV/" data-instgrm-version="14"></blockquote>
+                        <blockquote class="instagram-media" data-instgrm-permalink="https://www.instagram.com/p/C80B_yNx4l0/" data-instgrm-version="14"></blockquote>
+                        <blockquote class="instagram-media" data-instgrm-permalink="https://www.instagram.com/p/C8c7x_iRPAj/" data-instgrm-version="14"></blockquote>
+                        <blockquote class="instagram-media" data-instgrm-permalink="https://www.instagram.com/p/C8XYU6yR1S_/" data-instgrm-version="14"></blockquote>
+                        <blockquote class="instagram-media" data-instgrm-permalink="https://www.instagram.com/p/C8VAlpCxD5g/" data-instgrm-version="14"></blockquote>
+                        <blockquote class="instagram-media" data-instgrm-permalink="https://www.instagram.com/p/C8S1w_WRxQ-/" data-instgrm-version="14"></blockquote>
+                    </div>
                 </div>
             </div>
         </section>
@@ -55,13 +64,7 @@
     <footer class="site-footer"></footer>
 
     <script src="router.js"></script>
-    <script type="text/javascript">
-    (function(){
-    var i,e,d=document,s="script";i=d.createElement("script");i.async=1;i.charset="UTF-8";
-    i.src="https://cdn.curator.io/published/ecfc6731-dd7d-4877-bdc8-6e38d9fc2813.js";
-    e=d.getElementsByTagName(s)[0];e.parentNode.insertBefore(i, e);
-    })();
-    </script>
+    <script async src="//www.instagram.com/embed.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             const observer = new IntersectionObserver((entries) => {
