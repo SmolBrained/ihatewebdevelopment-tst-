@@ -142,13 +142,15 @@ const siteRouter = {
         const body = document.body;
         const currentPage = document.body.dataset.currentPage;
 
-        const handleScroll = () => {
-            if (header && currentPage !== 'article-single') {
-                header.classList.toggle('scrolled', window.pageYOffset > 50);
-            }
-        };
-        window.addEventListener('scroll', handleScroll);
-        handleScroll();
+        if (currentPage === 'article-single' || currentPage === 'member') {
+            header?.classList.add('scrolled');
+        } else {
+            const handleScroll = () => {
+                header?.classList.toggle('scrolled', window.pageYOffset > 50);
+            };
+            window.addEventListener('scroll', handleScroll);
+            handleScroll();
+        }
 
         const closeMenu = () => {
             body.classList.remove('menu-open');
