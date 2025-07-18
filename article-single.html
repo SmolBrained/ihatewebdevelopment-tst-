@@ -45,19 +45,43 @@
     <footer class="site-footer"></footer>
 
     <script src="router.js"></script>
-    <script>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
+        import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyD0qVihpuLI0cF0PZ32o8tFBLfTgjlqB6A",
+            authDomain: "literary-speaking.firebaseapp.com",
+            projectId: "literary-speaking",
+            storageBucket: "literary-speaking.appspot.com",
+            messagingSenderId: "699059463612",
+            appId: "1:699059463612:web:ecb2e784d627c6b93937b9",
+            measurementId: "G-0L1V3XXGGR"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
         document.addEventListener('DOMContentLoaded', async () => {
             await siteRouter.loadMembers();
-            const articles = await fetch('articles.json').then(res => res.json());
-
+            
             const urlParams = new URLSearchParams(window.location.search);
             const articleId = urlParams.get('id');
-            const article = articles.find(a => a.id === articleId);
-
-            if (!article) {
+            
+            if (!articleId) {
                 siteRouter.navigateTo('articles');
                 return;
             }
+
+            const docRef = doc(db, "articles", articleId);
+            const docSnap = await getDoc(docRef);
+
+            if (!docSnap.exists()) {
+                siteRouter.navigateTo('articles');
+                return;
+            }
+            
+            const article = docSnap.data();
 
             const updateArticleText = (lang) => {
                 document.title = `${article[`title_${lang}`]} - Literary Speaking`;
@@ -78,8 +102,10 @@
                 `;
 
                 const contentContainer = document.getElementById('article-content');
-                const formattedContent = article[`content_${lang}`]
-                    .split(/\n\n/)
+                const rawContent = article[`content_${lang}`] || '';
+                const formattedContent = rawContent
+                    .replace(/\\n/g, '\n')
+                    .split('\n\n')
                     .map(p => `<p>${p.replace(/\n/g, '<br>')}</p>`)
                     .join('');
                 contentContainer.innerHTML = formattedContent;
