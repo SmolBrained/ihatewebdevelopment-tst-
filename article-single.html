@@ -22,22 +22,19 @@
         .back-link:hover {text-decoration: underline;}
         
         .article-footer {max-width:750px; margin: 60px auto 0; padding-top: 40px; border-top: 1px solid #eee; text-align: left;}
-        .social-share { display: flex; align-items: center; gap: 15px; margin-bottom: 40px; }
-        .social-share-btn { display: inline-flex; align-items: center; gap: 8px; padding: 10px 20px; border-radius: 8px; text-decoration: none; color: #fff; font-weight: 700; }
-        .share-x { background-color: #14171A; }
-        .share-fb { background-color: #1877F2; }
+        .social-share { display: flex; align-items: center; gap: 20px; margin-bottom: 40px; min-height: 28px; }
 
         .comments-section h3 { font-size: 1.8rem; font-weight: 700; margin-bottom: 30px; }
         .comment-form .form-group { margin-bottom: 20px; }
         .comment-form label { font-weight: 700; font-size: 0.9rem; }
         .comment-form input, .comment-form textarea { width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 8px; font-family: var(--font-family); font-size: 1rem; }
         .comment-form .btn { padding: 12px 25px; border: none; background-color: var(--color-purple-dark); color: #fff; border-radius: 8px; cursor: pointer; }
-        .form-message { padding: 15px; border-radius: 8px; margin-top: 20px; font-weight: 500; }
+        .form-message { padding: 15px; border-radius: 8px; margin-top: 20px; font-weight: 500; display: none; }
+        .form-message.show { display: block; }
         .form-message.success { background-color: var(--color-green); color: var(--color-green-dark); }
-        .form-message.error { background-color: #f8d7da; color: #721c24; }
         
         .comments-list { list-style: none; padding: 0; margin-top: 40px; }
-        .comment-item { padding: 20px; border: 1px solid #eee; border-radius: 8px; margin-bottom: 20px; }
+        .comment-item { padding: 20px; border: 1px solid #eee; border-radius: 8px; margin-bottom: 20px; background-color: #fafafa; }
         .comment-author { font-weight: 700; margin: 0 0 5px; }
         .comment-date { font-size: 0.85rem; color: #888; margin: 0 0 15px; }
         .comment-body { line-height: 1.7; }
@@ -46,6 +43,10 @@
     </style>
 </head>
 <body data-current-page="article-single">
+    <div id="fb-root"></div>
+    <script async defer crossorigin="anonymous" src="https://connect.facebook.net/en_US/sdk.js#xfbml=1&version=v20.0&appId=YOUR_FACEBOOK_APP_ID" nonce="IfYouHaveOne"></script>
+    <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+
     <header class="site-header" id="header"></header>
 
     <main>
@@ -62,10 +63,7 @@
                 <div id="article-content" class="article-body"></div>
 
                 <div class="article-footer">
-                    <div class="social-share">
-                        <a href="#" id="share-x-btn" class="social-share-btn share-x" target="_blank">Post</a>
-                        <a href="#" id="share-fb-btn" class="social-share-btn share-fb" target="_blank">Like</a>
-                    </div>
+                    <div id="social-share-container" class="social-share"></div>
                     <div class="comments-section">
                         <h3 class="lang-switch" data-en="Leave a Reply" data-es="Deja una respuesta"></h3>
                         <form id="comment-form" class="comment-form">
@@ -78,7 +76,7 @@
                                 <textarea id="comment-text" rows="5" required></textarea>
                             </div>
                             <button type="submit" class="btn lang-switch" data-en="Submit" data-es="Enviar"></button>
-                            <div id="form-message" class="form-message hidden"></div>
+                            <div id="form-message" class="form-message"></div>
                         </form>
 
                         <h3 id="comments-title" class="lang-switch" data-en="Comments" data-es="Comentarios" style="margin-top: 50px;"></h3>
@@ -91,10 +89,6 @@
 
     <footer class="site-footer"></footer>
 
-    <script src="https://cdn.jsdelivr.net/npm/bad-words@3.0.4/lib/bad-words.js"></script>
-    <script>
-        const filter = new Filter();
-    </script>
     <script src="router.js"></script>
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
@@ -119,24 +113,17 @@
             const urlParams = new URLSearchParams(window.location.search);
             const articleId = urlParams.get('id');
             
-            if (!articleId) {
-                siteRouter.navigateTo('articles');
-                return;
-            }
+            if (!articleId) return siteRouter.navigateTo('articles');
 
             const docRef = doc(db, "articles", articleId);
             const docSnap = await getDoc(docRef);
 
-            if (!docSnap.exists()) {
-                siteRouter.navigateTo('articles');
-                return;
-            }
+            if (!docSnap.exists()) return siteRouter.navigateTo('articles');
             
             const article = docSnap.data();
-            let articleTitle = '';
 
             const updateArticleText = (lang) => {
-                articleTitle = article[`title_${lang}`];
+                const articleTitle = article[`title_${lang}`];
                 document.title = `${articleTitle} - Literary Speaking`;
                 document.getElementById('article-category').textContent = article[`category_${lang}`];
                 document.getElementById('article-title').textContent = articleTitle;
@@ -154,8 +141,7 @@
                 `;
 
                 const contentContainer = document.getElementById('article-content');
-                const formattedContent = (article[`content_${lang}`] || '').replace(/\\n/g, '\n').split('\n\n').map(p => `<p>${p.replace(/\n/g, '<br>')}</p>`).join('');
-                contentContainer.innerHTML = formattedContent;
+                contentContainer.innerHTML = (article[`content_${lang}`] || '').replace(/\\n/g, '\n').split('\n\n').map(p => `<p>${p.replace(/\n/g, '<br>')}</p>`).join('');
 
                 document.querySelectorAll('.nav-link').forEach(link => {
                     if(link.closest('#article-meta') || link.classList.contains('back-link')) {
@@ -166,7 +152,7 @@
                     }
                 });
 
-                setupShareLinks();
+                renderShareButtons(window.location.href, articleTitle);
             };
             
             document.getElementById('article-image').src = article.image;
@@ -178,11 +164,30 @@
             const langObserver = new MutationObserver(() => updateArticleText(document.documentElement.lang));
             langObserver.observe(document.documentElement, { attributes: true, attributeFilter: ['lang'] });
 
-            function setupShareLinks() {
-                const url = encodeURIComponent(window.location.href);
-                const text = encodeURIComponent(`Check out this article: ${articleTitle}`);
-                $('#share-x-btn').href = `https://twitter.com/intent/tweet?url=${url}&text=${text}`;
-                $('#share-fb-btn').href = `https://www.facebook.com/sharer/sharer.php?u=${url}`;
+            function renderShareButtons(url, text) {
+                const container = document.getElementById('social-share-container');
+                container.innerHTML = '';
+
+                const fbLike = document.createElement('div');
+                fbLike.className = 'fb-like';
+                fbLike.dataset.href = url;
+                fbLike.dataset.width = '';
+                fbLike.dataset.layout = 'button_count';
+                fbLike.dataset.action = 'like';
+                fbLike.dataset.size = 'small';
+                fbLike.dataset.share = 'true';
+                container.appendChild(fbLike);
+
+                const xShare = document.createElement('a');
+                xShare.className = 'twitter-share-button';
+                xShare.href = 'https://twitter.com/share?ref_src=twsrc%5Etfw';
+                xShare.dataset.text = `Check out this article: ${text}`;
+                xShare.dataset.url = url;
+                xShare.textContent = 'Tweet';
+                container.appendChild(xShare);
+
+                if (typeof FB !== 'undefined') FB.XFBML.parse(container);
+                if (typeof twttr !== 'undefined') twttr.widgets.load(container);
             }
 
             const commentForm = document.getElementById('comment-form');
@@ -190,30 +195,21 @@
 
             commentForm.addEventListener('submit', async (e) => {
                 e.preventDefault();
-                const name = document.getElementById('comment-name').value;
-                const commentText = document.getElementById('comment-text').value;
-
-                if (filter.isProfane(commentText)) {
-                    formMessage.textContent = 'Your comment contains inappropriate language and was not submitted.';
-                    formMessage.className = 'form-message error';
-                    return;
-                }
-
+                formMessage.classList.remove('show');
+                
                 try {
                     await addDoc(collection(db, "comments"), {
                         articleId: articleId,
-                        name: name,
-                        comment: commentText,
+                        name: document.getElementById('comment-name').value,
+                        comment: document.getElementById('comment-text').value,
                         timestamp: serverTimestamp(),
                         isApproved: false
                     });
                     commentForm.reset();
                     formMessage.textContent = 'Thank you! Your comment is awaiting moderation.';
-                    formMessage.className = 'form-message success';
+                    formMessage.className = 'form-message success show';
                 } catch (error) {
                     console.error("Error adding comment: ", error);
-                    formMessage.textContent = 'There was an error submitting your comment.';
-                    formMessage.className = 'form-message error';
                 }
             });
 
@@ -230,7 +226,6 @@
                 );
 
                 const querySnapshot = await getDocs(q);
-                
                 commentsTitle.style.display = querySnapshot.empty ? 'none' : 'block';
 
                 querySnapshot.forEach(doc => {
@@ -238,11 +233,7 @@
                     const date = comment.timestamp.toDate().toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' });
                     const li = document.createElement('li');
                     li.className = 'comment-item';
-                    li.innerHTML = `
-                        <p class="comment-author">${comment.name}</p>
-                        <p class="comment-date">${date}</p>
-                        <p class="comment-body">${comment.comment.replace(/\n/g, '<br>')}</p>
-                    `;
+                    li.innerHTML = `<p class="comment-author">${comment.name}</p><p class="comment-date">${date}</p><p class="comment-body">${comment.comment.replace(/\n/g, '<br>')}</p>`;
                     commentsList.appendChild(li);
                 });
             }
