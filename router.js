@@ -1,6 +1,6 @@
 const siteRouter = {
     pages: {
-        "home": "./index.html",
+        "home": "index.html",
         "about": "about.html",
         "news": "news.html",
         "the-team": "team.html",
@@ -34,6 +34,18 @@ const siteRouter = {
         } else {
             window.location.href = this.pages['home'];
         }
+    },
+    applyLanguage(lang) {
+        document.querySelectorAll('[data-en], [data-es]').forEach(el => {
+            const text = el.dataset[lang];
+            if (text !== undefined) {
+                 el.innerHTML = text;
+            }
+        });
+        document.documentElement.lang = lang;
+        const isEn = lang === 'en';
+        document.querySelectorAll('#lang-en-btn, #lang-en-btn-mobile').forEach(btn => btn.classList.toggle('active', isEn));
+        document.querySelectorAll('#lang-es-btn, #lang-es-btn-mobile').forEach(btn => btn.classList.toggle('active', !isEn));
     },
     init() {
         const headerContainer = document.getElementById('header');
@@ -188,21 +200,8 @@ const siteRouter = {
         });
 
         const setLanguage = (lang) => {
-            document.querySelectorAll('[data-en], [data-es]').forEach(el => {
-                const text = el.dataset[lang];
-                if (text) {
-                     if (el.tagName === 'UL') {
-                        el.innerHTML = text;
-                    } else {
-                        el.innerHTML = text;
-                    }
-                }
-            });
+            this.applyLanguage(lang);
             localStorage.setItem('language', lang);
-            document.documentElement.lang = lang;
-            const isEn = lang === 'en';
-            document.querySelectorAll('#lang-en-btn, #lang-en-btn-mobile').forEach(btn => btn.classList.toggle('active', isEn));
-            document.querySelectorAll('#lang-es-btn, #lang-es-btn-mobile').forEach(btn => btn.classList.toggle('active', !isEn));
         };
 
         const toggleLanguage = () => {
