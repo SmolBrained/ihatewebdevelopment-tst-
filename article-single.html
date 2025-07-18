@@ -38,13 +38,14 @@
         .comment-author { font-weight: 700; margin: 0 0 5px; }
         .comment-date { font-size: 0.85rem; color: #888; margin: 0 0 15px; }
         .comment-body { line-height: 1.7; }
+        .comments-loading { text-align: center; color: var(--color-text-muted); padding: 20px; }
 
         @media (max-width:768px){.article-title-full{font-size:2.2rem;}}
     </style>
 </head>
 <body data-current-page="article-single">
     <div id="fb-root"></div>
-    <script async defer crossorigin="anonymous" src="https://connect.facebook.net/en_US/sdk.js#xfbml=1&version=v20.0&appId=YOUR_FACEBOOK_APP_ID" nonce="IfYouHaveOne"></script>
+    <script async defer crossorigin="anonymous" src="https://connect.facebook.net/en_US/sdk.js#xfbml=1&version=v20.0&appId=YOUR_FACEBOOK_APP_ID"></script>
     <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
 
     <header class="site-header" id="header"></header>
@@ -67,20 +68,16 @@
                     <div class="comments-section">
                         <h3 class="lang-switch" data-en="Leave a Reply" data-es="Deja una respuesta"></h3>
                         <form id="comment-form" class="comment-form">
-                            <div class="form-group">
-                                <label for="comment-name" class="lang-switch" data-en="Name (required)" data-es="Nombre (requerido)"></label>
-                                <input type="text" id="comment-name" required>
-                            </div>
-                            <div class="form-group">
-                                <label for="comment-text" class="lang-switch" data-en="Comments (required)" data-es="Comentarios (requerido)"></label>
-                                <textarea id="comment-text" rows="5" required></textarea>
-                            </div>
+                            <div class="form-group"><label for="comment-name" class="lang-switch" data-en="Name (required)" data-es="Nombre (requerido)"></label><input type="text" id="comment-name" required></div>
+                            <div class="form-group"><label for="comment-text" class="lang-switch" data-en="Comments (required)" data-es="Comentarios (requerido)"></label><textarea id="comment-text" rows="5" required></textarea></div>
                             <button type="submit" class="btn lang-switch" data-en="Submit" data-es="Enviar"></button>
                             <div id="form-message" class="form-message"></div>
                         </form>
 
-                        <h3 id="comments-title" class="lang-switch" data-en="Comments" data-es="Comentarios" style="margin-top: 50px;"></h3>
-                        <ul id="comments-list" class="comments-list"></ul>
+                        <h3 id="comments-title" class="lang-switch" data-en="Comments" data-es="Comentarios" style="margin-top: 50px; display: none;"></h3>
+                        <ul id="comments-list" class="comments-list">
+                            <li class="comments-loading">Loading comments...</li>
+                        </ul>
                     </div>
                 </div>
             </div>
@@ -92,7 +89,7 @@
     <script src="router.js"></script>
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
-        import { getFirestore, doc, getDoc, collection, addDoc, query, where, getDocs, serverTimestamp, orderBy } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
+        import { getFirestore, doc, getDoc, collection, addDoc, query, where, onSnapshot, serverTimestamp, orderBy } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyD0qVihpuLI0cF0PZ32o8tFBLfTgjlqB6A",
@@ -133,25 +130,14 @@
                 const authorName = author ? author.name : 'Anonymous';
                 const articleDate = new Date(article.date).toLocaleDateString(lang.startsWith('es') ? 'es-ES' : 'en-US', { year: 'numeric', month: 'long', day: 'numeric' });
 
-                document.getElementById('article-meta').innerHTML = `
-                    <span class="lang-switch" data-en="By" data-es="Por">${lang === 'es' ? 'Por' : 'By'}</span>
-                    <a href="#" class="nav-link" data-page-id="member" data-member-id="${article.author_id}">${authorName}</a>
-                    <span>•</span>
-                    <span>${articleDate}</span>
-                `;
-
-                const contentContainer = document.getElementById('article-content');
-                contentContainer.innerHTML = (article[`content_${lang}`] || '').replace(/\\n/g, '\n').split('\n\n').map(p => `<p>${p.replace(/\n/g, '<br>')}</p>`).join('');
+                document.getElementById('article-meta').innerHTML = `<span class="lang-switch" data-en="By" data-es="Por">${lang === 'es' ? 'Por' : 'By'}</span> <a href="#" class="nav-link" data-page-id="member" data-member-id="${article.author_id}">${authorName}</a> <span>•</span> <span>${articleDate}</span>`;
+                document.getElementById('article-content').innerHTML = (article[`content_${lang}`] || '').replace(/\\n/g, '\n').split('\n\n').map(p => `<p>${p.replace(/\n/g, '<br>')}</p>`).join('');
 
                 document.querySelectorAll('.nav-link').forEach(link => {
                     if(link.closest('#article-meta') || link.classList.contains('back-link')) {
-                        link.addEventListener('click', (e) => {
-                            e.preventDefault();
-                            siteRouter.navigateTo(link.dataset.pageId, link.dataset.memberId);
-                        });
+                        link.addEventListener('click', (e) => { e.preventDefault(); siteRouter.navigateTo(link.dataset.pageId, link.dataset.memberId); });
                     }
                 });
-
                 renderShareButtons(window.location.href, articleTitle);
             };
             
@@ -166,26 +152,10 @@
 
             function renderShareButtons(url, text) {
                 const container = document.getElementById('social-share-container');
-                container.innerHTML = '';
-
-                const fbLike = document.createElement('div');
-                fbLike.className = 'fb-like';
-                fbLike.dataset.href = url;
-                fbLike.dataset.width = '';
-                fbLike.dataset.layout = 'button_count';
-                fbLike.dataset.action = 'like';
-                fbLike.dataset.size = 'small';
-                fbLike.dataset.share = 'true';
-                container.appendChild(fbLike);
-
-                const xShare = document.createElement('a');
-                xShare.className = 'twitter-share-button';
-                xShare.href = 'https://twitter.com/share?ref_src=twsrc%5Etfw';
-                xShare.dataset.text = `Check out this article: ${text}`;
-                xShare.dataset.url = url;
-                xShare.textContent = 'Tweet';
-                container.appendChild(xShare);
-
+                container.innerHTML = `
+                    <div class="fb-like" data-href="${url}" data-width="" data-layout="button" data-action="like" data-size="small" data-share="false"></div>
+                    <a class="twitter-share-button" href="https://twitter.com/share?ref_src=twsrc%5Etfw" data-text="Check out this article: ${text}" data-url="${url}">Post</a>
+                `;
                 if (typeof FB !== 'undefined') FB.XFBML.parse(container);
                 if (typeof twttr !== 'undefined') twttr.widgets.load(container);
             }
@@ -196,7 +166,6 @@
             commentForm.addEventListener('submit', async (e) => {
                 e.preventDefault();
                 formMessage.classList.remove('show');
-                
                 try {
                     await addDoc(collection(db, "comments"), {
                         articleId: articleId,
@@ -208,37 +177,31 @@
                     commentForm.reset();
                     formMessage.textContent = 'Thank you! Your comment is awaiting moderation.';
                     formMessage.className = 'form-message success show';
-                } catch (error) {
-                    console.error("Error adding comment: ", error);
-                }
+                } catch (error) { console.error("Error adding comment: ", error); }
             });
 
-            async function loadComments() {
+            const q = query(collection(db, "comments"), where("articleId", "==", articleId), where("isApproved", "==", true), orderBy("timestamp", "desc"));
+            onSnapshot(q, (querySnapshot) => {
                 const commentsList = document.getElementById('comments-list');
                 const commentsTitle = document.getElementById('comments-title');
-                commentsList.innerHTML = '';
                 
-                const q = query(
-                    collection(db, "comments"), 
-                    where("articleId", "==", articleId), 
-                    where("isApproved", "==", true),
-                    orderBy("timestamp", "desc")
-                );
-
-                const querySnapshot = await getDocs(q);
-                commentsTitle.style.display = querySnapshot.empty ? 'none' : 'block';
-
-                querySnapshot.forEach(doc => {
-                    const comment = doc.data();
-                    const date = comment.timestamp.toDate().toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' });
-                    const li = document.createElement('li');
-                    li.className = 'comment-item';
-                    li.innerHTML = `<p class="comment-author">${comment.name}</p><p class="comment-date">${date}</p><p class="comment-body">${comment.comment.replace(/\n/g, '<br>')}</p>`;
-                    commentsList.appendChild(li);
-                });
-            }
-
-            loadComments();
+                if (querySnapshot.empty) {
+                    commentsList.innerHTML = `<li class="comments-loading lang-switch" data-en="No comments yet." data-es="Aún no hay comentarios."></li>`;
+                    commentsTitle.style.display = 'none';
+                } else {
+                    commentsList.innerHTML = '';
+                    commentsTitle.style.display = 'block';
+                    querySnapshot.forEach(doc => {
+                        const comment = doc.data();
+                        const date = comment.timestamp.toDate().toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' });
+                        const li = document.createElement('li');
+                        li.className = 'comment-item';
+                        li.innerHTML = `<p class="comment-author">${comment.name}</p><p class="comment-date">${date}</p><p class="comment-body">${comment.comment.replace(/\n/g, '<br>')}</p>`;
+                        commentsList.appendChild(li);
+                    });
+                }
+                siteRouter.applyLanguage(localStorage.getItem('language') || 'en');
+            });
         });
     </script>
 </body>
