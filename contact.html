@@ -17,6 +17,8 @@
         .form-group input,.form-group textarea{width:100%;padding:12px 0;border:0;border-bottom:2px solid rgba(0,0,0,.2);font-family:var(--font-family);font-size:1rem;background-color:transparent;transition:border-color var(--transition-speed) ease}
         .form-group input:focus,.form-group textarea:focus{outline:0;border-color:currentColor}
         .form-group textarea{resize:vertical; min-height: 120px;}
+        .form-confirmation { padding: 20px; border-radius: 8px; background-color: var(--color-green); color: var(--color-green-dark); font-weight: 700; text-align: center; }
+        .hidden { display: none; }
         @media (max-width:768px){.hero-banner{background-attachment:scroll}.hero-banner h1{font-size:2.2rem}}
     </style>
 </head>
@@ -36,8 +38,7 @@
                 <h2 class="section-title lang-switch" data-en="Do you have questions?" data-es="¿Tienes preguntas?"></h2>
                 <p class="section-subtitle lang-switch" data-en="Use the form below for any questions, or contact us at <a href='mailto:literaryspeakingmentoring@gmail.com'>literaryspeakingmentoring@gmail.com</a>." data-es="Utilice el siguiente formulario para cualquier pregunta o póngase en contacto con nosotros en <a href='mailto:literaryspeakingmentoring@gmail.com'>literaryspeakingmentoring@gmail.com</a>."></p>
                 <div class="form-container scroll-animated">
-                    <form action="https://api.web3forms.com/submit" method="POST">
-                        <input type="hidden" name="access_key" value="YOUR_ACCESS_KEY_HERE">
+                    <form id="contact-form">
                         <div class="form-group">
                             <label for="contact-name" class="lang-switch" data-en="NAME *" data-es="NOMBRE *"></label>
                             <input type="text" id="contact-name" name="name" required>
@@ -52,6 +53,7 @@
                         </div>
                         <button type="submit" class="btn lang-switch" data-en="Submit" data-es="Enviar"></button>
                     </form>
+                    <div id="form-confirmation" class="form-confirmation hidden lang-switch" data-en="Thank you for your message! We'll get back to you soon." data-es="¡Gracias por tu mensaje! Nos pondremos en contacto contigo pronto."></div>
                 </div>
             </div>
         </section>
@@ -60,8 +62,51 @@
     <footer class="site-footer"></footer>
 
     <script src="router.js"></script>
-    <script>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
+        import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyD0qVihpuLI0cF0PZ32o8tFBLfTgjlqB6A",
+            authDomain: "literary-speaking.firebaseapp.com",
+            projectId: "literary-speaking",
+            storageBucket: "literary-speaking.appspot.com",
+            messagingSenderId: "699059463612",
+            appId: "1:699059463612:web:ecb2e784d627c6b93937b9",
+            measurementId: "G-0L1V3XXGGR"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
         document.addEventListener('DOMContentLoaded', () => {
+            const contactForm = document.getElementById('contact-form');
+            const confirmationMessage = document.getElementById('form-confirmation');
+
+            if (contactForm) {
+                contactForm.addEventListener('submit', async (event) => {
+                    event.preventDefault();
+                    
+                    const name = contactForm.name.value;
+                    const email = contactForm.email.value;
+                    const message = contactForm.message.value;
+
+                    try {
+                        await addDoc(collection(db, "messages"), {
+                            name: name,
+                            email: email,
+                            message: message,
+                            timestamp: serverTimestamp()
+                        });
+                        contactForm.style.display = 'none';
+                        confirmationMessage.classList.remove('hidden');
+                    } catch (error) {
+                        console.error("Error adding document: ", error);
+                        alert('There was an error sending your message. Please try again.');
+                    }
+                });
+            }
+
             const observer = new IntersectionObserver((entries) => {
                 entries.forEach(entry => {
                     if (entry.isIntersecting) {
