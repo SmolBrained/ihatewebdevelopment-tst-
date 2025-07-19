@@ -11,7 +11,6 @@
         .article-category {background-color:var(--color-green-dark);color:white;padding:5px 12px;border-radius:100px;font-size:0.9rem;font-weight:700;display:inline-block;margin-bottom:20px;}
         .article-title-full {font-size:3rem;font-weight:900;margin:0 0 20px;line-height:1.2;}
         .article-meta-full {font-size:1rem;color:var(--color-text-light);margin-bottom:40px;display:flex;justify-content:center;align-items:center;gap:15px;}
-        .article-meta-full svg {width:16px;height:16px;margin-right:5px;vertical-align:middle;}
         .article-meta-full a {color:var(--color-purple-dark);text-decoration:none;font-weight:700;}
         .article-meta-full a:hover {text-decoration:underline;}
         .article-image-full {width:100%;max-width:800px;margin:0 auto 15px;border-radius:16px;}
@@ -25,6 +24,7 @@
         .social-share { display: flex; align-items: center; gap: 20px; margin-bottom: 40px; min-height: 28px; }
 
         .comments-section h3 { font-size: 1.8rem; font-weight: 700; margin-bottom: 30px; }
+        .comment-form { background-color: #f9f9f9; padding: 20px; border-radius: 8px; }
         .comment-form .form-group { margin-bottom: 20px; }
         .comment-form label { font-weight: 700; font-size: 0.9rem; }
         .comment-form input, .comment-form textarea { width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 8px; font-family: var(--font-family); font-size: 1rem; }
@@ -34,11 +34,17 @@
         .form-message.success { background-color: var(--color-green); color: var(--color-green-dark); }
         
         .comments-list { list-style: none; padding: 0; margin-top: 40px; }
-        .comment-item { padding: 20px; border: 1px solid #eee; border-radius: 8px; margin-bottom: 20px; background-color: #fafafa; }
+        .comment-item { border-left: 3px solid #eee; padding-left: 20px; margin-bottom: 30px; }
+        .comment-item .comment-item { margin-top: 20px; }
         .comment-author { font-weight: 700; margin: 0 0 5px; }
         .comment-date { font-size: 0.85rem; color: #888; margin: 0 0 15px; }
-        .comment-body { line-height: 1.7; }
-        .comments-loading { text-align: center; color: var(--color-text-muted); padding: 20px; }
+        .comment-body { line-height: 1.7; margin-bottom: 15px; }
+        .comment-actions { display: flex; align-items: center; gap: 15px; font-size: 0.9rem; }
+        .comment-actions button { background: none; border: none; cursor: pointer; color: var(--color-text-light); font-weight: 700; padding: 5px; display: flex; align-items: center; gap: 5px; }
+        .comment-actions button:hover { color: var(--color-purple-dark); }
+        .comment-actions button.active { color: var(--color-purple-dark); }
+        .comment-actions button svg { width: 16px; height: 16px; fill: currentColor; }
+        .reply-form-container { margin-top: 15px; display: none; }
 
         @media (max-width:768px){.article-title-full{font-size:2.2rem;}}
     </style>
@@ -54,14 +60,7 @@
         <section class="section">
             <div class="container" id="article-container">
                 <a class="back-link nav-link" data-page-id="articles">← <span class="lang-switch" data-en="Back to all articles" data-es="Volver a todos los artículos"></span></a>
-                <div class="article-hero">
-                    <div id="article-category" class="article-category"></div>
-                    <h1 id="article-title" class="article-title-full"></h1>
-                    <div id="article-meta" class="article-meta-full"></div>
-                </div>
-                <img id="article-image" src="" alt="" class="article-image-full">
-                <p id="article-caption" class="article-image-caption"></p>
-                <div id="article-content" class="article-body"></div>
+                <div id="article-content-wrapper"></div>
 
                 <div class="article-footer">
                     <div id="social-share-container" class="social-share"></div>
@@ -75,9 +74,7 @@
                         </form>
 
                         <h3 id="comments-title" class="lang-switch" data-en="Comments" data-es="Comentarios" style="margin-top: 50px; display: none;"></h3>
-                        <ul id="comments-list" class="comments-list">
-                            <li class="comments-loading">Loading comments...</li>
-                        </ul>
+                        <ul id="comments-list" class="comments-list"></ul>
                     </div>
                 </div>
             </div>
@@ -89,7 +86,7 @@
     <script src="router.js"></script>
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
-        import { getFirestore, doc, getDoc, collection, addDoc, query, where, onSnapshot, serverTimestamp, orderBy } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
+        import { getFirestore, doc, getDoc, collection, addDoc, query, where, onSnapshot, serverTimestamp, orderBy, updateDoc, arrayUnion, arrayRemove, runTransaction } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyD0qVihpuLI0cF0PZ32o8tFBLfTgjlqB6A",
@@ -109,12 +106,18 @@
             
             const urlParams = new URLSearchParams(window.location.search);
             const articleId = urlParams.get('id');
+            const contentWrapper = document.getElementById('article-content-wrapper');
+            const commentsList = document.getElementById('comments-list');
+            let userId = localStorage.getItem('ls-userId');
+            if (!userId) {
+                userId = crypto.randomUUID();
+                localStorage.setItem('ls-userId', userId);
+            }
             
             if (!articleId) return siteRouter.navigateTo('articles');
 
             const docRef = doc(db, "articles", articleId);
             const docSnap = await getDoc(docRef);
-
             if (!docSnap.exists()) return siteRouter.navigateTo('articles');
             
             const article = docSnap.data();
@@ -122,31 +125,33 @@
             const updateArticleText = (lang) => {
                 const articleTitle = article[`title_${lang}`];
                 document.title = `${articleTitle} - Literary Speaking`;
-                document.getElementById('article-category').textContent = article[`category_${lang}`];
-                document.getElementById('article-title').textContent = articleTitle;
-                document.getElementById('article-caption').textContent = article[`image_caption_${lang}`];
-                
-                const author = siteRouter.members[article.author_id];
-                const authorName = author ? author.name : 'Anonymous';
+                const author = siteRouter.members[article.author_id] || { name: 'Anonymous' };
                 const articleDate = new Date(article.date).toLocaleDateString(lang.startsWith('es') ? 'es-ES' : 'en-US', { year: 'numeric', month: 'long', day: 'numeric' });
 
-                document.getElementById('article-meta').innerHTML = `<span class="lang-switch" data-en="By" data-es="Por">${lang === 'es' ? 'Por' : 'By'}</span> <a href="#" class="nav-link" data-page-id="member" data-member-id="${article.author_id}">${authorName}</a> <span>•</span> <span>${articleDate}</span>`;
-                document.getElementById('article-content').innerHTML = (article[`content_${lang}`] || '').replace(/\\n/g, '\n').split('\n\n').map(p => `<p>${p.replace(/\n/g, '<br>')}</p>`).join('');
-
+                contentWrapper.innerHTML = `
+                    <div class="article-hero">
+                        <div class="article-category">${article[`category_${lang}`]}</div>
+                        <h1 class="article-title-full">${articleTitle}</h1>
+                        <div class="article-meta-full">
+                            <span class="lang-switch" data-en="By" data-es="Por">${lang === 'es' ? 'Por' : 'By'}</span>
+                            <a href="#" class="nav-link" data-page-id="member" data-member-id="${article.author_id}">${author.name}</a>
+                            <span>•</span>
+                            <span>${articleDate}</span>
+                        </div>
+                    </div>
+                    <img id="article-image" src="${article.image}" alt="${article.title_en}" class="article-image-full">
+                    <p class="article-image-caption">${article[`image_caption_${lang}`]}</p>
+                    <div class="article-body">${(article[`content_${lang}`] || '').replace(/\\n/g, '\n').split('\n\n').map(p => `<p>${p.replace(/\n/g, '<br>')}</p>`).join('')}</div>
+                `;
                 document.querySelectorAll('.nav-link').forEach(link => {
-                    if(link.closest('#article-meta') || link.classList.contains('back-link')) {
+                    if(link.closest('.article-meta-full')) {
                         link.addEventListener('click', (e) => { e.preventDefault(); siteRouter.navigateTo(link.dataset.pageId, link.dataset.memberId); });
                     }
                 });
                 renderShareButtons(window.location.href, articleTitle);
             };
             
-            document.getElementById('article-image').src = article.image;
-            document.getElementById('article-image').alt = article.title_en;
-
-            const initialLang = localStorage.getItem('language') || 'en';
-            updateArticleText(initialLang);
-
+            updateArticleText(localStorage.getItem('language') || 'en');
             const langObserver = new MutationObserver(() => updateArticleText(document.documentElement.lang));
             langObserver.observe(document.documentElement, { attributes: true, attributeFilter: ['lang'] });
 
@@ -160,47 +165,129 @@
                 if (typeof twttr !== 'undefined') twttr.widgets.load(container);
             }
 
-            const commentForm = document.getElementById('comment-form');
-            const formMessage = document.getElementById('form-message');
-
-            commentForm.addEventListener('submit', async (e) => {
+            document.getElementById('comment-form').addEventListener('submit', async (e) => {
                 e.preventDefault();
+                const formMessage = document.getElementById('form-message');
                 formMessage.classList.remove('show');
                 try {
                     await addDoc(collection(db, "comments"), {
                         articleId: articleId,
+                        parentId: e.target.dataset.parentId || null,
                         name: document.getElementById('comment-name').value,
                         comment: document.getElementById('comment-text').value,
                         timestamp: serverTimestamp(),
-                        isApproved: false
+                        isApproved: false,
+                        likes: [],
+                        dislikes: []
                     });
-                    commentForm.reset();
+                    e.target.reset();
                     formMessage.textContent = 'Thank you! Your comment is awaiting moderation.';
                     formMessage.className = 'form-message success show';
                 } catch (error) { console.error("Error adding comment: ", error); }
             });
 
-            const q = query(collection(db, "comments"), where("articleId", "==", articleId), where("isApproved", "==", true), orderBy("timestamp", "desc"));
-            onSnapshot(q, (querySnapshot) => {
-                const commentsList = document.getElementById('comments-list');
-                const commentsTitle = document.getElementById('comments-title');
+            const q = query(collection(db, "comments"), where("articleId", "==", articleId), where("isApproved", "==", true), orderBy("timestamp", "asc"));
+            onSnapshot(q, (snapshot) => {
+                const comments = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                const commentsById = comments.reduce((acc, comment) => ({ ...acc, [comment.id]: { ...comment, children: [] } }), {});
+                const rootComments = [];
+                comments.forEach(comment => {
+                    if (comment.parentId && commentsById[comment.parentId]) {
+                        commentsById[comment.parentId].children.push(commentsById[comment.id]);
+                    } else {
+                        rootComments.push(commentsById[comment.id]);
+                    }
+                });
                 
-                if (querySnapshot.empty) {
-                    commentsList.innerHTML = `<li class="comments-loading lang-switch" data-en="No comments yet." data-es="Aún no hay comentarios."></li>`;
-                    commentsTitle.style.display = 'none';
-                } else {
-                    commentsList.innerHTML = '';
-                    commentsTitle.style.display = 'block';
-                    querySnapshot.forEach(doc => {
-                        const comment = doc.data();
-                        const date = comment.timestamp.toDate().toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' });
-                        const li = document.createElement('li');
-                        li.className = 'comment-item';
-                        li.innerHTML = `<p class="comment-author">${comment.name}</p><p class="comment-date">${date}</p><p class="comment-body">${comment.comment.replace(/\n/g, '<br>')}</p>`;
-                        commentsList.appendChild(li);
+                document.getElementById('comments-title').style.display = comments.length > 0 ? 'block' : 'none';
+                commentsList.innerHTML = rootComments.length > 0
+                    ? rootComments.map(comment => renderComment(comment)).join('')
+                    : `<li class="comments-loading lang-switch" data-en="No comments yet." data-es="Aún no hay comentarios."></li>`;
+                
+                siteRouter.applyLanguage(localStorage.getItem('language') || 'en');
+            });
+
+            function renderComment(comment) {
+                const date = comment.timestamp?.toDate().toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' }) || 'Just now';
+                const hasLiked = comment.likes.includes(userId);
+                const hasDisliked = comment.dislikes.includes(userId);
+                return `
+                    <li class="comment-item" id="comment-${comment.id}">
+                        <p class="comment-author">${comment.name}</p>
+                        <p class="comment-date">${date}</p>
+                        <p class="comment-body">${comment.comment.replace(/\n/g, '<br>')}</p>
+                        <div class="comment-actions">
+                            <button class="like-btn ${hasLiked ? 'active' : ''}" data-id="${comment.id}">
+                                <svg viewBox="0 0 24 24"><path d="M5 9v12H1V9h4zm16-2h-3.17l.94-4.34.03-.32c0-.41-.17-.79-.44-1.06L17.17 0l-6.58 6.59c-.36.36-.59.86-.59 1.41v10c0 1.1.9 2 2 2h7c.83 0 1.54-.5 1.84-1.22l3.02-7.05c.09-.23.14-.47.14-.73v-2c0-1.1-.9-2-2-2z"></path></svg>
+                                <span>${comment.likes.length}</span>
+                            </button>
+                            <button class="dislike-btn ${hasDisliked ? 'active' : ''}" data-id="${comment.id}">
+                                <svg viewBox="0 0 24 24"><path d="M19 15V3H23V15H19ZM3 13H6.17L5.23 17.34L5.2 17.66C5.2 18 5.37 18.34 5.64 18.61L6.83 19.8L13.41 13.21C13.78 12.85 14 12.35 14 11.8V5C14 3.9 13.1 3 12 3H5C4.17 3 3.46 3.5 3.16 4.22L0.14 11.27C0.05 11.5 0 11.74 0 12V13C0 13.55 0.45 14 1 14H3Z"></path></svg>
+                                <span>${comment.dislikes.length}</span>
+                            </button>
+                            <button class="reply-btn" data-id="${comment.id}">Reply</button>
+                        </div>
+                        <div class="reply-form-container"></div>
+                        <ul class="comments-list">${comment.children.map(renderComment).join('')}</ul>
+                    </li>
+                `;
+            }
+
+            commentsList.addEventListener('click', async (e) => {
+                const button = e.target.closest('button');
+                if (!button) return;
+                
+                const commentId = button.dataset.id;
+                if (button.classList.contains('reply-btn')) {
+                    const container = document.getElementById(`comment-${commentId}`).querySelector('.reply-form-container');
+                    if (container.innerHTML) {
+                        container.innerHTML = '';
+                        container.style.display = 'none';
+                    } else {
+                        const replyForm = document.getElementById('comment-form').cloneNode(true);
+                        replyForm.id = `reply-form-${commentId}`;
+                        replyForm.dataset.parentId = commentId;
+                        container.appendChild(replyForm);
+                        container.style.display = 'block';
+                        replyForm.addEventListener('submit', async (ev) => {
+                            ev.preventDefault();
+                            await addDoc(collection(db, "comments"), {
+                                articleId,
+                                parentId: commentId,
+                                name: ev.target.querySelector('input').value,
+                                comment: ev.target.querySelector('textarea').value,
+                                timestamp: serverTimestamp(),
+                                isApproved: false,
+                                likes: [],
+                                dislikes: []
+                            });
+                            container.innerHTML = '';
+                            container.style.display = 'none';
+                        });
+                    }
+                } else if (button.classList.contains('like-btn') || button.classList.contains('dislike-btn')) {
+                    const voteType = button.classList.contains('like-btn') ? 'likes' : 'dislikes';
+                    const oppositeType = voteType === 'likes' ? 'dislikes' : 'likes';
+                    const commentRef = doc(db, "comments", commentId);
+
+                    await runTransaction(db, async (transaction) => {
+                        const commentDoc = await transaction.get(commentRef);
+                        if (!commentDoc.exists()) return;
+                        
+                        const data = commentDoc.data();
+                        const voteArray = data[voteType];
+                        const oppositeArray = data[oppositeType];
+                        
+                        if (voteArray.includes(userId)) {
+                            transaction.update(commentRef, { [voteType]: arrayRemove(userId) });
+                        } else {
+                            transaction.update(commentRef, {
+                                [voteType]: arrayUnion(userId),
+                                [oppositeType]: arrayRemove(userId)
+                            });
+                        }
                     });
                 }
-                siteRouter.applyLanguage(localStorage.getItem('language') || 'en');
             });
         });
     </script>
