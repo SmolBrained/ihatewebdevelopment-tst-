@@ -32,7 +32,6 @@
         .form-message { padding: 15px; border-radius: 8px; margin-top: 20px; font-weight: 500; display: none; }
         .form-message.show { display: block; }
         .form-message.success { background-color: var(--color-green); color: var(--color-green-dark); }
-        .form-message.moderation { background-color: #fff4e5; color: #ff9800; }
         
         .comments-list { list-style: none; padding: 0; margin-top: 40px; }
         .comment-item { border-left: 3px solid #eee; padding-left: 20px; margin-bottom: 30px; }
@@ -84,7 +83,6 @@
 
     <footer class="site-footer"></footer>
 
-    <script src="https://cdn.jsdelivr.net/npm/@2toad/profanity@2.2.0/dist/profanity.js"></script>
     <script src="router.js"></script>
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
@@ -105,9 +103,6 @@
 
         document.addEventListener('DOMContentLoaded', async () => {
             await siteRouter.loadMembers();
-            
-            const { Profanity, en, es } = profanity;
-            const profanityFilter = new Profanity({ words: { ...en, ...es } });
             
             const urlParams = new URLSearchParams(window.location.search);
             const articleId = urlParams.get('id');
@@ -174,31 +169,20 @@
                 e.preventDefault();
                 const formMessage = document.getElementById('form-message');
                 formMessage.classList.remove('show');
-
-                const commentText = document.getElementById('comment-text').value;
-                const containsProfanity = profanityFilter.exists(commentText);
-                const isApproved = !containsProfanity;
-
                 try {
                     await addDoc(collection(db, "comments"), {
                         articleId: articleId,
                         parentId: e.target.dataset.parentId || null,
                         name: document.getElementById('comment-name').value,
-                        comment: commentText,
+                        comment: document.getElementById('comment-text').value,
                         timestamp: serverTimestamp(),
-                        isApproved: isApproved,
+                        isApproved: false,
                         likes: [],
                         dislikes: []
                     });
                     e.target.reset();
-                    
-                    if (isApproved) {
-                        formMessage.textContent = 'Comment posted successfully!';
-                        formMessage.className = 'form-message success show';
-                    } else {
-                        formMessage.textContent = 'Your comment contains sensitive language and is being held for moderation.';
-                        formMessage.className = 'form-message moderation show';
-                    }
+                    formMessage.textContent = 'Thank you! Your comment is awaiting moderation.';
+                    formMessage.className = 'form-message success show';
                 } catch (error) { console.error("Error adding comment: ", error); }
             });
 
@@ -267,16 +251,13 @@
                         container.style.display = 'block';
                         replyForm.addEventListener('submit', async (ev) => {
                             ev.preventDefault();
-                            const replyText = ev.target.querySelector('textarea').value;
-                            const replyContainsProfanity = profanityFilter.exists(replyText);
-                            
                             await addDoc(collection(db, "comments"), {
                                 articleId,
                                 parentId: commentId,
                                 name: ev.target.querySelector('input').value,
-                                comment: replyText,
+                                comment: ev.target.querySelector('textarea').value,
                                 timestamp: serverTimestamp(),
-                                isApproved: !replyContainsProfanity,
+                                isApproved: false,
                                 likes: [],
                                 dislikes: []
                             });
@@ -295,6 +276,7 @@
                         
                         const data = commentDoc.data();
                         const voteArray = data[voteType] || [];
+                        const oppositeArray = data[oppositeType] || [];
                         
                         if (voteArray.includes(userId)) {
                             transaction.update(commentRef, { [voteType]: arrayRemove(userId) });
