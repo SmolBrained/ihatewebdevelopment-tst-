@@ -1,8 +1,9 @@
 const siteRouter = {
     pages: {
-        "home": "index.html",
+        "home": "./index.html",
         "about": "about.html",
         "news": "news.html",
+        "news-single": "news-single.html",
         "the-team": "team.html",
         "contact": "contact.html",
         "receive-tutoring": "receive-tutoring.html",
@@ -27,7 +28,7 @@ const siteRouter = {
     navigateTo(pageId, params = null) {
         let url = this.pages[pageId];
         if (url) {
-            if ((pageId === 'member' || pageId === 'article-single') && params) {
+            if ((pageId === 'member' || pageId === 'article-single' || pageId === 'news-single') && params) {
                 url += `?id=${params}`;
             }
             window.location.href = url;
@@ -154,10 +155,9 @@ const siteRouter = {
         const body = document.body;
         
         const path = window.location.pathname;
-        const isArticlePage = path.endsWith('article-single.html');
-        const isMemberPage = path.endsWith('members.html');
+        const isSinglePage = path.endsWith('article-single.html') || path.endsWith('news-single.html') || path.endsWith('members.html');
 
-        if (isArticlePage || isMemberPage) {
+        if (isSinglePage) {
             header?.classList.add('scrolled');
         } else {
             const handleScroll = () => {
