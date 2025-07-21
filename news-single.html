@@ -7,7 +7,7 @@
     <title>News | Literary Speaking</title>
     <link rel="stylesheet" href="style.css">
     <style>
-        .news-layout { display: grid; grid-template-columns: 3fr 1fr; gap: 50px; align-items: flex-start; }
+        .news-article-container { max-width: 750px; margin: 0 auto; }
         .news-hero {padding: 60px 0 30px; text-align:left;}
         .news-title-full {font-size:3rem;font-weight:900;margin:0 0 20px;line-height:1.2;}
         .news-meta-full {font-size:1rem;color:var(--color-text-light);margin-bottom:40px; border-top: 1px solid #eee; border-bottom: 1px solid #eee; padding: 15px 0;}
@@ -20,17 +20,6 @@
         .news-body figcaption {font-size:0.9rem;color:var(--color-text-light);text-align:center;margin-top: 10px;font-style:italic;}
         .back-link {display:inline-block; margin-bottom: 20px; font-weight: 700; color: var(--color-purple-dark); text-decoration: none;}
         .back-link:hover {text-decoration: underline;}
-        
-        .sidebar { position: sticky; top: 100px; }
-        .sidebar-widget-title { font-size: 1.3rem; font-weight: 700; margin-bottom: 15px; border-bottom: 2px solid var(--color-purple); padding-bottom: 10px; }
-        .sidebar ul { list-style: none; padding: 0; margin: 0; }
-        .sidebar ul li { margin-bottom: 15px; }
-        .sidebar ul a { text-decoration: none; color: var(--color-text); }
-        .sidebar ul a:hover .sidebar-item-title { color: var(--color-purple-dark); }
-        .sidebar-item-title { font-size: 1.1rem; font-weight: 700; margin: 0 0 5px; line-height: 1.3; transition: color 0.3s ease; }
-        .sidebar-item-date { font-size: 0.85rem; color: var(--color-text-light); }
-
-        @media (max-width:900px){ .news-layout { grid-template-columns: 1fr; } .sidebar { position: static; margin-top: 60px; } }
         @media (max-width:768px){.news-title-full{font-size:2.2rem;}}
     </style>
 </head>
@@ -38,9 +27,9 @@
     <header class="site-header" id="header"></header>
     <main>
         <section class="section">
-            <div class="container" id="news-container">
-                <a class="back-link nav-link" data-page-id="news">← <span class="lang-switch" data-en="Back to all news" data-es="Volver a todas las noticias"></span></a>
-                <div class="news-layout">
+            <div class="container">
+                <div class="news-article-container">
+                    <a class="back-link nav-link" data-page-id="news">← <span class="lang-switch" data-en="Back to all news" data-es="Volver a todas las noticias"></span></a>
                     <article>
                         <div class="news-hero">
                             <h1 id="news-title" class="news-title-full"></h1>
@@ -48,10 +37,6 @@
                         </div>
                         <div id="news-content" class="news-body"></div>
                     </article>
-                    <aside class="sidebar">
-                        <h3 class="sidebar-widget-title lang-switch" data-en="More News" data-es="Más Noticias"></h3>
-                        <ul id="more-news-list"></ul>
-                    </aside>
                 </div>
             </div>
         </section>
@@ -60,7 +45,7 @@
     <script src="router.js"></script>
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
-        import { getFirestore, doc, getDoc, collection, query, orderBy, limit, getDocs } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
+        import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyD0qVihpuLI0cF0PZ32o8tFBLfTgjlqB6A",
@@ -85,30 +70,6 @@
             if (!docSnap.exists()) return siteRouter.navigateTo('news');
             
             const item = docSnap.data();
-
-            const moreNewsQuery = query(collection(db, "news"), orderBy("date", "desc"), limit(6));
-            const moreNewsSnapshot = await getDocs(moreNewsQuery);
-            const moreNewsItems = moreNewsSnapshot.docs
-                .filter(doc => doc.id !== newsId)
-                .slice(0, 5)
-                .map(doc => ({ id: doc.id, ...doc.data() }));
-
-            const populateSidebar = (lang) => {
-                const moreNewsList = document.getElementById('more-news-list');
-                if (!moreNewsList) return;
-                moreNewsList.innerHTML = '';
-                moreNewsItems.forEach(newsItem => {
-                    const li = document.createElement('li');
-                    const itemDate = new Date(newsItem.date).toLocaleDateString(lang.startsWith('es') ? 'es-ES' : 'en-US', { year: 'numeric', month: 'long', day: 'numeric' });
-                    li.innerHTML = `
-                        <a href="news-single.html?id=${newsItem.id}">
-                            <h4 class="sidebar-item-title">${newsItem[`title_${lang}`]}</h4>
-                            <p class="sidebar-item-date">${itemDate}</p>
-                        </a>
-                    `;
-                    moreNewsList.appendChild(li);
-                });
-            };
 
             const updateNewsText = (lang) => {
                 document.title = `${item[`title_${lang}`]} - Literary Speaking`;
@@ -143,13 +104,10 @@
             
             const initialLang = localStorage.getItem('language') || 'en';
             updateNewsText(initialLang);
-            populateSidebar(initialLang);
             siteRouter.applyLanguage(initialLang);
-
             const langObserver = new MutationObserver(() => {
                 const lang = document.documentElement.lang;
                 updateNewsText(lang);
-                populateSidebar(lang);
                 siteRouter.applyLanguage(lang);
             });
             langObserver.observe(document.documentElement, { attributes: true, attributeFilter: ['lang'] });
