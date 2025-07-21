@@ -65,15 +65,19 @@
             const gridContainer = document.getElementById('news-grid-container');
 
             const populateGrid = (lang) => {
+                if (!gridContainer) return;
                 gridContainer.innerHTML = '';
+
                 if (newsItems.length === 0) {
                     gridContainer.innerHTML = `<p class="lang-switch" data-en="No news items yet. Check back soon!" data-es="Aún no hay noticias. ¡Vuelve pronto!"></p>`;
+                    siteRouter.applyLanguage(lang);
                     return;
                 }
+
                 newsItems.forEach(item => {
                     const itemDate = new Date(item.date).toLocaleDateString(lang.startsWith('es') ? 'es-ES' : 'en-US', { year: 'numeric', month: 'long', day: 'numeric' });
                     const card = document.createElement('div');
-                    card.className = 'news-card scroll-animated';
+                    card.className = 'news-card';
                     card.addEventListener('click', () => siteRouter.navigateTo('news-single', item.id));
                     card.innerHTML = `
                         <div class="news-card-image-wrapper"><img src="${item.image}" alt="" class="news-card-image"></div>
@@ -90,11 +94,9 @@
 
             const initialLang = localStorage.getItem('language') || 'en';
             populateGrid(initialLang);
-            siteRouter.applyLanguage(initialLang);
+
             const langObserver = new MutationObserver(() => {
-                const lang = document.documentElement.lang;
-                populateGrid(lang);
-                siteRouter.applyLanguage(lang);
+                populateGrid(document.documentElement.lang);
             });
             langObserver.observe(document.documentElement, { attributes: true, attributeFilter: ['lang'] });
         });
