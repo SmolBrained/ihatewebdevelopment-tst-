@@ -45,6 +45,8 @@
         .comment-actions button.active { color: var(--color-purple-dark); }
         .comment-actions button svg { width: 16px; height: 16px; fill: currentColor; }
         .reply-form-container { margin-top: 15px; display: none; }
+        .auth-state { font-size: 0.9rem; margin-bottom: 20px; background-color: #f0e6fa; padding: 10px; border-radius: 8px; }
+        .auth-state a { color: var(--color-purple-dark); font-weight: 700; cursor: pointer; }
 
         @media (max-width:768px){.article-title-full{font-size:2.2rem;}}
     </style>
@@ -66,11 +68,21 @@
                     <div id="social-share-container" class="social-share"></div>
                     <div class="comments-section">
                         <h3 class="lang-switch" data-en="Leave a Reply" data-es="Deja una respuesta"></h3>
+                        <div id="auth-state" class="auth-state hidden"></div>
                         <form id="comment-form" class="comment-form">
-                            <div class="form-group"><label for="comment-name" class="lang-switch" data-en="Name (required)" data-es="Nombre (requerido)"></label><input type="text" id="comment-name" required></div>
-                            <div class="form-group"><label for="comment-email" class="lang-switch" data-en="Email (for verification, not published)" data-es="Correo electrónico (para verificación, no se publica)"></label><input type="email" id="comment-email" required></div>
-                            <div class="form-group"><label for="comment-text" class="lang-switch" data-en="Comments (required)" data-es="Comentarios (requerido)"></label><textarea id="comment-text" rows="5" required></textarea></div>
-                            <button type="submit" class="btn lang-switch" data-en="Submit" data-es="Enviar"></button>
+                            <div class="form-group" id="name-field-group">
+                                <label for="comment-name" class="lang-switch" data-en="Name (required)" data-es="Nombre (requerido)"></label>
+                                <input type="text" id="comment-name" required>
+                            </div>
+                            <div class="form-group hidden" id="email-field-group">
+                                <label for="comment-email" class="lang-switch" data-en="Email (required for verification)" data-es="Correo electrónico (requerido para verificación)"></label>
+                                <input type="email" id="comment-email" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="comment-text" class="lang-switch" data-en="Comments (required)" data-es="Comentarios (requerido)"></label>
+                                <textarea id="comment-text" rows="5" required></textarea>
+                            </div>
+                            <button type="submit" id="comment-submit-btn" class="btn lang-switch" data-en="Continue" data-es="Continuar"></button>
                             <div id="form-message" class="form-message"></div>
                         </form>
 
@@ -87,6 +99,7 @@
     <script src="router.js"></script>
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
+        import { getAuth, isSignInWithEmailLink, sendSignInLinkToEmail, signInWithEmailLink, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js";
         import { getFirestore, doc, getDoc, collection, addDoc, query, where, onSnapshot, serverTimestamp, orderBy, updateDoc, arrayUnion, arrayRemove, runTransaction } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
 
         const firebaseConfig = {
@@ -101,6 +114,7 @@
 
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
+        const auth = getAuth(app);
 
         document.addEventListener('DOMContentLoaded', async () => {
             await siteRouter.loadMembers();
@@ -109,11 +123,6 @@
             const articleId = urlParams.get('id');
             const contentWrapper = document.getElementById('article-content-wrapper');
             const commentsList = document.getElementById('comments-list');
-            let userId = localStorage.getItem('ls-userId');
-            if (!userId) {
-                userId = crypto.randomUUID();
-                localStorage.setItem('ls-userId', userId);
-            }
             
             if (!articleId) return siteRouter.navigateTo('articles');
 
@@ -166,65 +175,117 @@
                 if (typeof twttr !== 'undefined') twttr.widgets.load(container);
             }
 
-            document.getElementById('comment-form').addEventListener('submit', async (e) => {
+            const commentForm = document.getElementById('comment-form');
+            const nameGroup = document.getElementById('name-field-group');
+            const emailGroup = document.getElementById('email-field-group');
+            const authStateDiv = document.getElementById('auth-state');
+            const submitBtn = document.getElementById('comment-submit-btn');
+            const formMessage = document.getElementById('form-message');
+
+            onAuthStateChanged(auth, user => {
+                if (user) {
+                    authStateDiv.innerHTML = `Commenting as ${user.email}. <a id="sign-out-link">Sign out</a>`;
+                    authStateDiv.classList.remove('hidden');
+                    nameGroup.classList.add('hidden');
+                    emailGroup.classList.add('hidden');
+                    submitBtn.textContent = 'Post Comment';
+                    document.getElementById('sign-out-link').addEventListener('click', () => signOut(auth));
+                } else {
+                    authStateDiv.classList.add('hidden');
+                    nameGroup.classList.remove('hidden');
+                    emailGroup.classList.add('hidden');
+                    submitBtn.textContent = 'Continue';
+                }
+            });
+
+            if (isSignInWithEmailLink(auth, window.location.href)) {
+                let email = window.localStorage.getItem('emailForSignIn');
+                if (!email) {
+                    email = window.prompt('Please provide your email for confirmation');
+                }
+                signInWithEmailLink(auth, email, window.location.href)
+                    .then((result) => {
+                        window.localStorage.removeItem('emailForSignIn');
+                        const pendingComment = JSON.parse(window.localStorage.getItem('pendingComment'));
+                        if (pendingComment) {
+                            addDoc(collection(db, "comments"), { ...pendingComment, uid: result.user.uid, email: result.user.email });
+                            window.localStorage.removeItem('pendingComment');
+                        }
+                    })
+                    .catch((error) => console.error(error));
+            }
+
+            commentForm.addEventListener('submit', async (e) => {
                 e.preventDefault();
-                const formMessage = document.getElementById('form-message');
                 formMessage.classList.remove('show');
-                const verificationToken = crypto.randomUUID();
-                const verificationUrl = `${window.location.origin}/verify-comment.html?id=${verificationToken}`;
+                const currentUser = auth.currentUser;
 
-                try {
-                    const pendingCommentData = {
-                        articleId: articleId,
-                        parentId: e.target.dataset.parentId || null,
-                        name: document.getElementById('comment-name').value,
-                        email: document.getElementById('comment-email').value,
-                        comment: document.getElementById('comment-text').value,
-                        timestamp: serverTimestamp(),
-                        verificationToken: verificationToken
-                    };
-                    
-                    const pendingDocRef = await addDoc(collection(db, "pendingComments"), pendingCommentData);
-                    
-                    await addDoc(collection(db, "mail"), {
-                        to: pendingCommentData.email,
-                        message: {
-                            subject: "Please Verify Your Comment on Literary Speaking",
-                            html: `
-                                <h1>Thank you for your comment!</h1>
-                                <p>Please click the link below to verify and submit your comment for moderation.</p>
-                                <a href="${window.location.origin}/verify-comment.html?id=${pendingDocRef.id}&token=${verificationToken}" target="_blank">Verify My Comment</a>
-                                <p>This link will expire in 24 hours.</p>
-                            `,
-                        },
-                    });
+                if (currentUser) {
+                    try {
+                        await addDoc(collection(db, "comments"), {
+                            articleId: articleId,
+                            parentId: null,
+                            name: currentUser.displayName || currentUser.email.split('@')[0],
+                            comment: document.getElementById('comment-text').value,
+                            timestamp: serverTimestamp(),
+                            isApproved: false,
+                            likes: [],
+                            dislikes: [],
+                            uid: currentUser.uid,
+                            email: currentUser.email
+                        });
+                        commentForm.reset();
+                        formMessage.textContent = 'Thank you! Your comment is being processed.';
+                        formMessage.className = 'form-message success show';
+                    } catch (error) { console.error("Error adding comment: ", error); }
+                } else {
+                    if (!emailGroup.classList.contains('hidden')) {
+                        const name = document.getElementById('comment-name').value;
+                        const email = document.getElementById('comment-email').value;
+                        const comment = document.getElementById('comment-text').value;
 
-                    e.target.reset();
-                    formMessage.textContent = 'Success! Please check your email to verify your comment.';
-                    formMessage.className = 'form-message success show';
-                } catch (error) { 
-                    console.error("Error submitting comment: ", error);
-                    formMessage.textContent = 'There was an error submitting your comment.';
-                    formMessage.className = 'form-message error show';
+                        const actionCodeSettings = {
+                            url: window.location.href,
+                            handleCodeInApp: true,
+                        };
+
+                        try {
+                            await sendSignInLinkToEmail(auth, email, actionCodeSettings);
+                            window.localStorage.setItem('emailForSignIn', email);
+                            window.localStorage.setItem('pendingComment', JSON.stringify({
+                                articleId,
+                                parentId: null,
+                                name,
+                                comment,
+                                timestamp: serverTimestamp(),
+                                isApproved: false,
+                                likes: [],
+                                dislikes: []
+                            }));
+                            formMessage.textContent = 'A verification link has been sent to your email. Please click it to post your comment.';
+                            formMessage.className = 'form-message success show';
+                        } catch(error) { console.error(error); }
+
+                    } else {
+                        emailGroup.classList.remove('hidden');
+                        submitBtn.textContent = 'Send Verification Link';
+                    }
                 }
             });
 
             const q = query(collection(db, "comments"), where("articleId", "==", articleId), where("isApproved", "==", true), orderBy("timestamp", "asc"));
             onSnapshot(q, (snapshot) => {
                 const comments = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-                const commentsById = comments.reduce((acc, comment) => ({ ...acc, [comment.id]: { ...comment, children: [] } }), {});
+                const commentsById = comments.reduce((acc, c) => ({ ...acc, [c.id]: { ...c, children: [] } }), {});
                 const rootComments = [];
-                comments.forEach(comment => {
-                    if (comment.parentId && commentsById[comment.parentId]) {
-                        commentsById[comment.parentId].children.push(commentsById[comment.id]);
-                    } else {
-                        rootComments.push(commentsById[comment.id]);
-                    }
+                comments.forEach(c => {
+                    if (c.parentId && commentsById[c.parentId]) commentsById[c.parentId].children.push(commentsById[c.id]);
+                    else rootComments.push(commentsById[c.id]);
                 });
                 
                 document.getElementById('comments-title').style.display = comments.length > 0 ? 'block' : 'none';
                 commentsList.innerHTML = rootComments.length > 0
-                    ? rootComments.map(comment => renderComment(comment)).join('')
+                    ? rootComments.map(c => renderComment(c)).join('')
                     : `<li class="comments-loading lang-switch" data-en="No comments yet." data-es="Aún no hay comentarios."></li>`;
                 
                 siteRouter.applyLanguage(localStorage.getItem('language') || 'en');
@@ -232,8 +293,9 @@
 
             function renderComment(comment) {
                 const date = comment.timestamp?.toDate().toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' }) || 'Just now';
-                const hasLiked = (comment.likes || []).includes(userId);
-                const hasDisliked = (comment.dislikes || []).includes(userId);
+                const currentUser = auth.currentUser;
+                const hasLiked = currentUser && (comment.likes || []).includes(currentUser.uid);
+                const hasDisliked = currentUser && (comment.dislikes || []).includes(currentUser.uid);
                 return `
                     <li class="comment-item" id="comment-${comment.id}">
                         <p class="comment-author">${comment.name}</p>
@@ -261,6 +323,13 @@
                 if (!button) return;
                 
                 const commentId = button.dataset.id;
+                const currentUser = auth.currentUser;
+
+                if (!currentUser) {
+                    alert('Please verify your email to interact with comments.');
+                    return;
+                }
+
                 if (button.classList.contains('reply-btn')) {
                     const container = document.getElementById(`comment-${commentId}`).querySelector('.reply-form-container');
                     if (container.innerHTML) {
@@ -269,7 +338,9 @@
                     } else {
                         const replyForm = document.getElementById('comment-form').cloneNode(true);
                         replyForm.id = `reply-form-${commentId}`;
-                        replyForm.dataset.parentId = commentId;
+                        replyForm.querySelector('#name-field-group').remove();
+                        replyForm.querySelector('#email-field-group').remove();
+                        replyForm.querySelector('#comment-submit-btn').textContent = 'Post Reply';
                         container.appendChild(replyForm);
                         container.style.display = 'block';
                         replyForm.addEventListener('submit', async (ev) => {
@@ -277,12 +348,14 @@
                             await addDoc(collection(db, "comments"), {
                                 articleId,
                                 parentId: commentId,
-                                name: ev.target.querySelector('#comment-name').value,
-                                comment: ev.target.querySelector('#comment-text').value,
+                                name: currentUser.displayName || currentUser.email.split('@')[0],
+                                comment: ev.target.querySelector('textarea').value,
                                 timestamp: serverTimestamp(),
                                 isApproved: false,
                                 likes: [],
-                                dislikes: []
+                                dislikes: [],
+                                uid: currentUser.uid,
+                                email: currentUser.email
                             });
                             container.innerHTML = '';
                             container.style.display = 'none';
@@ -301,12 +374,12 @@
                         const voteArray = data[voteType] || [];
                         const oppositeArray = data[oppositeType] || [];
                         
-                        if (voteArray.includes(userId)) {
-                            transaction.update(commentRef, { [voteType]: arrayRemove(userId) });
+                        if (voteArray.includes(currentUser.uid)) {
+                            transaction.update(commentRef, { [voteType]: arrayRemove(currentUser.uid) });
                         } else {
                             transaction.update(commentRef, {
-                                [voteType]: arrayUnion(userId),
-                                [oppositeType]: arrayRemove(userId)
+                                [voteType]: arrayUnion(currentUser.uid),
+                                [oppositeType]: arrayRemove(currentUser.uid)
                             });
                         }
                     });
