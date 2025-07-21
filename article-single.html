@@ -19,76 +19,23 @@
         .article-body p {margin-bottom:1.5em;}
         .back-link {display:inline-block; margin-bottom: 20px; font-weight: 700; color: var(--color-purple-dark); text-decoration: none;}
         .back-link:hover {text-decoration: underline;}
-        
-        .article-footer {max-width:750px; margin: 60px auto 0; padding-top: 40px; border-top: 1px solid #eee; text-align: left;}
-        .social-share { display: flex; align-items: center; gap: 20px; margin-bottom: 40px; min-height: 28px; }
-
-        .comments-section h3 { font-size: 1.8rem; font-weight: 700; margin-bottom: 30px; }
-        .comment-form { background-color: #f9f9f9; padding: 20px; border-radius: 8px; }
-        .comment-form .form-group { margin-bottom: 20px; }
-        .comment-form label { font-weight: 700; font-size: 0.9rem; }
-        .comment-form input, .comment-form textarea { width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 8px; font-family: var(--font-family); font-size: 1rem; }
-        .comment-form .btn { padding: 12px 25px; border: none; background-color: var(--color-purple-dark); color: #fff; border-radius: 8px; cursor: pointer; }
-        .form-message { padding: 15px; border-radius: 8px; margin-top: 20px; font-weight: 500; display: none; }
-        .form-message.show { display: block; }
-        .form-message.success { background-color: var(--color-green); color: var(--color-green-dark); }
-        
-        .comments-list { list-style: none; padding: 0; margin-top: 40px; }
-        .comment-item { border-left: 3px solid #eee; padding-left: 20px; margin-bottom: 30px; }
-        .comment-item .comment-item { margin-top: 20px; }
-        .comment-author { font-weight: 700; margin: 0 0 5px; }
-        .comment-date { font-size: 0.85rem; color: #888; margin: 0 0 15px; }
-        .comment-body { line-height: 1.7; margin-bottom: 15px; }
-        .comment-actions { display: flex; align-items: center; gap: 15px; font-size: 0.9rem; }
-        .comment-actions button { background: none; border: none; cursor: pointer; color: var(--color-text-light); font-weight: 700; padding: 5px; display: flex; align-items: center; gap: 5px; }
-        .comment-actions button:hover { color: var(--color-purple-dark); }
-        .comment-actions button.active { color: var(--color-purple-dark); }
-        .comment-actions button svg { width: 16px; height: 16px; fill: currentColor; }
-        .reply-form-container { margin-top: 15px; display: none; }
-        .auth-state { font-size: 0.9rem; margin-bottom: 20px; background-color: #f0e6fa; padding: 10px; border-radius: 8px; }
-        .auth-state a { color: var(--color-purple-dark); font-weight: 700; cursor: pointer; }
+        .comments-container {max-width:750px; margin: 60px auto 0; padding-top: 40px; border-top: 1px solid #eee;}
 
         @media (max-width:768px){.article-title-full{font-size:2.2rem;}}
     </style>
 </head>
 <body data-current-page="article-single">
-    <div id="fb-root"></div>
-    <script async defer crossorigin="anonymous" src="https://connect.facebook.net/en_US/sdk.js#xfbml=1&version=v20.0&appId=YOUR_FACEBOOK_APP_ID"></script>
-    <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
-
     <header class="site-header" id="header"></header>
 
     <main>
         <section class="section">
             <div class="container" id="article-container">
                 <a class="back-link nav-link" data-page-id="articles">← <span class="lang-switch" data-en="Back to all articles" data-es="Volver a todos los artículos"></span></a>
-                <div id="article-content-wrapper"></div>
-
-                <div class="article-footer">
-                    <div id="social-share-container" class="social-share"></div>
-                    <div class="comments-section">
-                        <h3 class="lang-switch" data-en="Leave a Reply" data-es="Deja una respuesta"></h3>
-                        <div id="auth-state" class="auth-state hidden"></div>
-                        <form id="comment-form" class="comment-form">
-                            <div class="form-group" id="name-field-group">
-                                <label for="comment-name" class="lang-switch" data-en="Name (required)" data-es="Nombre (requerido)"></label>
-                                <input type="text" id="comment-name" required>
-                            </div>
-                            <div class="form-group hidden" id="email-field-group">
-                                <label for="comment-email" class="lang-switch" data-en="Email (required for verification)" data-es="Correo electrónico (requerido para verificación)"></label>
-                                <input type="email" id="comment-email" required>
-                            </div>
-                            <div class="form-group">
-                                <label for="comment-text" class="lang-switch" data-en="Comments (required)" data-es="Comentarios (requerido)"></label>
-                                <textarea id="comment-text" rows="5" required></textarea>
-                            </div>
-                            <button type="submit" id="comment-submit-btn" class="btn lang-switch" data-en="Continue" data-es="Continuar"></button>
-                            <div id="form-message" class="form-message"></div>
-                        </form>
-
-                        <h3 id="comments-title" class="lang-switch" data-en="Comments" data-es="Comentarios" style="margin-top: 50px; display: none;"></h3>
-                        <ul id="comments-list" class="comments-list"></ul>
-                    </div>
+                <div id="article-content-wrapper">
+                    <!-- Article content will be loaded here by JavaScript -->
+                </div>
+                <div id="comments" class="comments-container">
+                    <div id="disqus_thread"></div>
                 </div>
             </div>
         </section>
@@ -99,8 +46,7 @@
     <script src="router.js"></script>
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
-        import { getAuth, isSignInWithEmailLink, sendSignInLinkToEmail, signInWithEmailLink, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js";
-        import { getFirestore, doc, getDoc, collection, addDoc, query, where, onSnapshot, serverTimestamp, orderBy, updateDoc, arrayUnion, arrayRemove, runTransaction } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
+        import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyD0qVihpuLI0cF0PZ32o8tFBLfTgjlqB6A",
@@ -114,7 +60,6 @@
 
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
-        const auth = getAuth(app);
 
         document.addEventListener('DOMContentLoaded', async () => {
             await siteRouter.loadMembers();
@@ -122,7 +67,6 @@
             const urlParams = new URLSearchParams(window.location.search);
             const articleId = urlParams.get('id');
             const contentWrapper = document.getElementById('article-content-wrapper');
-            const commentsList = document.getElementById('comments-list');
             
             if (!articleId) return siteRouter.navigateTo('articles');
 
@@ -158,233 +102,23 @@
                         link.addEventListener('click', (e) => { e.preventDefault(); siteRouter.navigateTo(link.dataset.pageId, link.dataset.memberId); });
                     }
                 });
-                renderShareButtons(window.location.href, articleTitle);
             };
             
             updateArticleText(localStorage.getItem('language') || 'en');
             const langObserver = new MutationObserver(() => updateArticleText(document.documentElement.lang));
             langObserver.observe(document.documentElement, { attributes: true, attributeFilter: ['lang'] });
 
-            function renderShareButtons(url, text) {
-                const container = document.getElementById('social-share-container');
-                container.innerHTML = `
-                    <div class="fb-like" data-href="${url}" data-width="" data-layout="button" data-action="like" data-size="small" data-share="false"></div>
-                    <a class="twitter-share-button" href="https://twitter.com/share?ref_src=twsrc%5Etfw" data-text="Check out this article: ${text}" data-url="${url}">Post</a>
-                `;
-                if (typeof FB !== 'undefined') FB.XFBML.parse(container);
-                if (typeof twttr !== 'undefined') twttr.widgets.load(container);
-            }
-
-            const commentForm = document.getElementById('comment-form');
-            const nameGroup = document.getElementById('name-field-group');
-            const emailGroup = document.getElementById('email-field-group');
-            const authStateDiv = document.getElementById('auth-state');
-            const submitBtn = document.getElementById('comment-submit-btn');
-            const formMessage = document.getElementById('form-message');
-
-            onAuthStateChanged(auth, user => {
-                if (user) {
-                    authStateDiv.innerHTML = `Commenting as ${user.email}. <a id="sign-out-link">Sign out</a>`;
-                    authStateDiv.classList.remove('hidden');
-                    nameGroup.classList.add('hidden');
-                    emailGroup.classList.add('hidden');
-                    submitBtn.textContent = 'Post Comment';
-                    document.getElementById('sign-out-link').addEventListener('click', () => signOut(auth));
-                } else {
-                    authStateDiv.classList.add('hidden');
-                    nameGroup.classList.remove('hidden');
-                    emailGroup.classList.add('hidden');
-                    submitBtn.textContent = 'Continue';
-                }
-            });
-
-            if (isSignInWithEmailLink(auth, window.location.href)) {
-                let email = window.localStorage.getItem('emailForSignIn');
-                if (!email) {
-                    email = window.prompt('Please provide your email for confirmation');
-                }
-                signInWithEmailLink(auth, email, window.location.href)
-                    .then((result) => {
-                        window.localStorage.removeItem('emailForSignIn');
-                        const pendingComment = JSON.parse(window.localStorage.getItem('pendingComment'));
-                        if (pendingComment) {
-                            addDoc(collection(db, "comments"), { ...pendingComment, uid: result.user.uid, email: result.user.email });
-                            window.localStorage.removeItem('pendingComment');
-                        }
-                    })
-                    .catch((error) => console.error(error));
-            }
-
-            commentForm.addEventListener('submit', async (e) => {
-                e.preventDefault();
-                formMessage.classList.remove('show');
-                const currentUser = auth.currentUser;
-
-                if (currentUser) {
-                    try {
-                        await addDoc(collection(db, "comments"), {
-                            articleId: articleId,
-                            parentId: null,
-                            name: currentUser.displayName || currentUser.email.split('@')[0],
-                            comment: document.getElementById('comment-text').value,
-                            timestamp: serverTimestamp(),
-                            isApproved: false,
-                            likes: [],
-                            dislikes: [],
-                            uid: currentUser.uid,
-                            email: currentUser.email
-                        });
-                        commentForm.reset();
-                        formMessage.textContent = 'Thank you! Your comment is being processed.';
-                        formMessage.className = 'form-message success show';
-                    } catch (error) { console.error("Error adding comment: ", error); }
-                } else {
-                    if (!emailGroup.classList.contains('hidden')) {
-                        const name = document.getElementById('comment-name').value;
-                        const email = document.getElementById('comment-email').value;
-                        const comment = document.getElementById('comment-text').value;
-
-                        const actionCodeSettings = {
-                            url: window.location.href,
-                            handleCodeInApp: true,
-                        };
-
-                        try {
-                            await sendSignInLinkToEmail(auth, email, actionCodeSettings);
-                            window.localStorage.setItem('emailForSignIn', email);
-                            window.localStorage.setItem('pendingComment', JSON.stringify({
-                                articleId,
-                                parentId: null,
-                                name,
-                                comment,
-                                timestamp: serverTimestamp(),
-                                isApproved: false,
-                                likes: [],
-                                dislikes: []
-                            }));
-                            formMessage.textContent = 'A verification link has been sent to your email. Please click it to post your comment.';
-                            formMessage.className = 'form-message success show';
-                        } catch(error) { console.error(error); }
-
-                    } else {
-                        emailGroup.classList.remove('hidden');
-                        submitBtn.textContent = 'Send Verification Link';
-                    }
-                }
-            });
-
-            const q = query(collection(db, "comments"), where("articleId", "==", articleId), where("isApproved", "==", true), orderBy("timestamp", "asc"));
-            onSnapshot(q, (snapshot) => {
-                const comments = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-                const commentsById = comments.reduce((acc, c) => ({ ...acc, [c.id]: { ...c, children: [] } }), {});
-                const rootComments = [];
-                comments.forEach(c => {
-                    if (c.parentId && commentsById[c.parentId]) commentsById[c.parentId].children.push(commentsById[c.id]);
-                    else rootComments.push(commentsById[c.id]);
-                });
-                
-                document.getElementById('comments-title').style.display = comments.length > 0 ? 'block' : 'none';
-                commentsList.innerHTML = rootComments.length > 0
-                    ? rootComments.map(c => renderComment(c)).join('')
-                    : `<li class="comments-loading lang-switch" data-en="No comments yet." data-es="Aún no hay comentarios."></li>`;
-                
-                siteRouter.applyLanguage(localStorage.getItem('language') || 'en');
-            });
-
-            function renderComment(comment) {
-                const date = comment.timestamp?.toDate().toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' }) || 'Just now';
-                const currentUser = auth.currentUser;
-                const hasLiked = currentUser && (comment.likes || []).includes(currentUser.uid);
-                const hasDisliked = currentUser && (comment.dislikes || []).includes(currentUser.uid);
-                return `
-                    <li class="comment-item" id="comment-${comment.id}">
-                        <p class="comment-author">${comment.name}</p>
-                        <p class="comment-date">${date}</p>
-                        <p class="comment-body">${comment.comment.replace(/\n/g, '<br>')}</p>
-                        <div class="comment-actions">
-                            <button class="like-btn ${hasLiked ? 'active' : ''}" data-id="${comment.id}">
-                                <svg viewBox="0 0 24 24"><path d="M5 9v12H1V9h4zm16-2h-3.17l.94-4.34.03-.32c0-.41-.17-.79-.44-1.06L17.17 0l-6.58 6.59c-.36.36-.59.86-.59 1.41v10c0 1.1.9 2 2 2h7c.83 0 1.54-.5 1.84-1.22l3.02-7.05c.09-.23.14-.47.14-.73v-2c0-1.1-.9-2-2-2z"></path></svg>
-                                <span>${(comment.likes || []).length}</span>
-                            </button>
-                            <button class="dislike-btn ${hasDisliked ? 'active' : ''}" data-id="${comment.id}">
-                                <svg viewBox="0 0 24 24"><path d="M19 15V3H23V15H19ZM3 13H6.17L5.23 17.34L5.2 17.66C5.2 18 5.37 18.34 5.64 18.61L6.83 19.8L13.41 13.21C13.78 12.85 14 12.35 14 11.8V5C14 3.9 13.1 3 12 3H5C4.17 3 3.46 3.5 3.16 4.22L0.14 11.27C0.05 11.5 0 11.74 0 12V13C0 13.55 0.45 14 1 14H3Z"></path></svg>
-                                <span>${(comment.dislikes || []).length}</span>
-                            </button>
-                            <button class="reply-btn" data-id="${comment.id}">Reply</button>
-                        </div>
-                        <div class="reply-form-container"></div>
-                        <ul class="comments-list">${(comment.children || []).map(renderComment).join('')}</ul>
-                    </li>
-                `;
-            }
-
-            commentsList.addEventListener('click', async (e) => {
-                const button = e.target.closest('button');
-                if (!button) return;
-                
-                const commentId = button.dataset.id;
-                const currentUser = auth.currentUser;
-
-                if (!currentUser) {
-                    alert('Please verify your email to interact with comments.');
-                    return;
-                }
-
-                if (button.classList.contains('reply-btn')) {
-                    const container = document.getElementById(`comment-${commentId}`).querySelector('.reply-form-container');
-                    if (container.innerHTML) {
-                        container.innerHTML = '';
-                        container.style.display = 'none';
-                    } else {
-                        const replyForm = document.getElementById('comment-form').cloneNode(true);
-                        replyForm.id = `reply-form-${commentId}`;
-                        replyForm.querySelector('#name-field-group').remove();
-                        replyForm.querySelector('#email-field-group').remove();
-                        replyForm.querySelector('#comment-submit-btn').textContent = 'Post Reply';
-                        container.appendChild(replyForm);
-                        container.style.display = 'block';
-                        replyForm.addEventListener('submit', async (ev) => {
-                            ev.preventDefault();
-                            await addDoc(collection(db, "comments"), {
-                                articleId,
-                                parentId: commentId,
-                                name: currentUser.displayName || currentUser.email.split('@')[0],
-                                comment: ev.target.querySelector('textarea').value,
-                                timestamp: serverTimestamp(),
-                                isApproved: false,
-                                likes: [],
-                                dislikes: [],
-                                uid: currentUser.uid,
-                                email: currentUser.email
-                            });
-                            container.innerHTML = '';
-                            container.style.display = 'none';
-                        });
-                    }
-                } else if (button.classList.contains('like-btn') || button.classList.contains('dislike-btn')) {
-                    const voteType = button.classList.contains('like-btn') ? 'likes' : 'dislikes';
-                    const oppositeType = voteType === 'likes' ? 'dislikes' : 'likes';
-                    const commentRef = doc(db, "comments", commentId);
-
-                    await runTransaction(db, async (transaction) => {
-                        const commentDoc = await transaction.get(commentRef);
-                        if (!commentDoc.exists()) return;
-                        
-                        const data = commentDoc.data();
-                        const voteArray = data[voteType] || [];
-                        const oppositeArray = data[oppositeType] || [];
-                        
-                        if (voteArray.includes(currentUser.uid)) {
-                            transaction.update(commentRef, { [voteType]: arrayRemove(currentUser.uid) });
-                        } else {
-                            transaction.update(commentRef, {
-                                [voteType]: arrayUnion(currentUser.uid),
-                                [oppositeType]: arrayRemove(currentUser.uid)
-                            });
-                        }
-                    });
-                }
-            });
+            var disqus_config = function () {
+                this.page.url = window.location.href;
+                this.page.identifier = articleId;
+            };
+            
+            (function() {
+                var d = document, s = d.createElement('script');
+                s.src = 'https://literary-speaking.disqus.com/embed.js';
+                s.setAttribute('data-timestamp', +new Date());
+                (d.head || d.body).appendChild(s);
+            })();
         });
     </script>
 </body>
