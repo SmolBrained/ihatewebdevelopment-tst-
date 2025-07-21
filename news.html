@@ -12,23 +12,28 @@
         .hero-banner .content{position:relative;z-index:3}
         .hero-banner h1{font-size:3.8rem;font-weight:900;margin:0;line-height:1.2}
         
-        .news-list-container { max-width: 1000px; margin: 40px auto 0; }
-        .news-item { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; align-items: center; padding: 40px 0; border-bottom: 1px solid #eee; text-decoration: none; color: inherit; }
-        .news-item:last-child { border-bottom: none; }
-        .news-item-content { text-align: left; }
-        .news-item-title { font-size: 2rem; font-weight: 900; margin: 0 0 15px; line-height: 1.2; transition: color 0.3s ease; }
+        .news-layout { display: grid; grid-template-columns: 2fr 1fr; gap: 50px; }
+        .main-column, .sidebar-column { text-align: left; }
+        .news-item { display: grid; grid-template-columns: 1fr 1.5fr; gap: 30px; align-items: center; padding: 30px 0; border-top: 1px solid #eee; text-decoration: none; color: inherit; }
+        .news-item:first-child { border-top: none; padding-top: 0; }
+        .news-item:last-child { padding-bottom: 0; }
+        .news-item-title { font-size: 1.8rem; font-weight: 900; margin: 0 0 10px; line-height: 1.2; transition: color 0.3s ease; }
         .news-item:hover .news-item-title { color: var(--color-purple-dark); }
-        .news-item-excerpt { font-size: 1.1rem; line-height: 1.7; color: var(--color-text-light); margin: 0 0 15px; }
-        .news-item-meta { font-size: 0.9rem; font-weight: 700; color: var(--color-text-muted); }
-        .news-item-image { width: 100%; aspect-ratio: 16/10; object-fit: cover; border-radius: 12px; }
+        .news-item-excerpt { font-size: 1rem; line-height: 1.6; color: var(--color-text-light); margin: 0 0 10px; }
+        .news-item-meta { font-size: 0.8rem; font-weight: 700; color: var(--color-text-muted); text-transform: uppercase; }
+        .news-item-image { width: 100%; aspect-ratio: 16/10; object-fit: cover; border-radius: 8px; }
 
+        .sidebar-item { padding: 20px 0; border-bottom: 1px solid #eee; }
+        .sidebar-item:last-child { border-bottom: none; }
+        .sidebar-item-title { font-size: 1.1rem; }
+
+        @media (max-width: 900px) { .news-layout { grid-template-columns: 1fr; } }
         @media (max-width: 768px) {
             .hero-banner{background-attachment:scroll;}
             .hero-banner h1{font-size:2.2rem;}
             .news-item { grid-template-columns: 1fr; }
             .news-item-image { grid-row: 1; margin-bottom: 20px; }
             .news-item-title { font-size: 1.5rem; }
-            .news-item-excerpt { font-size: 1rem; }
         }
     </style>
 </head>
@@ -43,7 +48,10 @@
         </section>
         <section class="section">
             <div class="container">
-                <div id="news-list-container" class="news-list-container"></div>
+                <div id="news-layout" class="news-layout">
+                    <div id="main-column" class="main-column"></div>
+                    <div id="sidebar-column" class="sidebar-column"></div>
+                </div>
             </div>
         </section>
     </main>
@@ -68,45 +76,54 @@
         document.addEventListener('DOMContentLoaded', async () => {
             const newsQuery = query(collection(db, "news"), orderBy("date", "desc"));
             const querySnapshot = await getDocs(newsQuery);
-            const newsItems = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-            const listContainer = document.getElementById('news-list-container');
+            const allNewsItems = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+            
+            const featuredItems = allNewsItems.filter(item => item.isFeatured);
+            const sidebarItems = allNewsItems.filter(item => !item.isFeatured);
 
-            const populateList = (lang) => {
-                if (!listContainer) return;
-                listContainer.innerHTML = '';
+            const mainColumn = document.getElementById('main-column');
+            const sidebarColumn = document.getElementById('sidebar-column');
 
-                if (newsItems.length === 0) {
-                    listContainer.innerHTML = `<p class="lang-switch" data-en="No news items yet. Check back soon!" data-es="Aún no hay noticias. ¡Vuelve pronto!"></p>`;
+            const populateColumns = (lang) => {
+                if (!mainColumn || !sidebarColumn) return;
+                mainColumn.innerHTML = '';
+                sidebarColumn.innerHTML = '';
+
+                if (allNewsItems.length === 0) {
+                    mainColumn.innerHTML = `<p class="lang-switch" data-en="No news items yet. Check back soon!" data-es="Aún no hay noticias. ¡Vuelve pronto!"></p>`;
                     siteRouter.applyLanguage(lang);
                     return;
                 }
 
-                newsItems.forEach(item => {
+                featuredItems.forEach(item => {
                     const link = document.createElement('a');
                     link.className = 'news-item';
                     link.href = `news-single.html?id=${item.id}`;
-                    link.addEventListener('click', (e) => {
-                        e.preventDefault();
-                        siteRouter.navigateTo('news-single', item.id);
-                    });
-
                     link.innerHTML = `
                         <div class="news-item-content">
                             <h3 class="news-item-title">${item[`title_${lang}`]}</h3>
                             <p class="news-item-excerpt">${item[`excerpt_${lang}`]}</p>
                             <p class="news-item-meta">${item[`read_time_${lang}`]}</p>
                         </div>
-                        <img src="${item.image || 'https://i.imgur.com/3Yj6bA1.png'}" alt="" class="news-item-image">
+                        <img src="${item.contentBlocks?.[0]?.url || 'https://i.imgur.com/3Yj6bA1.png'}" alt="" class="news-item-image">
                     `;
-                    listContainer.appendChild(link);
+                    mainColumn.appendChild(link);
+                });
+
+                sidebarItems.forEach(item => {
+                    const link = document.createElement('a');
+                    link.className = 'news-item sidebar-item';
+                    link.href = `news-single.html?id=${item.id}`;
+                    link.innerHTML = `<h3 class="news-item-title sidebar-item-title">${item[`title_${lang}`]}</h3>`;
+                    sidebarColumn.appendChild(link);
                 });
             };
 
             const initialLang = localStorage.getItem('language') || 'en';
-            populateList(initialLang);
+            populateColumns(initialLang);
 
             const langObserver = new MutationObserver(() => {
-                populateList(document.documentElement.lang);
+                populateColumns(document.documentElement.lang);
             });
             langObserver.observe(document.documentElement, { attributes: true, attributeFilter: ['lang'] });
         });
