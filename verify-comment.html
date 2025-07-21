@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="https://i.imgur.com/WPy5YDY.png">
+    <title>Verify Comment | Literary Speaking</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        body { display: flex; justify-content: center; align-items: center; min-height: 100vh; text-align: center; background-color: #f4f7fc; }
+        .message-box { background-color: #fff; padding: 40px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); max-width: 500px; }
+        h1 { font-size: 2rem; font-weight: 900; margin: 0 0 20px; }
+        p { font-size: 1.1rem; line-height: 1.6; }
+        .btn { margin-top: 20px; }
+    </style>
+</head>
+<body>
+    <div class="message-box">
+        <h1 id="message-title">Verifying your comment...</h1>
+        <p id="message-body">Please wait a moment.</p>
+        <a href="index.html" class="btn btn-primary" style="display: none;" id="home-button">Back to Home</a>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
+        import { getFirestore, doc, getDoc, addDoc, deleteDoc, collection, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyD0qVihpuLI0cF0PZ32o8tFBLfTgjlqB6A",
+            authDomain: "literary-speaking.firebaseapp.com",
+            projectId: "literary-speaking",
+            storageBucket: "literary-speaking.appspot.com",
+            messagingSenderId: "699059463612",
+            appId: "1:699059463612:web:ecb2e784d627c6b93937b9",
+            measurementId: "G-0L1V3XXGGR"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        const titleEl = document.getElementById('message-title');
+        const bodyEl = document.getElementById('message-body');
+        const homeButton = document.getElementById('home-button');
+
+        async function verifyComment() {
+            const params = new URLSearchParams(window.location.search);
+            const id = params.get('id');
+            const token = params.get('token');
+
+            if (!id || !token) {
+                titleEl.textContent = 'Error';
+                bodyEl.textContent = 'Invalid verification link. The ID or token is missing.';
+                homeButton.style.display = 'inline-block';
+                return;
+            }
+
+            const pendingDocRef = doc(db, 'pendingComments', id);
+            const pendingDocSnap = await getDoc(pendingDocRef);
+
+            if (!pendingDocSnap.exists() || pendingDocSnap.data().verificationToken !== token) {
+                titleEl.textContent = 'Verification Failed';
+                bodyEl.textContent = 'This verification link is invalid or has already been used.';
+                homeButton.style.display = 'inline-block';
+                return;
+            }
+
+            try {
+                const data = pendingDocSnap.data();
+                await addDoc(collection(db, 'comments'), {
+                    articleId: data.articleId,
+                    parentId: data.parentId,
+                    name: data.name,
+                    comment: data.comment,
+                    timestamp: serverTimestamp(),
+                    isApproved: false,
+                    likes: [],
+                    dislikes: []
+                });
+                
+                await deleteDoc(pendingDocRef);
+
+                titleEl.textContent = 'Success!';
+                bodyEl.textContent = 'Your comment has been submitted and is now awaiting moderation.';
+                homeButton.style.display = 'inline-block';
+
+            } catch (error) {
+                console.error("Error during verification:", error);
+                titleEl.textContent = 'Error';
+                bodyEl.textContent = 'An unexpected error occurred. Please try again later.';
+                homeButton.style.display = 'inline-block';
+            }
+        }
+
+        verifyComment();
+    </script>
+</body>
+</html>
