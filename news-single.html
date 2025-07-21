@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="https://i.imgur.com/WPy5YDY.png">
+    <title>News | Literary Speaking</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .news-hero {padding-top:60px;padding-bottom:60px;text-align:center;}
+        .news-title-full {font-size:3rem;font-weight:900;margin:0 0 20px;line-height:1.2;}
+        .news-meta-full {font-size:1rem;color:var(--color-text-light);margin-bottom:40px;}
+        .news-image-full {width:100%;max-width:800px;margin:0 auto 15px;border-radius:16px;}
+        .news-body {max-width:750px;margin:0 auto;text-align:left;line-height:2;font-size:1.1rem;}
+        .news-body p {margin-bottom:1.5em;}
+        .back-link {display:inline-block; margin-bottom: 20px; font-weight: 700; color: var(--color-purple-dark); text-decoration: none;}
+        .back-link:hover {text-decoration: underline;}
+        @media (max-width:768px){.news-title-full{font-size:2.2rem;}}
+    </style>
+</head>
+<body data-current-page="news">
+    <header class="site-header" id="header"></header>
+    <main>
+        <section class="section">
+            <div class="container" id="news-container">
+                <a class="back-link nav-link" data-page-id="news">← <span class="lang-switch" data-en="Back to all news" data-es="Volver a todas las noticias"></span></a>
+                <div class="news-hero">
+                    <h1 id="news-title" class="news-title-full"></h1>
+                    <div id="news-meta" class="news-meta-full"></div>
+                </div>
+                <img id="news-image" src="" alt="" class="news-image-full">
+                <div id="news-content" class="news-body"></div>
+            </div>
+        </section>
+    </main>
+    <footer class="site-footer"></footer>
+    <script src="router.js"></script>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
+        import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyD0qVihpuLI0cF0PZ32o8tFBLfTgjlqB6A",
+            authDomain: "literary-speaking.firebaseapp.com",
+            projectId: "literary-speaking",
+            storageBucket: "literary-speaking.appspot.com",
+            messagingSenderId: "699059463612",
+            appId: "1:699059463612:web:ecb2e784d627c6b93937b9",
+            measurementId: "G-0L1V3XXGGR"
+        };
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const newsId = urlParams.get('id');
+            if (!newsId) return siteRouter.navigateTo('news');
+
+            const docRef = doc(db, "news", newsId);
+            const docSnap = await getDoc(docRef);
+            if (!docSnap.exists()) return siteRouter.navigateTo('news');
+            
+            const item = docSnap.data();
+
+            const updateNewsText = (lang) => {
+                document.title = `${item[`title_${lang}`]} - Literary Speaking`;
+                document.getElementById('news-title').textContent = item[`title_${lang}`];
+                const itemDate = new Date(item.date).toLocaleDateString(lang.startsWith('es') ? 'es-ES' : 'en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+                document.getElementById('news-meta').textContent = itemDate;
+                document.getElementById('news-content').innerHTML = (item[`content_${lang}`] || '').replace(/\\n/g, '\n').split('\n\n').map(p => `<p>${p.replace(/\n/g, '<br>')}</p>`).join('');
+            };
+            
+            document.getElementById('news-image').src = item.image;
+            document.getElementById('news-image').alt = item.title_en;
+
+            const initialLang = localStorage.getItem('language') || 'en';
+            updateNewsText(initialLang);
+            siteRouter.applyLanguage(initialLang);
+            const langObserver = new MutationObserver(() => {
+                const lang = document.documentElement.lang;
+                updateNewsText(lang);
+                siteRouter.applyLanguage(lang);
+            });
+            langObserver.observe(document.documentElement, { attributes: true, attributeFilter: ['lang'] });
+        });
+    </script>
+</body>
+</html>
