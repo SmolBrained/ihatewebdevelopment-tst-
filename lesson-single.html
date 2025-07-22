@@ -104,6 +104,7 @@
                 moduleList.appendChild(moduleItem);
             });
             sidebar.appendChild(moduleList);
+            siteRouter.applyLanguage(lang);
 
             sidebar.querySelectorAll('a').forEach(a => {
                 a.addEventListener('click', e => {
@@ -136,7 +137,6 @@
             
             const initialLang = localStorage.getItem('language') || 'en';
             populateLesson(lesson, initialLang);
-            siteRouter.applyLanguage(initialLang);
 
             const langObserver = new MutationObserver(() => {
                 const currentLang = document.documentElement.lang;
