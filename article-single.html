@@ -74,7 +74,7 @@
             if (article.contentBlocks && Array.isArray(article.contentBlocks)) {
                 article.contentBlocks.forEach(block => {
                     if (block.type === 'text') {
-                        contentHTML += (block[`content_${lang}`] || '').replace(/\\n/g, '\n').split('\n\n').map(p => `<p>${p.replace(/\n/g, '<br>')}</p>`).join('');
+                        contentHTML += block[`content_${lang}`] || '';
                     } else if (block.type === 'image') {
                         contentHTML += `<figure><img src="${block.url}" alt="${block[`caption_${lang}`] || ''}"><figcaption>${block[`caption_${lang}`] || ''}</figcaption></figure>`;
                     }
@@ -99,6 +99,7 @@
                     link.addEventListener('click', (e) => { e.preventDefault(); siteRouter.navigateTo(link.dataset.pageId, link.dataset.memberId); });
                 }
             });
+            siteRouter.applyLanguage(lang);
         };
 
         document.addEventListener('DOMContentLoaded', async () => {
