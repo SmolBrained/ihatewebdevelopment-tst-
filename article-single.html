@@ -30,12 +30,13 @@
 
     <main>
         <section class="section">
-            <div class="container page-specific-content">
+            <div class="container">
                 <a class="back-link nav-link" data-page-id="articles">← <span class="lang-switch" data-en="Back to all articles" data-es="Volver a todos los artículos"></span></a>
-                <div id="article-content-wrapper">
-                </div>
-                <div id="comments" class="comments-container">
-                    <div id="disqus_thread"></div>
+                <div class="page-specific-content">
+                    <div id="article-content-wrapper"></div>
+                    <div id="comments" class="comments-container">
+                        <div id="disqus_thread"></div>
+                    </div>
                 </div>
             </div>
         </section>
@@ -93,7 +94,7 @@
                 </div>
                 <div class="article-body">${contentHTML}</div>
             `;
-            document.querySelectorAll('.nav-link').forEach(link => {
+            document.querySelectorAll('#article-content-wrapper .nav-link').forEach(link => {
                 if(link.closest('.article-meta-full')) {
                     link.addEventListener('click', (e) => { e.preventDefault(); siteRouter.navigateTo(link.dataset.pageId, link.dataset.memberId); });
                 }
