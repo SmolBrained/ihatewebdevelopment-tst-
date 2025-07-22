@@ -204,7 +204,7 @@
                     if (authorMatch && archiveMatch && categoryMatch) {
                         card.innerHTML = `
                             <div class="article-card-image-wrapper">
-                                <img src="${article.image}" alt="" class="article-card-image">
+                                <img src="${article.thumbnail_url || 'https://i.imgur.com/3Yj6bA1.png'}" alt="" class="article-card-image">
                                 <div class="article-card-category">${article[`category_${lang}`]}</div>
                             </div>
                             <div class="article-card-content">
