@@ -7,16 +7,17 @@
     <title>Article | Literary Speaking</title>
     <link rel="stylesheet" href="style.css">
     <style>
-        .article-hero {padding-top:60px;padding-bottom:60px;text-align:center;}
+        .article-hero {padding-top:60px;padding-bottom:30px;text-align:center;}
         .article-category {background-color:var(--color-green-dark);color:white;padding:5px 12px;border-radius:100px;font-size:0.9rem;font-weight:700;display:inline-block;margin-bottom:20px;}
         .article-title-full {font-size:3rem;font-weight:900;margin:0 0 20px;line-height:1.2;}
         .article-meta-full {font-size:1rem;color:var(--color-text-light);margin-bottom:40px;display:flex;justify-content:center;align-items:center;gap:15px;}
         .article-meta-full a {color:var(--color-purple-dark);text-decoration:none;font-weight:700;}
         .article-meta-full a:hover {text-decoration:underline;}
-        .article-image-full {width:100%;max-width:800px;margin:0 auto 15px;border-radius:16px;}
-        .article-image-caption {font-size:0.9rem;color:var(--color-text-light);text-align:center;margin-bottom:60px;font-style:italic;}
         .article-body {max-width:750px;margin:0 auto;text-align:left;line-height:2;font-size:1.1rem;}
         .article-body p {margin-bottom:1.5em;}
+        .article-body figure {margin: 30px 0; }
+        .article-body img {width:100%;max-width:800px;border-radius:16px; margin: 0 auto; display: block;}
+        .article-body figcaption {font-size:0.9rem;color:var(--color-text-light);text-align:center;margin-top: 10px;font-style:italic;}
         .back-link {display:inline-block; margin-bottom: 20px; font-weight: 700; color: var(--color-purple-dark); text-decoration: none;}
         .back-link:hover {text-decoration: underline;}
         .comments-container {max-width:750px; margin: 60px auto 0; padding-top: 40px; border-top: 1px solid #eee;}
@@ -29,10 +30,9 @@
 
     <main>
         <section class="section">
-            <div class="container" id="article-container">
+            <div class="container page-specific-content">
                 <a class="back-link nav-link" data-page-id="articles">← <span class="lang-switch" data-en="Back to all articles" data-es="Volver a todos los artículos"></span></a>
                 <div id="article-content-wrapper">
-                    <!-- Article content will be loaded here by JavaScript -->
                 </div>
                 <div id="comments" class="comments-container">
                     <div id="disqus_thread"></div>
@@ -61,13 +61,50 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
+        const updateArticleText = (article, lang) => {
+            if (!article) return;
+            const contentWrapper = document.getElementById('article-content-wrapper');
+            const articleTitle = article[`title_${lang}`];
+            document.title = `${articleTitle} - Literary Speaking`;
+            const author = siteRouter.members[article.author_id] || { name: 'Anonymous' };
+            const articleDate = new Date(article.date).toLocaleDateString(lang.startsWith('es') ? 'es-ES' : 'en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+
+            let contentHTML = '';
+            if (article.contentBlocks && Array.isArray(article.contentBlocks)) {
+                article.contentBlocks.forEach(block => {
+                    if (block.type === 'text') {
+                        contentHTML += (block[`content_${lang}`] || '').replace(/\\n/g, '\n').split('\n\n').map(p => `<p>${p.replace(/\n/g, '<br>')}</p>`).join('');
+                    } else if (block.type === 'image') {
+                        contentHTML += `<figure><img src="${block.url}" alt="${block[`caption_${lang}`] || ''}"><figcaption>${block[`caption_${lang}`] || ''}</figcaption></figure>`;
+                    }
+                });
+            }
+
+            contentWrapper.innerHTML = `
+                <div class="article-hero">
+                    <div class="article-category">${article[`category_${lang}`]}</div>
+                    <h1 class="article-title-full">${articleTitle}</h1>
+                    <div class="article-meta-full">
+                        <span class="lang-switch" data-en="By" data-es="Por">${lang === 'es' ? 'Por' : 'By'}</span>
+                        <a href="#" class="nav-link" data-page-id="member" data-member-id="${article.author_id}">${author.name}</a>
+                        <span>•</span>
+                        <span>${articleDate}</span>
+                    </div>
+                </div>
+                <div class="article-body">${contentHTML}</div>
+            `;
+            document.querySelectorAll('.nav-link').forEach(link => {
+                if(link.closest('.article-meta-full')) {
+                    link.addEventListener('click', (e) => { e.preventDefault(); siteRouter.navigateTo(link.dataset.pageId, link.dataset.memberId); });
+                }
+            });
+        };
+
         document.addEventListener('DOMContentLoaded', async () => {
             await siteRouter.loadMembers();
             
             const urlParams = new URLSearchParams(window.location.search);
             const articleId = urlParams.get('id');
-            const contentWrapper = document.getElementById('article-content-wrapper');
-            
             if (!articleId) return siteRouter.navigateTo('articles');
 
             const docRef = doc(db, "articles", articleId);
@@ -76,36 +113,11 @@
             
             const article = docSnap.data();
 
-            const updateArticleText = (lang) => {
-                const articleTitle = article[`title_${lang}`];
-                document.title = `${articleTitle} - Literary Speaking`;
-                const author = siteRouter.members[article.author_id] || { name: 'Anonymous' };
-                const articleDate = new Date(article.date).toLocaleDateString(lang.startsWith('es') ? 'es-ES' : 'en-US', { year: 'numeric', month: 'long', day: 'numeric' });
-
-                contentWrapper.innerHTML = `
-                    <div class="article-hero">
-                        <div class="article-category">${article[`category_${lang}`]}</div>
-                        <h1 class="article-title-full">${articleTitle}</h1>
-                        <div class="article-meta-full">
-                            <span class="lang-switch" data-en="By" data-es="Por">${lang === 'es' ? 'Por' : 'By'}</span>
-                            <a href="#" class="nav-link" data-page-id="member" data-member-id="${article.author_id}">${author.name}</a>
-                            <span>•</span>
-                            <span>${articleDate}</span>
-                        </div>
-                    </div>
-                    <img id="article-image" src="${article.image}" alt="${article.title_en}" class="article-image-full">
-                    <p class="article-image-caption">${article[`image_caption_${lang}`]}</p>
-                    <div class="article-body">${(article[`content_${lang}`] || '').replace(/\\n/g, '\n').split('\n\n').map(p => `<p>${p.replace(/\n/g, '<br>')}</p>`).join('')}</div>
-                `;
-                document.querySelectorAll('.nav-link').forEach(link => {
-                    if(link.closest('.article-meta-full')) {
-                        link.addEventListener('click', (e) => { e.preventDefault(); siteRouter.navigateTo(link.dataset.pageId, link.dataset.memberId); });
-                    }
-                });
-            };
+            updateArticleText(article, localStorage.getItem('language') || 'en');
             
-            updateArticleText(localStorage.getItem('language') || 'en');
-            const langObserver = new MutationObserver(() => updateArticleText(document.documentElement.lang));
+            const langObserver = new MutationObserver(() => {
+                updateArticleText(article, document.documentElement.lang);
+            });
             langObserver.observe(document.documentElement, { attributes: true, attributeFilter: ['lang'] });
 
             var disqus_config = function () {
