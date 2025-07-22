@@ -62,6 +62,16 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
+        const rawToVisual = (raw) => {
+            if (!raw) return '';
+            return raw
+                .replace(/\\b\[(.*?)\]/g, '<b>$1</b>')
+                .replace(/\\i\[(.*?)\]/g, '<i>$1</i>')
+                .replace(/\\u\[(.*?)\]/g, '<u>$1</u>')
+                .replace(/\n\n/g, '</p><p>')
+                .replace(/\n/g, '<br>');
+        };
+
         const updateArticleText = (article, lang) => {
             if (!article) return;
             const contentWrapper = document.getElementById('article-content-wrapper');
@@ -74,7 +84,7 @@
             if (article.contentBlocks && Array.isArray(article.contentBlocks)) {
                 article.contentBlocks.forEach(block => {
                     if (block.type === 'text') {
-                        contentHTML += (block[`content_${lang}`] || '').replace(/\\n/g, '\n').split('\n\n').map(p => `<p>${p.replace(/\n/g, '<br>')}</p>`).join('');
+                        contentHTML += `<p>${rawToVisual(block[`content_${lang}`] || '')}</p>`;
                     } else if (block.type === 'image') {
                         contentHTML += `<figure><img src="${block.url}" alt="${block[`caption_${lang}`] || ''}"><figcaption>${block[`caption_${lang}`] || ''}</figcaption></figure>`;
                     }
