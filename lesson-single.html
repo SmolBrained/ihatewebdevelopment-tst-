@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="https://i.imgur.com/WPy5YDY.png">
+    <title>Lesson | Literary Speaking</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .lesson-layout { display: grid; grid-template-columns: 280px 1fr; gap: 40px; }
+        .lesson-sidebar { border-right: 1px solid #eee; padding-right: 30px; }
+        .lesson-sidebar h3 { font-size: 1.2rem; margin-bottom: 20px; }
+        .module-list { list-style: none; padding: 0; margin: 0; }
+        .module-item { margin-bottom: 20px; }
+        .module-title { font-weight: 900; font-size: 1.1rem; padding: 10px; background-color: #f0f8ff; border-radius: 8px; }
+        .module-content-list { list-style: none; padding: 10px 0 0 20px; margin: 0; }
+        .module-content-item a { display: block; padding: 8px; text-decoration: none; color: var(--color-text); border-radius: 5px; }
+        .module-content-item a.active, .module-content-item a:hover { background-color: var(--color-primary-light); color: var(--color-primary); }
+        
+        .lesson-main-content { padding-top: 20px; }
+        .lesson-content-title { font-size: 2.5rem; font-weight: 900; margin-bottom: 30px; }
+        .lesson-content-body { line-height: 1.8; font-size: 1.1rem; }
+        .lesson-content-body iframe { width: 100%; aspect-ratio: 16/9; border: none; border-radius: 12px; margin: 20px 0; }
+        @media (max-width: 900px) { .lesson-layout { grid-template-columns: 1fr; } .lesson-sidebar { border-right: none; border-bottom: 1px solid #eee; padding-right: 0; padding-bottom: 30px; } }
+    </style>
+</head>
+<body data-current-page="lessons">
+    <header class="site-header" id="header"></header>
+    <main>
+        <section class="section">
+            <div class="container">
+                <h1 id="lesson-title-main" style="font-size: 2.5rem; font-weight: 900; margin-bottom: 30px;"></h1>
+                <div class="lesson-layout">
+                    <aside id="lesson-sidebar" class="lesson-sidebar"></aside>
+                    <div id="lesson-main-content" class="lesson-main-content"></div>
+                </div>
+            </div>
+        </section>
+    </main>
+    <footer class="site-footer"></footer>
+    <script src="router.js"></script>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
+        import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyD0qVihpuLI0cF0PZ32o8tFBLfTgjlqB6A",
+            authDomain: "literary-speaking.firebaseapp.com",
+            projectId: "literary-speaking",
+            storageBucket: "literary-speaking.appspot.com",
+            messagingSenderId: "699059463612",
+            appId: "1:699059463612:web:ecb2e784d627c6b93937b9",
+            measurementId: "G-0L1V3XXGGR"
+        };
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const lessonId = urlParams.get('id');
+            if (!lessonId) return siteRouter.navigateTo('lessons');
+
+            const docRef = doc(db, "lessons", lessonId);
+            const docSnap = await getDoc(docRef);
+            if (!docSnap.exists()) return siteRouter.navigateTo('lessons');
+            
+            const lesson = docSnap.data();
+            const sidebar = document.getElementById('lesson-sidebar');
+            const mainContent = document.getElementById('lesson-main-content');
+
+            const renderContent = (content, lang) => {
+                mainContent.innerHTML = '';
+                if (content.type === 'text') {
+                    mainContent.innerHTML = `<h2 class="lesson-content-title">${content[`title_${lang}`]}</h2><div class="lesson-content-body">${(content[`content_${lang}`] || '').replace(/\\n/g, '\n').split('\n\n').map(p => `<p>${p.replace(/\n/g, '<br>')}</p>`).join('')}</div>`;
+                } else if (content.type === 'video') {
+                    mainContent.innerHTML = `<h2 class="lesson-content-title">${content[`title_${lang}`]}</h2><div class="lesson-content-body"><iframe src="https://www.youtube.com/embed/${content.videoId}" frameborder="0" allowfullscreen></iframe></div>`;
+                }
+            };
+
+            const populateLesson = (lang) => {
+                document.title = `${lesson[`title_${lang}`]} | Literary Speaking`;
+                document.getElementById('lesson-title-main').textContent = lesson[`title_${lang}`];
+                sidebar.innerHTML = `<h3>Course Modules</h3>`;
+                const moduleList = document.createElement('ul');
+                moduleList.className = 'module-list';
+                
+                (lesson.modules || []).forEach((module, moduleIndex) => {
+                    const moduleItem = document.createElement('li');
+                    moduleItem.className = 'module-item';
+                    const contentList = document.createElement('ul');
+                    contentList.className = 'module-content-list';
+                    
+                    (module.content || []).forEach((content, contentIndex) => {
+                        const contentItem = document.createElement('li');
+                        contentItem.className = 'module-content-item';
+                        const link = document.createElement('a');
+                        link.href = '#';
+                        link.textContent = content[`title_${lang}`];
+                        link.dataset.moduleIndex = moduleIndex;
+                        link.dataset.contentIndex = contentIndex;
+                        contentItem.appendChild(link);
+                        contentList.appendChild(contentItem);
+                    });
+                    
+                    moduleItem.innerHTML = `<div class="module-title">${module[`title_${lang}`]}</div>`;
+                    moduleItem.appendChild(contentList);
+                    moduleList.appendChild(moduleItem);
+                });
+                sidebar.appendChild(moduleList);
+
+                sidebar.querySelectorAll('a').forEach(a => {
+                    a.addEventListener('click', e => {
+                        e.preventDefault();
+                        sidebar.querySelectorAll('a').forEach(link => link.classList.remove('active'));
+                        e.target.classList.add('active');
+                        const moduleIndex = e.target.dataset.moduleIndex;
+                        const contentIndex = e.target.dataset.contentIndex;
+                        const contentData = lesson.modules[moduleIndex].content[contentIndex];
+                        renderContent(contentData, lang);
+                    });
+                });
+
+                if (lesson.modules?.[0]?.content?.[0]) {
+                    sidebar.querySelector('a')?.click();
+                }
+            };
+
+            const initialLang = localStorage.getItem('language') || 'en';
+            populateLesson(initialLang);
+
+            const langObserver = new MutationObserver(() => populateLesson(document.documentElement.lang));
+            langObserver.observe(document.documentElement, { attributes: true, attributeFilter: ['lang'] });
+        });
+    </script>
+</body>
+</html>
