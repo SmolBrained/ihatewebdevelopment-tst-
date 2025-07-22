@@ -16,6 +16,8 @@
         .module-content-list { list-style: none; padding: 10px 0 0 20px; margin: 0; }
         .module-content-item a { display: block; padding: 8px; text-decoration: none; color: var(--color-text); border-radius: 5px; }
         .module-content-item a.active, .module-content-item a:hover { background-color: var(--color-primary-light); color: var(--color-primary); }
+        .back-link {display:inline-block; margin-bottom: 20px; font-weight: 700; color: var(--color-purple-dark); text-decoration: none;}
+        .back-link:hover {text-decoration: underline;}
         
         .lesson-main-content { padding-top: 20px; }
         .lesson-content-title { font-size: 2.5rem; font-weight: 900; margin-bottom: 30px; }
@@ -29,10 +31,13 @@
     <main>
         <section class="section">
             <div class="container">
-                <h1 id="lesson-title-main" style="font-size: 2.5rem; font-weight: 900; margin-bottom: 30px;"></h1>
-                <div class="lesson-layout">
-                    <aside id="lesson-sidebar" class="lesson-sidebar"></aside>
-                    <div id="lesson-main-content" class="lesson-main-content"></div>
+                <a class="back-link nav-link" data-page-id="lessons">← <span class="lang-switch" data-en="Back to all lessons" data-es="Volver a todas las lecciones"></span></a>
+                <div class="page-specific-content">
+                    <h1 id="lesson-title-main" style="font-size: 2.5rem; font-weight: 900; margin-bottom: 30px;"></h1>
+                    <div class="lesson-layout">
+                        <aside id="lesson-sidebar" class="lesson-sidebar"></aside>
+                        <div id="lesson-main-content" class="lesson-main-content"></div>
+                    </div>
                 </div>
             </div>
         </section>
@@ -55,6 +60,69 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
+        const renderContent = (content, lang) => {
+            const mainContent = document.getElementById('lesson-main-content');
+            if (!mainContent || !content) return;
+            mainContent.innerHTML = '';
+            const title = content[`title_${lang}`] || content.title_en || '';
+            if (content.type === 'text') {
+                mainContent.innerHTML = `<h2 class="lesson-content-title">${title}</h2><div class="lesson-content-body">${(content[`content_${lang}`] || '').replace(/\\n/g, '\n').split('\n\n').map(p => `<p>${p.replace(/\n/g, '<br>')}</p>`).join('')}</div>`;
+            } else if (content.type === 'video') {
+                mainContent.innerHTML = `<h2 class="lesson-content-title">${title}</h2><div class="lesson-content-body"><iframe src="https://www.youtube.com/embed/${content.videoId}" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe></div>`;
+            }
+        };
+
+        const populateLesson = (lesson, lang) => {
+            if (!lesson) return;
+            document.title = `${lesson[`title_${lang}`]} | Literary Speaking`;
+            document.getElementById('lesson-title-main').textContent = lesson[`title_${lang}`];
+            const sidebar = document.getElementById('lesson-sidebar');
+            sidebar.innerHTML = `<h3 class="lang-switch" data-en="Course Modules" data-es="Módulos del Curso"></h3>`;
+            const moduleList = document.createElement('ul');
+            moduleList.className = 'module-list';
+            
+            (lesson.modules || []).forEach((module, moduleIndex) => {
+                const moduleItem = document.createElement('li');
+                moduleItem.className = 'module-item';
+                const contentList = document.createElement('ul');
+                contentList.className = 'module-content-list';
+                
+                (module.content || []).forEach((content, contentIndex) => {
+                    const contentItem = document.createElement('li');
+                    contentItem.className = 'module-content-item';
+                    const link = document.createElement('a');
+                    link.href = '#';
+                    link.textContent = content[`title_${lang}`] || content.title_en;
+                    link.dataset.moduleIndex = moduleIndex;
+                    link.dataset.contentIndex = contentIndex;
+                    contentItem.appendChild(link);
+                    contentList.appendChild(contentItem);
+                });
+                
+                moduleItem.innerHTML = `<div class="module-title">${module[`title_${lang}`]}</div>`;
+                moduleItem.appendChild(contentList);
+                moduleList.appendChild(moduleItem);
+            });
+            sidebar.appendChild(moduleList);
+
+            sidebar.querySelectorAll('a').forEach(a => {
+                a.addEventListener('click', e => {
+                    e.preventDefault();
+                    sidebar.querySelectorAll('a').forEach(link => link.classList.remove('active'));
+                    e.target.classList.add('active');
+                    const moduleIndex = e.target.dataset.moduleIndex;
+                    const contentIndex = e.target.dataset.contentIndex;
+                    const contentData = lesson.modules[moduleIndex].content[contentIndex];
+                    renderContent(contentData, lang);
+                });
+            });
+
+            if (lesson.modules?.[0]?.content?.[0]) {
+                const firstLink = sidebar.querySelector('a');
+                if(firstLink) firstLink.click();
+            }
+        };
+
         document.addEventListener('DOMContentLoaded', async () => {
             const urlParams = new URLSearchParams(window.location.search);
             const lessonId = urlParams.get('id');
@@ -65,72 +133,16 @@
             if (!docSnap.exists()) return siteRouter.navigateTo('lessons');
             
             const lesson = docSnap.data();
-            const sidebar = document.getElementById('lesson-sidebar');
-            const mainContent = document.getElementById('lesson-main-content');
-
-            const renderContent = (content, lang) => {
-                mainContent.innerHTML = '';
-                const title = content[`title_${lang}`] || content.title_en || '';
-                if (content.type === 'text') {
-                    mainContent.innerHTML = `<h2 class="lesson-content-title">${title}</h2><div class="lesson-content-body">${(content[`content_${lang}`] || '').replace(/\\n/g, '\n').split('\n\n').map(p => `<p>${p.replace(/\n/g, '<br>')}</p>`).join('')}</div>`;
-                } else if (content.type === 'video') {
-                    mainContent.innerHTML = `<h2 class="lesson-content-title">${title}</h2><div class="lesson-content-body"><iframe src="https://www.youtube.com/embed/${content.videoId}" frameborder="0" allowfullscreen></iframe></div>`;
-                }
-            };
-
-            const populateLesson = (lang) => {
-                document.title = `${lesson[`title_${lang}`]} | Literary Speaking`;
-                document.getElementById('lesson-title-main').textContent = lesson[`title_${lang}`];
-                sidebar.innerHTML = `<h3 class="lang-switch" data-en="Course Modules" data-es="Módulos del Curso"></h3>`;
-                const moduleList = document.createElement('ul');
-                moduleList.className = 'module-list';
-                
-                (lesson.modules || []).forEach((module, moduleIndex) => {
-                    const moduleItem = document.createElement('li');
-                    moduleItem.className = 'module-item';
-                    const contentList = document.createElement('ul');
-                    contentList.className = 'module-content-list';
-                    
-                    (module.content || []).forEach((content, contentIndex) => {
-                        const contentItem = document.createElement('li');
-                        contentItem.className = 'module-content-item';
-                        const link = document.createElement('a');
-                        link.href = '#';
-                        link.textContent = content[`title_${lang}`] || content.title_en;
-                        link.dataset.moduleIndex = moduleIndex;
-                        link.dataset.contentIndex = contentIndex;
-                        contentItem.appendChild(link);
-                        contentList.appendChild(contentItem);
-                    });
-                    
-                    moduleItem.innerHTML = `<div class="module-title">${module[`title_${lang}`]}</div>`;
-                    moduleItem.appendChild(contentList);
-                    moduleList.appendChild(moduleItem);
-                });
-                sidebar.appendChild(moduleList);
-                siteRouter.applyLanguage(lang);
-
-                sidebar.querySelectorAll('a').forEach(a => {
-                    a.addEventListener('click', e => {
-                        e.preventDefault();
-                        sidebar.querySelectorAll('a').forEach(link => link.classList.remove('active'));
-                        e.target.classList.add('active');
-                        const moduleIndex = e.target.dataset.moduleIndex;
-                        const contentIndex = e.target.dataset.contentIndex;
-                        const contentData = lesson.modules[moduleIndex].content[contentIndex];
-                        renderContent(contentData, lang);
-                    });
-                });
-
-                if (lesson.modules?.[0]?.content?.[0]) {
-                    sidebar.querySelector('a')?.click();
-                }
-            };
-
+            
             const initialLang = localStorage.getItem('language') || 'en';
-            populateLesson(initialLang);
+            populateLesson(lesson, initialLang);
+            siteRouter.applyLanguage(initialLang);
 
-            const langObserver = new MutationObserver(() => populateLesson(document.documentElement.lang));
+            const langObserver = new MutationObserver(() => {
+                const currentLang = document.documentElement.lang;
+                populateLesson(lesson, currentLang);
+                siteRouter.applyLanguage(currentLang);
+            });
             langObserver.observe(document.documentElement, { attributes: true, attributeFilter: ['lang'] });
         });
     </script>
