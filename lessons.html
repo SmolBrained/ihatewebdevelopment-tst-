@@ -20,21 +20,11 @@
         .lesson-card-content{padding:25px;flex-grow:1;}
         .lesson-card-title{font-size:1.5rem;font-weight:700;margin:0;color:var(--color-text);}
         
-        .resources-section{background-color:var(--color-pink); --section-text:var(--color-pink-dark);}
-        .resource-grid{display:grid;grid-template-columns:repeat(auto-fit, minmax(320px, 1fr));gap:30px;text-align:left;margin-top:40px;}
-        .resource-card{background-color:rgba(255,255,255,0.7);padding:30px;border-radius:16px;transition:background-color .3s ease, transform .3s ease;}
-        .resource-card:hover{background-color:#fff;transform:translateY(-5px);}
-        .resource-card h3{margin:0 0 15px;font-size:1.6rem;font-weight:700;}
-        .resource-card ul{list-style:none;padding:0;margin:0;line-height:1.8;}
-        .resource-card ul li{margin-bottom:10px;}
-        .resource-card ul li a{color:var(--color-pink-dark);font-weight:500;text-decoration:underline;}
-        
         @media (max-width:768px){.hero-banner{background-attachment:scroll}.hero-banner h1{font-size:2.2rem}}
     </style>
 </head>
 <body data-current-page="lessons">
     <header class="site-header" id="header"></header>
-
     <main>
         <section class="hero-banner">
             <div class="overlay"></div>
@@ -42,75 +32,60 @@
                 <h1 class="lang-switch" data-en="Lessons" data-es="Lecciones"></h1>
             </div>
         </section>
-
         <section class="section" style="--section-bg: #e6f2ff;">
             <div class="container">
-                <h2 class="section-title lang-switch" data-en="More Coming Soon!" data-es="¡Pronto Habrá Más!"></h2>
-                <div class="lesson-grid">
-                    <a href="#" class="lesson-card scroll-animated">
-                        <div class="lesson-card-image-wrapper"><img src="https://i.imgur.com/WEjnuyf.png" alt="Biology Lesson" class="lesson-card-image"></div>
-                        <div class="lesson-card-content"><h3 class="lesson-card-title lang-switch" data-en="Biology" data-es="Biología"></h3></div>
-                    </a>
-                    <a href="#" class="lesson-card scroll-animated">
-                        <div class="lesson-card-image-wrapper"><img src="https://i.imgur.com/zDNSXdb.png" alt="Math Lesson" class="lesson-card-image"></div>
-                        <div class="lesson-card-content"><h3 class="lesson-card-title lang-switch" data-en="Math" data-es="Matemáticas"></h3></div>
-                    </a>
-                    <a href="#" class="lesson-card scroll-animated">
-                        <div class="lesson-card-image-wrapper"><img src="https://i.imgur.com/LV7iu0S.png" alt="Physics Lesson" class="lesson-card-image"></div>
-                        <div class="lesson-card-content"><h3 class="lesson-card-title lang-switch" data-en="Physics" data-es="Física"></h3></div>
-                    </a>
-                    <a href="#" class="lesson-card scroll-animated">
-                        <div class="lesson-card-image-wrapper"><img src="https://i.imgur.com/Po9o3Rn.png" alt="Chemistry Lesson" class="lesson-card-image"></div>
-                        <div class="lesson-card-content"><h3 class="lesson-card-title lang-switch" data-en="Chemistry" data-es="Química"></h3></div>
-                    </a>
-                </div>
-            </div>
-        </section>
-
-        <section class="section resources-section">
-            <div class="container">
-                <h2 class="section-title lang-switch" data-en="Additional Resources" data-es="Recursos Adicionales"></h2>
-                <div class="resource-grid">
-                    <div class="resource-card scroll-animated">
-                        <h3 class="lang-switch" data-en="FAST Exams and State Standards" data-es="Exámenes FAST y Estándares Estatales"></h3>
-                        <ul>
-                            <li><a href="http://flfast.org/families.html" target="_blank" class="lang-switch" data-en="Florida Dept. of Education: State Exam Standards" data-es="Dept. de Educación de Florida: Estándares de Exámenes Estatales"></a></li>
-                            <li><a href="https://www.floridastudents.org/" target="_blank" class="lang-switch" data-en="Florida CPALMS: Learning Resources by Grade Level" data-es="CPALMS de Florida: Recursos de aprendizaje por nivel de grado"></a></li>
-                            <li><a href="http://flfast.org/families.html" target="_blank" class="lang-switch" data-en="FAST Website: Practice Questions and Answers" data-es="Sitio Web de FAST: Preguntas y respuestas de práctica"></a></li>
-                        </ul>
-                    </div>
-                    <div class="resource-card scroll-animated">
-                        <h3 class="lang-switch" data-en="General Help with Learning English" data-es="Ayuda General para Aprender Inglés"></h3>
-                        <ul>
-                            <li><a href="http://khanacademy.org/" target="_blank">Khan Academy</a></li>
-                            <li><a href="https://www.esolcourses.com/" target="_blank">ESOL Courses</a></li>
-                            <li><a href="https://www.grammarbank.com/beginners-grammar-worksheets.html" target="_blank">GrammarBank</a></li>
-                            <li><a href="https://www.englishclub.com/?utm_source=EClogo" target="_blank">EnglishClub</a></li>
-                            <li><a href="http://poorvucenter.yale.edu/graduate-students/writing-resources-tutorials/downloadable-english-grammar-tutorials" target="_blank">Yale Poorvu Center</a></li>
-                        </ul>
-                    </div>
-                </div>
+                <div id="lesson-grid-container" class="lesson-grid"></div>
             </div>
         </section>
     </main>
-
     <footer class="site-footer"></footer>
-
     <script src="router.js"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const observer = new IntersectionObserver((entries) => {
-                entries.forEach(entry => {
-                    if (entry.isIntersecting) {
-                        entry.target.classList.add('is-visible');
-                        observer.unobserve(entry.target);
-                    }
-                });
-            }, { threshold: 0.1 });
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
+        import { getFirestore, collection, getDocs, query, orderBy } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
 
-            document.querySelectorAll('main .scroll-animated').forEach(el => {
-                observer.observe(el);
-            });
+        const firebaseConfig = {
+            apiKey: "AIzaSyD0qVihpuLI0cF0PZ32o8tFBLfTgjlqB6A",
+            authDomain: "literary-speaking.firebaseapp.com",
+            projectId: "literary-speaking",
+            storageBucket: "literary-speaking.appspot.com",
+            messagingSenderId: "699059463612",
+            appId: "1:699059463612:web:ecb2e784d627c6b93937b9",
+            measurementId: "G-0L1V3XXGGR"
+        };
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            const lessonsQuery = query(collection(db, "lessons"), orderBy("title_en"));
+            const querySnapshot = await getDocs(lessonsQuery);
+            const lessons = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+            const gridContainer = document.getElementById('lesson-grid-container');
+
+            const populateGrid = (lang) => {
+                if (!gridContainer) return;
+                gridContainer.innerHTML = '';
+                if (lessons.length === 0) {
+                    gridContainer.innerHTML = `<p class="lang-switch" data-en="Lessons are coming soon!" data-es="¡Pronto habrá lecciones!"></p>`;
+                    siteRouter.applyLanguage(lang);
+                    return;
+                }
+                lessons.forEach(lesson => {
+                    const card = document.createElement('a');
+                    card.className = 'lesson-card scroll-animated';
+                    card.href = `lesson-single.html?id=${lesson.id}`;
+                    card.innerHTML = `
+                        <div class="lesson-card-image-wrapper"><img src="${lesson.thumbnail_url || 'https://i.imgur.com/3Yj6bA1.png'}" alt="" class="lesson-card-image"></div>
+                        <div class="lesson-card-content"><h3 class="lesson-card-title">${lesson[`title_${lang}`]}</h3></div>
+                    `;
+                    gridContainer.appendChild(card);
+                });
+            };
+
+            const initialLang = localStorage.getItem('language') || 'en';
+            populateGrid(initialLang);
+            const langObserver = new MutationObserver(() => populateGrid(document.documentElement.lang));
+            langObserver.observe(document.documentElement, { attributes: true, attributeFilter: ['lang'] });
         });
     </script>
 </body>
