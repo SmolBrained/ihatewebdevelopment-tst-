@@ -6,6 +6,15 @@
     <link rel="icon" type="image/png" href="https://i.imgur.com/WPy5YDY.png">
     <title>Home | Literary Speaking</title>
     <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
+    <script>
+      window.OneSignalDeferred = window.OneSignalDeferred || [];
+      OneSignalDeferred.push(async function(OneSignal) {
+        await OneSignal.init({
+          appId: "d12debe4-4f24-4db4-bfa5-9f6ee5f38d48",
+        });
+      });
+    </script>
 </head>
 <body data-current-page="home">
     <header class="site-header" id="header"></header>
@@ -135,20 +144,6 @@
                  <div class="card-grid">
                     <div class="stat-card scroll-animated"><p class="stat-label lang-switch" data-en="Over" data-es="Más de"></p><div class="big-number">200</div><p class="stat-desc lang-switch" data-en="Students and community members have contributed" data-es="Estudiantes y miembros de la comunidad han contribuido"></p></div>
                     <div class="stat-card scroll-animated"><p class="stat-label lang-switch" data-en="Over" data-es="Más de"></p><div class="big-number">1500</div><p class="stat-desc lang-switch" data-en="Dollars worth of donations distributed" data-es="Dólares en donaciones distribuidas"></p></div>
-                </div>
-            </div>
-        </section>
-
-        <section class="section section-theme-purple-2">
-            <div class="container">
-                <div class="title-box scroll-animated"><div class="title-number">6</div><h2 class="title-main lang-switch" data-en="Newsletter" data-es="Boletín Informativo"></h2></div>
-                <div class="image-grid-2 scroll-animated">
-                    <img src="https://i.imgur.com/ltxyrk1.jpeg" alt="Contact Form Image" class="placeholder-img">
-                    <div class="form-container">
-                        <h3 class="lang-switch" data-en="Sign Up for Our Seasonal Newsletter" data-es="Suscríbete a Nuestro Boletín de Temporada"></h3>
-                        <p class="lang-switch" data-en="Receive updates on our program, articles, and news!" data-es="¡Recibe notificaciones sobre nuestro programa, artículos y noticias!"></p>
-                        <form><div class="form-group"><label for="email-signup" class="lang-switch" data-en="EMAIL *" data-es="CORREO ELECTRÓNICO *"></label><input type="email" id="email-signup" required></div><button type="submit" class="btn lang-switch" data-en="Subscribe" data-es="Suscribir"></button></form>
-                    </div>
                 </div>
             </div>
         </section>
