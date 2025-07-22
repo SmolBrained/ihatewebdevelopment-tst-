@@ -70,17 +70,18 @@
 
             const renderContent = (content, lang) => {
                 mainContent.innerHTML = '';
+                const title = content[`title_${lang}`] || content.title_en || '';
                 if (content.type === 'text') {
-                    mainContent.innerHTML = `<h2 class="lesson-content-title">${content[`title_${lang}`]}</h2><div class="lesson-content-body">${(content[`content_${lang}`] || '').replace(/\\n/g, '\n').split('\n\n').map(p => `<p>${p.replace(/\n/g, '<br>')}</p>`).join('')}</div>`;
+                    mainContent.innerHTML = `<h2 class="lesson-content-title">${title}</h2><div class="lesson-content-body">${(content[`content_${lang}`] || '').replace(/\\n/g, '\n').split('\n\n').map(p => `<p>${p.replace(/\n/g, '<br>')}</p>`).join('')}</div>`;
                 } else if (content.type === 'video') {
-                    mainContent.innerHTML = `<h2 class="lesson-content-title">${content[`title_${lang}`]}</h2><div class="lesson-content-body"><iframe src="https://www.youtube.com/embed/${content.videoId}" frameborder="0" allowfullscreen></iframe></div>`;
+                    mainContent.innerHTML = `<h2 class="lesson-content-title">${title}</h2><div class="lesson-content-body"><iframe src="https://www.youtube.com/embed/${content.videoId}" frameborder="0" allowfullscreen></iframe></div>`;
                 }
             };
 
             const populateLesson = (lang) => {
                 document.title = `${lesson[`title_${lang}`]} | Literary Speaking`;
                 document.getElementById('lesson-title-main').textContent = lesson[`title_${lang}`];
-                sidebar.innerHTML = `<h3>Course Modules</h3>`;
+                sidebar.innerHTML = `<h3 class="lang-switch" data-en="Course Modules" data-es="Módulos del Curso"></h3>`;
                 const moduleList = document.createElement('ul');
                 moduleList.className = 'module-list';
                 
@@ -95,7 +96,7 @@
                         contentItem.className = 'module-content-item';
                         const link = document.createElement('a');
                         link.href = '#';
-                        link.textContent = content[`title_${lang}`];
+                        link.textContent = content[`title_${lang}`] || content.title_en;
                         link.dataset.moduleIndex = moduleIndex;
                         link.dataset.contentIndex = contentIndex;
                         contentItem.appendChild(link);
@@ -107,6 +108,7 @@
                     moduleList.appendChild(moduleItem);
                 });
                 sidebar.appendChild(moduleList);
+                siteRouter.applyLanguage(lang);
 
                 sidebar.querySelectorAll('a').forEach(a => {
                     a.addEventListener('click', e => {
