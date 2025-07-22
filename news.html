@@ -156,11 +156,26 @@
 
             const initialLang = localStorage.getItem('language') || 'en';
             populateColumns(initialLang);
+            siteRouter.applyLanguage(initialLang);
 
             const langObserver = new MutationObserver(() => {
                 populateColumns(document.documentElement.lang);
+                siteRouter.applyLanguage(document.documentElement.lang);
             });
             langObserver.observe(document.documentElement, { attributes: true, attributeFilter: ['lang'] });
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('is-visible');
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, { threshold: 0.1 });
+
+            document.querySelectorAll('main .scroll-animated').forEach(el => {
+                observer.observe(el);
+            });
         });
     </script>
 </body>
