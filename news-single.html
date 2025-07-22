@@ -59,6 +59,39 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
+        const updateNewsText = (item, lang) => {
+            if (!item) return;
+            document.title = `${item[`title_${lang}`]} - Literary Speaking`;
+            document.getElementById('news-title').textContent = item[`title_${lang}`];
+            const author = siteRouter.members[item.author_id] || { name: 'Anonymous' };
+            const itemDate = new Date(item.date).toLocaleDateString(lang.startsWith('es') ? 'es-ES' : 'en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+            document.getElementById('news-meta').innerHTML = `
+                <span class="lang-switch" data-en="By" data-es="Por">By</span> <a href="#" class="nav-link" data-page-id="member" data-member-id="${item.author_id}">${author.name}</a>
+                <span style="margin: 0 10px;">|</span>
+                <span>${itemDate}</span>
+                <span style="margin: 0 10px;">|</span>
+                <span>${item[`read_time_${lang}`]}</span>
+            `;
+            const contentContainer = document.getElementById('news-content');
+            contentContainer.innerHTML = '';
+            if (item.contentBlocks && Array.isArray(item.contentBlocks)) {
+                item.contentBlocks.forEach(block => {
+                    if (block.type === 'text') {
+                        const formattedText = (block[`content_${lang}`] || '').replace(/\\n/g, '\n').split('\n\n').map(p => `<p>${p.replace(/\n/g, '<br>')}</p>`).join('');
+                        contentContainer.innerHTML += formattedText;
+                    } else if (block.type === 'image') {
+                        contentContainer.innerHTML += `
+                            <figure>
+                                <img src="${block.url}" alt="${block[`caption_${lang}`] || ''}">
+                                <figcaption>${block[`caption_${lang}`] || ''}</figcaption>
+                            </figure>
+                        `;
+                    }
+                });
+            }
+            siteRouter.applyLanguage(lang);
+        };
+        
         document.addEventListener('DOMContentLoaded', async () => {
             await siteRouter.loadMembers();
             const urlParams = new URLSearchParams(window.location.search);
@@ -69,46 +102,14 @@
             const docSnap = await getDoc(docRef);
             if (!docSnap.exists()) return siteRouter.navigateTo('news');
             
-            const item = docSnap.data();
-
-            const updateNewsText = (lang) => {
-                document.title = `${item[`title_${lang}`]} - Literary Speaking`;
-                document.getElementById('news-title').textContent = item[`title_${lang}`];
-                const author = siteRouter.members[item.author_id] || { name: 'Anonymous' };
-                const itemDate = new Date(item.date).toLocaleDateString(lang.startsWith('es') ? 'es-ES' : 'en-US', { year: 'numeric', month: 'long', day: 'numeric' });
-                document.getElementById('news-meta').innerHTML = `
-                    <span class="lang-switch" data-en="By" data-es="Por">By</span> <a href="#" class="nav-link" data-page-id="member" data-member-id="${item.author_id}">${author.name}</a>
-                    <span style="margin: 0 10px;">|</span>
-                    <span>${itemDate}</span>
-                    <span style="margin: 0 10px;">|</span>
-                    <span>${item[`read_time_${lang}`]}</span>
-                `;
-                const contentContainer = document.getElementById('news-content');
-                contentContainer.innerHTML = '';
-                if (item.contentBlocks && Array.isArray(item.contentBlocks)) {
-                    item.contentBlocks.forEach(block => {
-                        if (block.type === 'text') {
-                            const formattedText = (block[`content_${lang}`] || '').replace(/\\n/g, '\n').split('\n\n').map(p => `<p>${p.replace(/\n/g, '<br>')}</p>`).join('');
-                            contentContainer.innerHTML += formattedText;
-                        } else if (block.type === 'image') {
-                            contentContainer.innerHTML += `
-                                <figure>
-                                    <img src="${block.url}" alt="${block[`caption_${lang}`] || ''}">
-                                    <figcaption>${block[`caption_${lang}`] || ''}</figcaption>
-                                </figure>
-                            `;
-                        }
-                    });
-                }
-            };
+            const newsItem = docSnap.data();
             
             const initialLang = localStorage.getItem('language') || 'en';
-            updateNewsText(initialLang);
-            siteRouter.applyLanguage(initialLang);
+            updateNewsText(newsItem, initialLang);
+
             const langObserver = new MutationObserver(() => {
-                const lang = document.documentElement.lang;
-                updateNewsText(lang);
-                siteRouter.applyLanguage(lang);
+                const currentLang = document.documentElement.lang;
+                updateNewsText(newsItem, currentLang);
             });
             langObserver.observe(document.documentElement, { attributes: true, attributeFilter: ['lang'] });
         });
