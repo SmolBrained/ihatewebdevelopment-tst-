@@ -141,8 +141,6 @@
             const langObserver = new MutationObserver(() => {
                 const currentLang = document.documentElement.lang;
                 populateLesson(lesson, currentLang);
-                // The line below was the cause of the crash and has been removed.
-                // siteRouter.applyLanguage(currentLang); 
             });
             langObserver.observe(document.documentElement, { attributes: true, attributeFilter: ['lang'] });
         });
