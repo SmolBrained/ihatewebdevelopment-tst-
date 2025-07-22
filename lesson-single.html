@@ -66,7 +66,7 @@
             mainContent.innerHTML = '';
             const title = content[`title_${lang}`] || content.title_en || '';
             if (content.type === 'text') {
-                mainContent.innerHTML = `<h2 class="lesson-content-title">${title}</h2><div class="lesson-content-body">${(content[`content_${lang}`] || '').replace(/\\n/g, '\n').split('\n\n').map(p => `<p>${p.replace(/\n/g, '<br>')}</p>`).join('')}</div>`;
+                mainContent.innerHTML = `<h2 class="lesson-content-title">${title}</h2><div class="lesson-content-body">${content[`content_${lang}`] || ''}</div>`;
             } else if (content.type === 'video') {
                 mainContent.innerHTML = `<h2 class="lesson-content-title">${title}</h2><div class="lesson-content-body"><iframe src="https://www.youtube.com/embed/${content.videoId}" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe></div>`;
             }
@@ -141,7 +141,8 @@
             const langObserver = new MutationObserver(() => {
                 const currentLang = document.documentElement.lang;
                 populateLesson(lesson, currentLang);
-                siteRouter.applyLanguage(currentLang);
+                // The line below was the cause of the crash and has been removed.
+                // siteRouter.applyLanguage(currentLang); 
             });
             langObserver.observe(document.documentElement, { attributes: true, attributeFilter: ['lang'] });
         });
