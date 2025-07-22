@@ -38,6 +38,9 @@ const siteRouter = {
     },
     applyLanguage(lang) {
         document.querySelectorAll('[data-en], [data-es]').forEach(el => {
+            if (el.closest('.page-specific-content')) {
+                return;
+            }
             const text = el.dataset[lang];
             if (text !== undefined) {
                  el.innerHTML = text;
