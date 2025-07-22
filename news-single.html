@@ -20,6 +20,7 @@
         .news-body figcaption {font-size:0.9rem;color:var(--color-text-light);text-align:center;margin-top: 10px;font-style:italic;}
         .back-link {display:inline-block; margin-bottom: 20px; font-weight: 700; color: var(--color-purple-dark); text-decoration: none;}
         .back-link:hover {text-decoration: underline;}
+        .comments-container {max-width:750px; margin: 60px auto 0; padding-top: 40px; border-top: 1px solid #eee;}
         @media (max-width:768px){.news-title-full{font-size:2.2rem;}}
     </style>
 </head>
@@ -37,6 +38,9 @@
                         </div>
                         <div id="news-content" class="news-body"></div>
                     </article>
+                </div>
+                <div id="comments" class="comments-container">
+                    <div id="disqus_thread"></div>
                 </div>
             </div>
         </section>
@@ -111,6 +115,18 @@
                 updateNewsText(newsItem, currentLang);
             });
             langObserver.observe(document.documentElement, { attributes: true, attributeFilter: ['lang'] });
+
+            var disqus_config = function () {
+                this.page.url = window.location.href;
+                this.page.identifier = newsId;
+            };
+            
+            (function() {
+                var d = document, s = d.createElement('script');
+                s.src = 'https://literary-speaking.disqus.com/embed.js';
+                s.setAttribute('data-timestamp', +new Date());
+                (d.head || d.body).appendChild(s);
+            })();
         });
     </script>
 </body>
