@@ -10,14 +10,14 @@
         .back-link { display: inline-block; margin-bottom: 20px; font-weight: 700; color: var(--color-primary-dark); text-decoration: none; }
         .back-link:hover { text-decoration: underline; }
         .course-list { list-style: none; padding: 0; margin: 0; }
-        .course-item { 
-            border-radius: 8px; 
-            overflow: hidden; 
-            margin-bottom: 20px; 
+        .course-item {
+            border-radius: 8px;
+            overflow: hidden;
+            margin-bottom: 20px;
             border: 1px solid #e9ecef;
         }
         .course-header {
-            background-color: #f1f3f5;
+            background-color: #f8f9fa;
             padding: 15px 20px;
             font-weight: 700;
             font-size: 1.2rem;
@@ -25,36 +25,34 @@
             display: flex;
             align-items: center;
             color: #333;
-            border-bottom: 1px solid #e9ecef;
-        }
-        .course-header.collapsed {
-             border-bottom: none;
         }
         .course-header::before {
-            content: '►';
+            content: '▼';
             font-size: 0.8em;
             margin-right: 12px;
             transition: transform 0.3s ease;
         }
-        .course-header:not(.collapsed)::before {
-            transform: rotate(90deg);
+        .course-header.collapsed::before {
+            transform: rotate(-90deg);
         }
         .course-content {
             background-color: #fff;
             max-height: 2000px;
             transition: max-height 0.5s ease-in-out;
+            border-top: 1px solid #e9ecef;
         }
         .course-header.collapsed + .course-content {
             max-height: 0;
+            border-top: none;
             overflow: hidden;
         }
         .module-title {
-            background-color: #f8f9fa;
-            padding: 12px 20px 12px 45px;
+            background-color: #fff;
+            padding: 12px 20px;
             font-weight: 700;
             font-size: 1rem;
-            color: #444;
-            border-top: 1px solid #e9ecef;
+            color: #333;
+            border-bottom: 1px solid #e9ecef;
         }
         .unit-list {
             list-style: none;
@@ -64,10 +62,13 @@
         .unit-item a {
             display: flex;
             align-items: center;
-            padding: 12px 20px 12px 60px;
+            padding: 12px 20px 12px 45px;
             text-decoration: none;
             color: var(--color-primary-dark);
             border-top: 1px solid #e9ecef;
+        }
+        .unit-list .unit-item:first-child a {
+            border-top: none;
         }
         .unit-item a:hover {
             background-color: #f5f0fa;
@@ -128,7 +129,7 @@
                 });
 
                 courseItem.innerHTML = `
-                    <div class="course-header collapsed">${course[`title_${lang}`]}</div>
+                    <div class="course-header">${course[`title_${lang}`]}</div>
                     <div class="course-content">${contentHTML}</div>
                 `;
                 courseListContainer.appendChild(courseItem);
