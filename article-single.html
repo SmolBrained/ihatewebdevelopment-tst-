@@ -115,13 +115,10 @@
             const article = docSnap.data();
 
             updateArticleText(article, localStorage.getItem('language') || 'en');
-            siteRouter.applyLanguage(localStorage.getItem('language') || 'en');
             
-            const langObserver = new MutationObserver(() => {
-                updateArticleText(article, document.documentElement.lang);
-                siteRouter.applyLanguage(document.documentElement.lang);
+            document.addEventListener('languageChanged', (e) => {
+                updateArticleText(article, e.detail.lang);
             });
-            langObserver.observe(document.documentElement, { attributes: true, attributeFilter: ['lang'] });
 
             var disqus_config = function () {
                 this.page.url = window.location.href;
