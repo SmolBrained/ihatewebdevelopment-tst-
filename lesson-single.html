@@ -124,7 +124,6 @@
         };
 
         document.addEventListener('DOMContentLoaded', async () => {
-            await siteRouter.loadMembers();
             const urlParams = new URLSearchParams(window.location.search);
             const lessonId = urlParams.get('id');
             if (!lessonId) return siteRouter.navigateTo('lessons');
@@ -135,16 +134,13 @@
             
             const lesson = docSnap.data();
             
-            const initialLang = localStorage.getItem('language') || 'en';
-            populateLesson(lesson, initialLang);
-            siteRouter.applyLanguage(initialLang);
+            populateLesson(lesson, localStorage.getItem('language') || 'en');
+            siteRouter.applyLanguage(localStorage.getItem('language') || 'en');
 
-            const langObserver = new MutationObserver(() => {
-                const currentLang = document.documentElement.lang;
-                populateLesson(lesson, currentLang);
-                siteRouter.applyLanguage(currentLang);
+            document.addEventListener('languageChanged', (e) => {
+                populateLesson(lesson, e.detail.lang);
+                siteRouter.applyLanguage(e.detail.lang);
             });
-            langObserver.observe(document.documentElement, { attributes: true, attributeFilter: ['lang'] });
         });
     </script>
 </body>
