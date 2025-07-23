@@ -8,31 +8,34 @@
     <link rel="stylesheet" href="style.css">
     <style>
         .page-header-container { padding-bottom: 20px; border-bottom: 1px solid #ddd; margin-bottom: 20px; }
-        .back-link { display: inline-block; margin-bottom: 20px; font-weight: 700; color: var(--color-primary-dark); text-decoration: none; }
-        .back-link:hover { text-decoration: underline; }
-        .lesson-layout { display: flex; gap: 40px; }
-        .lesson-sidebar { width: 220px; flex-shrink: 0; }
-        .lesson-sidebar-nav { list-style: none; padding: 0; margin: 0; position: sticky; top: 120px; }
-        .lesson-sidebar-nav a { display: block; padding: 10px 15px; text-decoration: none; color: var(--color-primary-dark); font-weight: 700; border-radius: 8px; margin-bottom: 5px; }
-        .lesson-sidebar-nav a.active { background-color: #f0e6fa; }
-        .lesson-sidebar-nav a:not(.active):hover { background-color: #f8f9fa; }
-        .lesson-main-content { flex-grow: 1; }
+        .lesson-layout { display: flex; gap: 40px; align-items: flex-start; }
+        .lesson-sidebar { width: 220px; flex-shrink: 0; position: sticky; top: 120px; }
+        .lesson-sidebar-nav { list-style: none; padding: 0; margin: 0; }
+        .sidebar-back-link { display: block; font-weight: 700; color: var(--color-primary); text-decoration: none; margin-bottom: 20px; padding: 5px 0; }
+        .sidebar-back-link:hover { text-decoration: underline; }
+        .lesson-sidebar-nav a.lesson-nav-link { display: block; padding: 10px 15px; text-decoration: none; color: var(--color-primary-dark); font-weight: 700; border-left: 3px solid transparent; }
+        .lesson-sidebar-nav a.lesson-nav-link.active { color: #2d3b45; border-left-color: #2d3b45; }
+        .lesson-sidebar-nav a.lesson-nav-link:not(.active):hover { background-color: #f8f9fa; }
+        .lesson-main-content { flex-grow: 1; min-width: 0; }
         .lesson-panel { display: none; }
         .lesson-panel.active { display: block; }
         .course-list { list-style: none; padding: 0; margin: 0; }
-        .course-item { border-radius: 8px; overflow: hidden; margin-bottom: 20px; border: 1px solid #e9ecef; }
-        .course-header { background-color: #f8f9fa; padding: 15px 20px; font-weight: 700; font-size: 1.2rem; cursor: pointer; display: flex; align-items: center; color: #333; }
+        .course-item { border-radius: 8px; overflow: hidden; margin-bottom: 15px; border: 1px solid #ddd; }
+        .course-header { background-color: #f8f9fa; padding: 15px 20px; font-weight: 700; font-size: 1.1rem; cursor: pointer; display: flex; align-items: center; color: #333; }
         .course-header::before { content: '►'; font-size: 0.8em; margin-right: 12px; transition: transform 0.3s ease; }
         .course-header:not(.collapsed)::before { transform: rotate(90deg); }
-        .course-content { background-color: #fff; max-height: 2000px; transition: max-height 0.5s ease-in-out; border-top: 1px solid #e9ecef; }
-        .course-header.collapsed + .course-content { max-height: 0; border-top: none; overflow: hidden; }
-        .module-title { background-color: #fff; padding: 12px 20px; font-weight: 700; font-size: 1rem; color: #333; border-bottom: 1px solid #e9ecef; text-align: left; }
+        .course-content { background-color: #fff; max-height: 0; overflow: hidden; transition: max-height 0.4s ease-out; }
+        .module-title { background-color: #fff; padding: 12px 20px; font-weight: 700; font-size: 1rem; color: #333; border-top: 1px solid #eee; border-bottom: 1px solid #eee; text-align: left; }
         .unit-list { list-style: none; padding: 0; margin: 0; }
-        .unit-item a { display: flex; align-items: center; padding: 12px 20px 12px 45px; text-decoration: none; color: var(--color-primary-dark); border-top: 1px solid #e9ecef; }
+        .unit-item a { display: flex; align-items: center; padding: 12px 20px 12px 45px; text-decoration: none; color: var(--color-primary-dark); border-top: 1px solid #eee; }
         .unit-list .unit-item:first-child a { border-top: none; }
         .unit-item a:hover { background-color: #f5f0fa; }
         .resource-list { list-style: none; padding: 0; margin: 0; }
         .resource-item a { display: block; padding: 15px; border-bottom: 1px solid #eee; text-decoration: none; font-weight: 700; }
+        #home-content-panel { line-height: 1.8; font-size: 1.1rem; }
+        #home-content-panel figure { margin: 30px 0; }
+        #home-content-panel img { max-width: 100%; border-radius: 8px; }
+        #home-content-panel figcaption { font-size: 0.9rem; color: #6c757d; text-align: center; margin-top: 10px; }
     </style>
 </head>
 <body data-current-page="lessons">
@@ -40,22 +43,20 @@
     <main>
         <section class="section">
             <div class="container page-specific-content">
-                <div class="page-header-container">
-                    <a class="back-link" href="lessons.html">← Back to all lessons</a>
-                    <h1 id="subject-title-main" style="font-size: 2.5rem; font-weight: 900; margin: 0;"></h1>
-                </div>
                 <div class="lesson-layout">
                     <aside class="lesson-sidebar">
+                        <a class="sidebar-back-link" href="lessons.html">← Back to all lessons</a>
                         <ul class="lesson-sidebar-nav">
-                            <li><a href="#" class="lesson-nav-link active" data-panel="modules">Modules</a></li>
+                            <li><a href="#" class="lesson-nav-link active" data-panel="home">Home</a></li>
+                            <li><a href="#" class="lesson-nav-link" data-panel="modules">Modules</a></li>
                             <li><a href="#" class="lesson-nav-link" data-panel="discussions">Discussions</a></li>
                             <li><a href="#" class="lesson-nav-link" data-panel="resources">More Resources</a></li>
                         </ul>
                     </aside>
                     <div class="lesson-main-content">
-                        <div id="modules-panel" class="lesson-panel active">
-                            <div id="course-list-container" class="course-list"></div>
-                        </div>
+                        <h1 id="subject-title-main" style="font-size: 2.2rem; font-weight: 900; margin: 0 0 30px 0;"></h1>
+                        <div id="home-panel" class="lesson-panel active"></div>
+                        <div id="modules-panel" class="lesson-panel"></div>
                         <div id="discussions-panel" class="lesson-panel">
                             <div id="disqus_thread"></div>
                         </div>
@@ -76,9 +77,21 @@
         const firebaseConfig = { apiKey: "AIzaSyD0qVihpuLI0cF0PZ32o8tFBLfTgjlqB6A", authDomain: "literary-speaking.firebaseapp.com", projectId: "literary-speaking", storageBucket: "literary-speaking.appspot.com", messagingSenderId: "699059463612", appId: "1:699059463612:web:ecb2e784d627c6b93937b9", measurementId: "G-0L1V3XXGGR" };
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
+        const populateHome = (subject, lang) => {
+            const container = document.getElementById('home-panel');
+            let contentHTML = '';
+            (subject.home_content || []).forEach(block => {
+                if (block.type === 'text') {
+                    contentHTML += block[`content_${lang}`] || '';
+                } else if (block.type === 'image') {
+                    contentHTML += `<figure><img src="${block.url}" alt="${block[`caption_${lang}`] || ''}"><figcaption>${block[`caption_${lang}`] || ''}</figcaption></figure>`;
+                }
+            });
+            container.innerHTML = contentHTML;
+        };
         const populateModules = (subject, lang) => {
-            const courseListContainer = document.getElementById('course-list-container');
-            courseListContainer.innerHTML = '';
+            const container = document.getElementById('modules-panel');
+            container.innerHTML = '';
             (subject.courses || []).forEach((course, courseIndex) => {
                 const courseItem = document.createElement('div');
                 courseItem.className = 'course-item';
@@ -89,25 +102,31 @@
                     contentHTML += `<ul class="unit-list">${unitsHTML}</ul>`;
                 });
                 courseItem.innerHTML = `<div class="course-header collapsed">${course[`title_${lang}`]}</div><div class="course-content">${contentHTML}</div>`;
-                courseListContainer.appendChild(courseItem);
+                container.appendChild(courseItem);
             });
-            courseListContainer.querySelectorAll('.course-header').forEach(header => header.addEventListener('click', () => header.classList.toggle('collapsed')));
+            container.querySelectorAll('.course-header').forEach(header => {
+                header.addEventListener('click', () => {
+                    header.classList.toggle('collapsed');
+                    const content = header.nextElementSibling;
+                    if (content.style.maxHeight) {
+                        content.style.maxHeight = null;
+                    } else {
+                        content.style.maxHeight = content.scrollHeight + "px";
+                    }
+                });
+            });
         };
         const populateResources = async (subjectId, lang) => {
-            const resourcesContainer = document.getElementById('resource-list-container');
-            resourcesContainer.innerHTML = '<li>Loading...</li>';
+            const container = document.getElementById('resource-list-container');
+            container.innerHTML = '<li>Loading...</li>';
             const q = query(collection(db, "resources"), where("subject_id", "==", subjectId));
-            const querySnapshot = await getDocs(q);
-            if(querySnapshot.empty) {
-                resourcesContainer.innerHTML = `<li><span class="lang-switch" data-en="No resources available for this lesson." data-es="No hay recursos disponibles para esta lección."></span></li>`;
-                return;
-            }
-            resourcesContainer.innerHTML = querySnapshot.docs.map(doc => {
-                const resource = doc.data();
-                return `<li class="resource-item"><a href="${resource.url}" target="_blank" rel="noopener noreferrer">${resource[`title_${lang}`]}</a></li>`;
-            }).join('');
+            const snapshot = await getDocs(q);
+            container.innerHTML = snapshot.empty ? `<li>No resources available.</li>` : snapshot.docs.map(doc => `<li class="resource-item"><a href="${doc.data().url}" target="_blank" rel="noopener noreferrer">${doc.data()[`title_${lang}`]}</a></li>`).join('');
         };
         const initDisqus = (subjectId) => {
+            const container = document.getElementById('discussions-panel');
+            if(container.classList.contains('disqus-loaded')) return;
+            container.innerHTML = '<div id="disqus_thread"></div>';
             if (window.DISQUS) {
                 window.DISQUS.reset({ reload: true, config: function () { this.page.url = window.location.href; this.page.identifier = subjectId; } });
             } else {
@@ -117,6 +136,7 @@
                 s.setAttribute('data-timestamp', +new Date());
                 (d.head || d.body).appendChild(s);
             }
+            container.classList.add('disqus-loaded');
         };
         const switchPanel = (panelId) => {
             document.querySelectorAll('.lesson-panel').forEach(p => p.classList.remove('active'));
@@ -134,12 +154,12 @@
             const updateUIForLanguage = (lang) => {
                 document.title = `${subject[`title_${lang}`]} | Literary Speaking`;
                 document.getElementById('subject-title-main').textContent = subject[`title_${lang}`];
+                populateHome(subject, lang);
                 populateModules(subject, lang);
                 populateResources(subjectId, lang);
                 if (window.siteRouter) siteRouter.applyLanguage(lang);
             };
-            const currentLang = localStorage.getItem('language') || 'en';
-            updateUIForLanguage(currentLang);
+            updateUIForLanguage(localStorage.getItem('language') || 'en');
             document.querySelectorAll('.lesson-nav-link').forEach(link => {
                 link.addEventListener('click', (e) => {
                     e.preventDefault();
