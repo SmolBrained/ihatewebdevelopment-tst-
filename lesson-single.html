@@ -20,6 +20,8 @@
         .lesson-panel.active { display: block; }
         .home-content-body { line-height: 1.8; font-size: 1.1rem; }
         .home-content-body img { max-width: 100%; border-radius: 8px; margin: 20px 0; }
+        .home-content-body figure { margin: 20px 0; }
+        .home-content-body figcaption { font-size: 0.9rem; color: #6c757d; text-align: center; margin-top: 5px; }
         .course-list { list-style: none; padding: 0; margin: 0; }
         .course-item { border-radius: 5px; overflow: hidden; margin-bottom: 15px; border: 1px solid #ccc; }
         .course-header { background-color: #f8f9fa; padding: 15px; font-weight: 700; font-size: 1.1rem; cursor: pointer; display: flex; align-items: center; color: #333; }
@@ -30,10 +32,7 @@
         .module-title { background-color: #fff; padding: 15px 20px; font-weight: 700; color: #333; border-top: 1px solid #eee; text-align: left; }
         .unit-list { list-style: none; padding: 0; margin: 0; }
         .unit-item a { display: flex; align-items: center; padding: 12px 20px 12px 45px; text-decoration: none; color: var(--color-primary-dark); border-top: 1px solid #eee; }
-        .unit-item a::before { font-family: sans-serif; margin-right: 12px; font-size: 1.2rem; }
-        .unit-item[data-unit-type="text"] a::before { content: '📄'; }
-        .unit-item[data-unit-type="video"] a::before { content: '▶️'; }
-        .unit-item[data-unit-type="image"] a::before { content: '🖼️'; }
+        .unit-item a::before { content: '📄'; font-family: sans-serif; margin-right: 12px; font-size: 1.2rem; }
         .unit-item a:hover { background-color: #f5f0fa; }
         .resource-list { list-style: none; padding: 0; margin: 0; }
         .resource-item a { display: block; padding: 15px; border-bottom: 1px solid #eee; text-decoration: none; font-weight: 700; }
@@ -84,9 +83,12 @@
         const populateHome = (subject, lang) => {
             const container = document.getElementById('home-panel');
             let contentHTML = '<div class="home-content-body">';
-            (subject.homeContentBlocks || []).forEach(block => {
-                if (block.type === 'text') contentHTML += block[`content_${lang}`] || '';
-                else if (block.type === 'image') contentHTML += `<figure><img src="${block.url}" alt="${block[`caption_${lang}`] || ''}"><figcaption>${block[`caption_${lang}`] || ''}</figcaption></figure>`;
+            (subject.contentBlocks || []).forEach(block => {
+                if (block.type === 'text') {
+                    contentHTML += block[`content_${lang}`] || '';
+                } else if (block.type === 'image') {
+                    contentHTML += `<figure><img src="${block.url}" alt="${block[`caption_${lang}`] || ''}"><figcaption>${block[`caption_${lang}`] || ''}</figcaption></figure>`;
+                }
             });
             contentHTML += '</div>';
             container.innerHTML = contentHTML;
@@ -94,13 +96,19 @@
         const populateModules = (subject, lang) => {
             const container = document.getElementById('modules-panel');
             container.innerHTML = '';
+            if (!subject.courses || subject.courses.length === 0) {
+                container.innerHTML = `<p><span class="lang-switch" data-en="No modules are available for this subject yet." data-es="Aún no hay módulos disponibles para esta materia."></span></p>`;
+                return;
+            }
             (subject.courses || []).forEach((course, courseIndex) => {
                 const courseItem = document.createElement('div');
                 courseItem.className = 'course-item';
                 let contentHTML = '';
                 (course.modules || []).forEach((module, moduleIndex) => {
                     contentHTML += `<div class="module-title">${module[`title_${lang}`]}</div>`;
-                    let unitsHTML = (module.units || []).map((unit, unitIndex) => `<li class="unit-item" data-unit-type="${unit.type || 'text'}"><a href="course-unit.html?subjectId=${subject.id}&courseIndex=${courseIndex}&moduleIndex=${moduleIndex}&unitIndex=${unitIndex}">${unit[`title_${lang}`]}</a></li>`).join('');
+                    let unitsHTML = (module.units || []).map((unit, unitIndex) => 
+                        `<li class="unit-item"><a href="course-unit.html?subjectId=${subject.id}&courseIndex=${courseIndex}&moduleIndex=${moduleIndex}&unitIndex=${unitIndex}">${unit[`title_${lang}`]}</a></li>`
+                    ).join('');
                     contentHTML += `<ul class="unit-list">${unitsHTML}</ul>`;
                 });
                 courseItem.innerHTML = `<div class="course-header collapsed">${course[`title_${lang}`]}</div><div class="course-content">${contentHTML}</div>`;
@@ -141,10 +149,16 @@
         document.addEventListener('DOMContentLoaded', async () => {
             const urlParams = new URLSearchParams(window.location.search);
             const subjectId = urlParams.get('id');
-            if (!subjectId) return siteRouter.navigateTo('lessons');
+            if (!subjectId) {
+                if (window.siteRouter) window.siteRouter.navigateTo('lessons');
+                return;
+            }
             const docRef = doc(db, "lessons", subjectId);
             const docSnap = await getDoc(docRef);
-            if (!docSnap.exists()) return siteRouter.navigateTo('lessons');
+            if (!docSnap.exists()) {
+                if (window.siteRouter) window.siteRouter.navigateTo('lessons');
+                return;
+            }
             const subject = { id: docSnap.id, ...docSnap.data() };
             const updateUIForLanguage = (lang) => {
                 document.title = `${subject[`title_${lang}`]} | Literary Speaking`;
@@ -152,7 +166,7 @@
                 populateHome(subject, lang);
                 populateModules(subject, lang);
                 populateResources(subjectId, lang);
-                if (window.siteRouter) siteRouter.applyLanguage(lang);
+                if (window.siteRouter) window.siteRouter.applyLanguage(lang);
             };
             updateUIForLanguage(localStorage.getItem('language') || 'en');
             document.querySelectorAll('.lesson-nav-link').forEach(link => link.addEventListener('click', e => { e.preventDefault(); switchPanel(e.target.dataset.panel, subjectId); }));
