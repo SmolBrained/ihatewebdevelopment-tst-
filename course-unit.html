@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="https://i.imgur.com/WPy5YDY.png">
+    <title>Unit | Literary Speaking</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .unit-layout { display: grid; grid-template-columns: 280px 1fr; gap: 40px; }
+        .unit-sidebar { border-right: 1px solid #eee; padding-right: 30px; }
+        .unit-sidebar h3 { font-size: 1.2rem; margin-bottom: 20px; }
+        .module-list { list-style: none; padding: 0; margin: 0; }
+        .module-item { margin-bottom: 20px; }
+        .module-title { font-weight: 900; font-size: 1.1rem; padding: 10px; background-color: #f0f8ff; border-radius: 8px; }
+        .module-content-list { list-style: none; padding: 10px 0 0 20px; margin: 0; }
+        .module-content-item a { display: block; padding: 8px; text-decoration: none; color: var(--color-text); border-radius: 5px; }
+        .module-content-item a.active, .module-content-item a:hover { background-color: var(--color-primary-light); color: var(--color-primary); }
+        .back-link {display:inline-block; margin-bottom: 20px; font-weight: 700; color: var(--color-purple-dark); text-decoration: none;}
+        .back-link:hover {text-decoration: underline;}
+        
+        .unit-main-content { padding-top: 20px; }
+        .unit-content-title { font-size: 2.5rem; font-weight: 900; margin-bottom: 30px; }
+        .unit-content-body { line-height: 1.8; font-size: 1.1rem; text-align: left; }
+        .unit-content-body iframe { width: 100%; aspect-ratio: 16/9; border: none; border-radius: 12px; margin: 20px 0; }
+        .unit-content-body figure {margin: 30px 0; }
+        .unit-content-body img {width:100%;max-width:800px;border-radius:16px; margin: 0 auto; display: block;}
+        .unit-content-body figcaption {font-size:0.9rem;color:var(--color-text-light);text-align:center;margin-top: 10px;font-style:italic;}
+
+        @media (max-width: 900px) { .unit-layout { grid-template-columns: 1fr; } .unit-sidebar { border-right: none; border-bottom: 1px solid #eee; padding-right: 0; padding-bottom: 30px; } }
+    </style>
+</head>
+<body data-current-page="lessons">
+    <header class="site-header" id="header"></header>
+    <main>
+        <section class="section">
+            <div class="container">
+                <a id="back-to-subject-link" class="back-link nav-link"></a>
+                <div class="page-specific-content">
+                    <h1 id="subject-title-main" style="font-size: 2.5rem; font-weight: 900; margin-bottom: 30px;"></h1>
+                    <div class="unit-layout">
+                        <aside id="unit-sidebar" class="unit-sidebar"></aside>
+                        <div id="unit-main-content" class="unit-main-content"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+    <footer class="site-footer"></footer>
+    <script src="router.js"></script>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
+        import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyD0qVihpuLI0cF0PZ32o8tFBLfTgjlqB6A",
+            authDomain: "literary-speaking.firebaseapp.com",
+            projectId: "literary-speaking",
+            storageBucket: "literary-speaking.appspot.com",
+            messagingSenderId: "699059463612",
+            appId: "1:699059463612:web:ecb2e784d627c6b93937b9",
+            measurementId: "G-0L1V3XXGGR"
+        };
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        const renderContent = (contentBlocks, lang) => {
+            const mainContent = document.getElementById('unit-main-content');
+            if (!mainContent || !contentBlocks) return;
+            mainContent.innerHTML = '';
+            
+            contentBlocks.forEach(block => {
+                if (block.type === 'text') {
+                    mainContent.innerHTML += block[`content_${lang}`] || '';
+                } else if (block.type === 'image') {
+                    mainContent.innerHTML += `<figure><img src="${block.url}" alt="${block[`caption_${lang}`] || ''}"><figcaption>${block[`caption_${lang}`] || ''}</figcaption></figure>`;
+                } else if (block.type === 'video') {
+                    mainContent.innerHTML += `<iframe src="https://www.youtube.com/embed/${block.videoId}" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`;
+                }
+            });
+        };
+
+        const populatePage = (subject, courseIndex, unitIndex, lang) => {
+            if (!subject) return;
+            const course = subject.courses[courseIndex];
+            const unit = course.units[unitIndex];
+
+            document.title = `${unit[`title_${lang}`]} | ${subject[`title_${lang}`]}`;
+            document.getElementById('subject-title-main').textContent = subject[`title_${lang}`];
+            document.getElementById('back-to-subject-link').innerHTML = `← <span class="lang-switch" data-en="Back to ${subject.title_en}" data-es="Volver a ${subject.title_es}"></span>`;
+            
+            const sidebar = document.getElementById('unit-sidebar');
+            sidebar.innerHTML = `<h3 class="lang-switch" data-en="Course Units" data-es="Unidades del Curso"></h3>`;
+            const moduleList = document.createElement('ul');
+            moduleList.className = 'module-list';
+            
+            (course.units || []).forEach((u, u_idx) => {
+                const unitItem = document.createElement('li');
+                unitItem.className = 'module-content-item';
+                const link = document.createElement('a');
+                link.href = `course-unit.html?subjectId=${subject.id}&courseIndex=${courseIndex}&unitIndex=${u_idx}`;
+                link.textContent = u[`title_${lang}`];
+                if (u_idx == unitIndex) link.classList.add('active');
+                unitItem.appendChild(link);
+                moduleList.appendChild(unitItem);
+            });
+            sidebar.appendChild(moduleList);
+
+            renderContent(unit.contentBlocks, lang);
+        };
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const subjectId = urlParams.get('subjectId');
+            const courseIndex = urlParams.get('courseIndex');
+            const unitIndex = urlParams.get('unitIndex');
+
+            if (!subjectId || courseIndex === null || unitIndex === null) return siteRouter.navigateTo('lessons');
+
+            const docRef = doc(db, "lessons", subjectId);
+            const docSnap = await getDoc(docRef);
+            if (!docSnap.exists()) return siteRouter.navigateTo('lessons');
+            
+            const subject = { id: docSnap.id, ...docSnap.data() };
+            
+            document.getElementById('back-to-subject-link').dataset.pageId = 'lesson-single';
+            document.getElementById('back-to-subject-link').dataset.id = subjectId;
+
+            populatePage(subject, courseIndex, unitIndex, localStorage.getItem('language') || 'en');
+            siteRouter.applyLanguage(localStorage.getItem('language') || 'en');
+
+            document.addEventListener('languageChanged', (e) => {
+                populatePage(subject, courseIndex, unitIndex, e.detail.lang);
+                siteRouter.applyLanguage(e.detail.lang);
+            });
+        });
+    </script>
+</body>
+</html>
