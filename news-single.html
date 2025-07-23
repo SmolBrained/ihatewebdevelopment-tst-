@@ -102,16 +102,11 @@
             
             const newsItem = docSnap.data();
             
-            const initialLang = localStorage.getItem('language') || 'en';
-            updateNewsText(newsItem, initialLang);
-            siteRouter.applyLanguage(initialLang);
+            updateNewsText(newsItem, localStorage.getItem('language') || 'en');
 
-            const langObserver = new MutationObserver(() => {
-                const currentLang = document.documentElement.lang;
-                updateNewsText(newsItem, currentLang);
-                siteRouter.applyLanguage(currentLang);
+            document.addEventListener('languageChanged', (e) => {
+                updateNewsText(newsItem, e.detail.lang);
             });
-            langObserver.observe(document.documentElement, { attributes: true, attributeFilter: ['lang'] });
         });
     </script>
 </body>
