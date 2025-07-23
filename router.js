@@ -38,9 +38,6 @@ const siteRouter = {
     },
     applyLanguage(lang) {
         document.querySelectorAll('[data-en], [data-es]').forEach(el => {
-            if (el.closest('.page-specific-content')) {
-                return;
-            }
             const text = el.dataset[lang];
             if (text !== undefined) {
                  el.innerHTML = text;
@@ -50,6 +47,9 @@ const siteRouter = {
         const isEn = lang === 'en';
         document.querySelectorAll('#lang-en-btn, #lang-en-btn-mobile').forEach(btn => btn.classList.toggle('active', isEn));
         document.querySelectorAll('#lang-es-btn, #lang-es-btn-mobile').forEach(btn => btn.classList.toggle('active', !isEn));
+        
+        const langChangeEvent = new CustomEvent('languageChanged', { detail: { lang: lang } });
+        document.dispatchEvent(langChangeEvent);
     },
     init() {
         const headerContainer = document.getElementById('header');
