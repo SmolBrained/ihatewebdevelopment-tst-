@@ -99,7 +99,6 @@
                     link.addEventListener('click', (e) => { e.preventDefault(); siteRouter.navigateTo(link.dataset.pageId, link.dataset.memberId); });
                 }
             });
-            siteRouter.applyLanguage(lang);
         };
 
         document.addEventListener('DOMContentLoaded', async () => {
@@ -116,9 +115,11 @@
             const article = docSnap.data();
 
             updateArticleText(article, localStorage.getItem('language') || 'en');
+            siteRouter.applyLanguage(localStorage.getItem('language') || 'en');
             
             const langObserver = new MutationObserver(() => {
                 updateArticleText(article, document.documentElement.lang);
+                siteRouter.applyLanguage(document.documentElement.lang);
             });
             langObserver.observe(document.documentElement, { attributes: true, attributeFilter: ['lang'] });
 
