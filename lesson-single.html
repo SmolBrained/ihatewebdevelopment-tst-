@@ -12,7 +12,6 @@
 
         .course-list { list-style: none; padding: 0; margin: 0; }
         
-        /* The main container for a single course */
         .course-item { 
             background-color: #f8f9fa; 
             border-radius: 8px; 
@@ -21,15 +20,14 @@
             border: 1px solid #e9ecef;
         }
 
-        /* The clickable header for the course */
         .course-header {
             padding: 15px 20px;
             font-weight: 700;
-            font-size: 1.2rem; /* Larger font for the main course title */
+            font-size: 1.2rem;
             cursor: pointer;
             display: flex;
             align-items: center;
-            color: #333; /* Darker text for the main title */
+            color: #333;
         }
         .course-header::before {
             content: '►';
@@ -41,10 +39,9 @@
             transform: rotate(90deg);
         }
 
-        /* The container for all modules and units, which will be collapsed */
         .course-content {
             background-color: #fff;
-            max-height: 2000px; /* Allow for plenty of content */
+            max-height: 2000px;
             transition: max-height 0.5s ease-in-out;
         }
         .course-header.collapsed + .course-content {
@@ -52,13 +49,14 @@
             overflow: hidden;
         }
 
-        /* The static, gray text for Module titles */
+        /* Updated Module Title Style */
         .module-title {
-            padding: 15px 20px 10px 45px;
+            background-color: #f1f3f5; /* Slightly darker gray for the module bar */
+            padding: 12px 20px 12px 45px; /* Indented padding */
             font-weight: 700;
             font-size: 1rem;
-            color: #555; /* Slightly lighter gray than main text */
-            border-top: 1px solid #f0f0f0;
+            color: #333; /* Darker text for readability */
+            border-top: 1px solid #e9ecef; /* Separator line */
         }
 
         .unit-list {
@@ -69,11 +67,10 @@
         .unit-item a {
             display: flex;
             align-items: center;
-            /* Indent further than the module title */
-            padding: 12px 20px 12px 60px; 
+            padding: 12px 20px 12px 60px; /* Further indent for units */
             text-decoration: none;
             color: var(--color-primary-dark);
-            border-top: 1px solid #f0f0f0;
+            border-top: 1px solid #e9ecef; /* Separator line */
         }
         .unit-item a:hover {
             background-color: #f5f0fa;
@@ -116,13 +113,11 @@
             const courseListContainer = document.getElementById('course-list-container');
             courseListContainer.innerHTML = '';
 
-            // The top-level item is the Course, which is collapsible
             (subject.courses || []).forEach((course, courseIndex) => {
                 const courseItem = document.createElement('div');
                 courseItem.className = 'course-item';
 
                 let contentHTML = '';
-                // Inside the course, we have static Module titles and lists of Units
                 (course.modules || []).forEach((module, moduleIndex) => {
                     contentHTML += `<div class="module-title">${module[`title_${lang}`]}</div>`;
                     
@@ -135,7 +130,6 @@
                     contentHTML += `<ul class="unit-list">${unitsHTML}</ul>`;
                 });
 
-                // Assemble the full course block
                 courseItem.innerHTML = `
                     <div class="course-header collapsed">${course[`title_${lang}`]}</div>
                     <div class="course-content">${contentHTML}</div>
@@ -143,7 +137,6 @@
                 courseListContainer.appendChild(courseItem);
             });
 
-            // Add click listeners to the new collapsible headers
             courseListContainer.querySelectorAll('.course-header').forEach(header => {
                 header.addEventListener('click', () => {
                     header.classList.toggle('collapsed');
