@@ -7,13 +7,12 @@
     <title>Lesson | Literary Speaking</title>
     <link rel="stylesheet" href="style.css">
     <style>
-        .page-header-container { padding-bottom: 15px; display: flex; justify-content: space-between; align-items: center; }
+        .page-header-container { padding-bottom: 15px; border-bottom: 1px solid #ddd; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; }
         .page-header-actions button { background-color: #f8f9fa; border: 1px solid #ccc; border-radius: 5px; padding: 8px 15px; font-weight: 700; cursor: pointer; }
-        .separator-line { border: 0; border-top: 1px solid #ddd; margin: 0 0 20px 0; }
-        .back-link { display: inline-block; margin-bottom: 20px; font-weight: 700; color: var(--color-primary); text-decoration: none; text-align: left;}
         .lesson-layout { display: flex; gap: 40px; }
         .lesson-sidebar { width: 220px; flex-shrink: 0; }
         .lesson-sidebar-nav { list-style: none; padding: 0; margin: 0; position: sticky; top: 120px; }
+        .lesson-sidebar-nav .back-link { display: block; padding: 10px 0; font-weight: 700; color: var(--color-primary); text-decoration: none; margin-bottom: 15px; text-align: left; }
         .lesson-sidebar-nav a.lesson-nav-link { display: block; padding: 10px 15px; text-decoration: none; color: #333; font-weight: 700; border-left: 3px solid transparent; text-align: left; }
         .lesson-sidebar-nav a.lesson-nav-link.active { border-left-color: #333; }
         .lesson-main-content { flex-grow: 1; }
@@ -26,8 +25,8 @@
         .course-header { background-color: #f8f9fa; padding: 15px; font-weight: 700; font-size: 1.1rem; cursor: pointer; display: flex; align-items: center; color: #333; }
         .course-header::before { content: '►'; font-size: 0.8em; margin-right: 12px; transition: transform 0.3s ease; }
         .course-header:not(.collapsed)::before { transform: rotate(90deg); }
-        .course-content { background-color: #fff; max-height: 5000px; overflow: hidden; transition: max-height 0.5s ease-in-out; }
-        .course-header.collapsed + .course-content { max-height: 0; }
+        .course-content { background-color: #fff; max-height: 5000px; overflow: hidden; transition: max-height 0.5s ease-in-out; border-top: 1px solid #ccc; }
+        .course-header.collapsed + .course-content { max-height: 0; border-top: none; }
         .module-title { background-color: #fff; padding: 15px 20px; font-weight: 700; color: #333; border-top: 1px solid #eee; text-align: left; }
         .unit-list { list-style: none; padding: 0; margin: 0; }
         .unit-item a { display: flex; align-items: center; padding: 12px 20px 12px 45px; text-decoration: none; color: var(--color-primary-dark); border-top: 1px solid #eee; }
@@ -46,20 +45,19 @@
         <section class="section">
             <div class="container page-specific-content">
                 <div class="page-header-container">
-                    <h1 id="subject-title-main" style="font-size: 2.5rem; font-weight: 900; margin: 0;"></h1>
+                    <h1 id="subject-title-main" style="font-size: 1.8rem; font-weight: 900; margin: 0;"></h1>
                     <div class="page-header-actions">
-                        <button id="collapse-all-btn"><span class="lang-switch" data-en="Collapse All" data-es="Contraer Todo"></span></button>
+                        <button id="collapse-all-btn">Collapse All</button>
                     </div>
                 </div>
-                <hr class="separator-line">
                 <div class="lesson-layout">
                     <aside class="lesson-sidebar">
                         <ul class="lesson-sidebar-nav">
-                            <li><a class="back-link" href="lessons.html"><span class="lang-switch" data-en="← Back to all lessons" data-es="← Volver a todas las lecciones"></span></a></li>
-                            <li><a href="#" class="lesson-nav-link active" data-panel="home"><span class="lang-switch" data-en="Home" data-es="Inicio"></span></a></li>
-                            <li><a href="#" class="lesson-nav-link" data-panel="modules"><span class="lang-switch" data-en="Modules" data-es="Módulos"></span></a></li>
-                            <li><a href="#" class="lesson-nav-link" data-panel="discussions"><span class="lang-switch" data-en="Discussions" data-es="Discusiones"></span></a></li>
-                            <li><a href="#" class="lesson-nav-link" data-panel="resources"><span class="lang-switch" data-en="More Resources" data-es="Más Recursos"></span></a></li>
+                            <li><a class="back-link" href="lessons.html">← Back to all lessons</a></li>
+                            <li><a href="#" class="lesson-nav-link active" data-panel="home">Home</a></li>
+                            <li><a href="#" class="lesson-nav-link" data-panel="modules">Modules</a></li>
+                            <li><a href="#" class="lesson-nav-link" data-panel="discussions">Discussions</a></li>
+                            <li><a href="#" class="lesson-nav-link" data-panel="resources">More Resources</a></li>
                         </ul>
                     </aside>
                     <div class="lesson-main-content">
@@ -67,7 +65,7 @@
                         <div id="modules-panel" class="lesson-panel"></div>
                         <div id="discussions-panel" class="lesson-panel"><div id="disqus_thread"></div></div>
                         <div id="resources-panel" class="lesson-panel">
-                            <h2 style="font-weight: 900;"><span class="lang-switch" data-en="Resources" data-es="Recursos"></span></h2>
+                            <h2 style="font-weight: 900;">Resources</h2>
                             <ul id="resource-list-container" class="resource-list"></ul>
                         </div>
                     </div>
@@ -117,7 +115,6 @@
             const querySnapshot = await getDocs(q);
             if(querySnapshot.empty) {
                 container.innerHTML = `<li><span class="lang-switch" data-en="No resources available." data-es="No hay recursos disponibles."></span></li>`;
-                if (window.siteRouter) window.siteRouter.applyLanguage(lang);
                 return;
             }
             container.innerHTML = querySnapshot.docs.map(doc => `<li class="resource-item"><a href="${doc.data().url}" target="_blank" rel="noopener noreferrer">${doc.data()[`title_${lang}`]}</a></li>`).join('');
@@ -151,14 +148,14 @@
             const subject = { id: docSnap.id, ...docSnap.data() };
             const updateUIForLanguage = (lang) => {
                 document.title = `${subject[`title_${lang}`]} | Literary Speaking`;
-                document.getElementById('subject-title-main').textContent = subject[`title_${lang}`];
+                document.getElementById('subject-title-main').textContent = `${subject.id} | ${subject[`title_${lang}`]}`;
                 populateHome(subject, lang);
                 populateModules(subject, lang);
                 populateResources(subjectId, lang);
                 if (window.siteRouter) siteRouter.applyLanguage(lang);
             };
             updateUIForLanguage(localStorage.getItem('language') || 'en');
-            document.querySelectorAll('.lesson-nav-link').forEach(link => link.addEventListener('click', e => { e.preventDefault(); switchPanel(e.target.closest('a').dataset.panel, subjectId); }));
+            document.querySelectorAll('.lesson-nav-link').forEach(link => link.addEventListener('click', e => { e.preventDefault(); switchPanel(e.target.dataset.panel, subjectId); }));
             document.addEventListener('languageChanged', e => updateUIForLanguage(e.detail.lang));
             document.getElementById('collapse-all-btn').addEventListener('click', () => {
                 document.querySelectorAll('#modules-panel .course-header').forEach(header => header.classList.add('collapsed'));
