@@ -10,7 +10,7 @@
         .page-header-container { padding-bottom: 15px; display: flex; justify-content: space-between; align-items: center; }
         .page-header-actions button { background-color: #f8f9fa; border: 1px solid #ccc; border-radius: 5px; padding: 8px 15px; font-weight: 700; cursor: pointer; }
         .separator-line { border: 0; border-top: 1px solid #ddd; margin: 0 0 20px 0; }
-        .back-link { display: inline-block; margin-bottom: 20px; font-weight: 700; color: var(--color-primary); text-decoration: none; }
+        .back-link { display: inline-block; margin-bottom: 20px; font-weight: 700; color: var(--color-primary); text-decoration: none; text-align: left;}
         .lesson-layout { display: flex; gap: 40px; }
         .lesson-sidebar { width: 220px; flex-shrink: 0; }
         .lesson-sidebar-nav { list-style: none; padding: 0; margin: 0; position: sticky; top: 120px; }
@@ -48,7 +48,7 @@
                 <div class="page-header-container">
                     <h1 id="subject-title-main" style="font-size: 2.5rem; font-weight: 900; margin: 0;"></h1>
                     <div class="page-header-actions">
-                        <button id="collapse-all-btn">Collapse All</button>
+                        <button id="collapse-all-btn"><span class="lang-switch" data-en="Collapse All" data-es="Contraer Todo"></span></button>
                     </div>
                 </div>
                 <hr class="separator-line">
@@ -56,10 +56,10 @@
                     <aside class="lesson-sidebar">
                         <ul class="lesson-sidebar-nav">
                             <li><a class="back-link" href="lessons.html"><span class="lang-switch" data-en="← Back to all lessons" data-es="← Volver a todas las lecciones"></span></a></li>
-                            <li><a href="#" class="lesson-nav-link active" data-panel="home">Home</a></li>
-                            <li><a href="#" class="lesson-nav-link" data-panel="modules">Modules</a></li>
-                            <li><a href="#" class="lesson-nav-link" data-panel="discussions">Discussions</a></li>
-                            <li><a href="#" class="lesson-nav-link" data-panel="resources">More Resources</a></li>
+                            <li><a href="#" class="lesson-nav-link active" data-panel="home"><span class="lang-switch" data-en="Home" data-es="Inicio"></span></a></li>
+                            <li><a href="#" class="lesson-nav-link" data-panel="modules"><span class="lang-switch" data-en="Modules" data-es="Módulos"></span></a></li>
+                            <li><a href="#" class="lesson-nav-link" data-panel="discussions"><span class="lang-switch" data-en="Discussions" data-es="Discusiones"></span></a></li>
+                            <li><a href="#" class="lesson-nav-link" data-panel="resources"><span class="lang-switch" data-en="More Resources" data-es="Más Recursos"></span></a></li>
                         </ul>
                     </aside>
                     <div class="lesson-main-content">
@@ -67,7 +67,7 @@
                         <div id="modules-panel" class="lesson-panel"></div>
                         <div id="discussions-panel" class="lesson-panel"><div id="disqus_thread"></div></div>
                         <div id="resources-panel" class="lesson-panel">
-                            <h2 style="font-weight: 900;">Resources</h2>
+                            <h2 style="font-weight: 900;"><span class="lang-switch" data-en="Resources" data-es="Recursos"></span></h2>
                             <ul id="resource-list-container" class="resource-list"></ul>
                         </div>
                     </div>
@@ -158,7 +158,7 @@
                 if (window.siteRouter) siteRouter.applyLanguage(lang);
             };
             updateUIForLanguage(localStorage.getItem('language') || 'en');
-            document.querySelectorAll('.lesson-nav-link').forEach(link => link.addEventListener('click', e => { e.preventDefault(); switchPanel(e.target.dataset.panel, subjectId); }));
+            document.querySelectorAll('.lesson-nav-link').forEach(link => link.addEventListener('click', e => { e.preventDefault(); switchPanel(e.target.closest('a').dataset.panel, subjectId); }));
             document.addEventListener('languageChanged', e => updateUIForLanguage(e.detail.lang));
             document.getElementById('collapse-all-btn').addEventListener('click', () => {
                 document.querySelectorAll('#modules-panel .course-header').forEach(header => header.classList.add('collapsed'));
