@@ -104,7 +104,6 @@
                 moduleList.appendChild(moduleItem);
             });
             sidebar.appendChild(moduleList);
-            siteRouter.applyLanguage(lang);
 
             sidebar.querySelectorAll('a').forEach(a => {
                 a.addEventListener('click', e => {
@@ -125,6 +124,7 @@
         };
 
         document.addEventListener('DOMContentLoaded', async () => {
+            await siteRouter.loadMembers();
             const urlParams = new URLSearchParams(window.location.search);
             const lessonId = urlParams.get('id');
             if (!lessonId) return siteRouter.navigateTo('lessons');
@@ -137,10 +137,12 @@
             
             const initialLang = localStorage.getItem('language') || 'en';
             populateLesson(lesson, initialLang);
+            siteRouter.applyLanguage(initialLang);
 
             const langObserver = new MutationObserver(() => {
                 const currentLang = document.documentElement.lang;
                 populateLesson(lesson, currentLang);
+                siteRouter.applyLanguage(currentLang);
             });
             langObserver.observe(document.documentElement, { attributes: true, attributeFilter: ['lang'] });
         });
