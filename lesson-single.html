@@ -11,13 +11,13 @@
         .back-link:hover { text-decoration: underline; }
         .course-list { list-style: none; padding: 0; margin: 0; }
         .course-item { 
-            background-color: #f8f9fa; 
             border-radius: 8px; 
             overflow: hidden; 
             margin-bottom: 20px; 
             border: 1px solid #e9ecef;
         }
         .course-header {
+            background-color: #f1f3f5;
             padding: 15px 20px;
             font-weight: 700;
             font-size: 1.2rem;
@@ -25,6 +25,10 @@
             display: flex;
             align-items: center;
             color: #333;
+            border-bottom: 1px solid #e9ecef;
+        }
+        .course-header.collapsed {
+             border-bottom: none;
         }
         .course-header::before {
             content: '►';
@@ -45,11 +49,11 @@
             overflow: hidden;
         }
         .module-title {
-            background-color: #f1f3f5;
+            background-color: #f8f9fa;
             padding: 12px 20px 12px 45px;
             font-weight: 700;
             font-size: 1rem;
-            color: #333;
+            color: #444;
             border-top: 1px solid #e9ecef;
         }
         .unit-list {
