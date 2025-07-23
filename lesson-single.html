@@ -7,36 +7,35 @@
     <title>Lesson | Literary Speaking</title>
     <link rel="stylesheet" href="style.css">
     <style>
-        .page-header-container { padding-bottom: 15px; border-bottom: 1px solid #ddd; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; }
-        .page-header-actions button { background-color: #f8f9fa; border: 1px solid #ccc; border-radius: 5px; padding: 8px 15px; font-weight: 700; cursor: pointer; }
-        .lesson-layout { display: flex; gap: 40px; }
-        .lesson-sidebar { width: 220px; flex-shrink: 0; }
-        .lesson-sidebar-nav { list-style: none; padding: 0; margin: 0; position: sticky; top: 120px; }
-        .lesson-sidebar-nav .back-link { display: block; padding: 10px 0; font-weight: 700; color: var(--color-primary); text-decoration: none; margin-bottom: 15px; }
-        .lesson-sidebar-nav a.lesson-nav-link { display: block; padding: 10px 15px; text-decoration: none; color: #333; font-weight: 700; border-left: 3px solid transparent; }
-        .lesson-sidebar-nav a.lesson-nav-link.active { border-left-color: #333; }
-        .lesson-main-content { flex-grow: 1; }
+        .page-header-container { padding-bottom: 20px; border-bottom: 1px solid #ddd; margin-bottom: 20px; }
+        .lesson-layout { display: flex; gap: 40px; align-items: flex-start; }
+        .lesson-sidebar { width: 220px; flex-shrink: 0; position: sticky; top: 120px; }
+        .lesson-sidebar-nav { list-style: none; padding: 0; margin: 0; }
+        .sidebar-back-link { display: block; font-weight: 700; color: var(--color-primary); text-decoration: none; margin-bottom: 20px; padding: 5px 0; }
+        .sidebar-back-link:hover { text-decoration: underline; }
+        .lesson-sidebar-nav a.lesson-nav-link { display: block; padding: 10px 15px; text-decoration: none; color: var(--color-primary-dark); font-weight: 700; border-left: 3px solid transparent; }
+        .lesson-sidebar-nav a.lesson-nav-link.active { color: #2d3b45; border-left-color: #2d3b45; }
+        .lesson-sidebar-nav a.lesson-nav-link:not(.active):hover { background-color: #f8f9fa; }
+        .lesson-main-content { flex-grow: 1; min-width: 0; }
         .lesson-panel { display: none; }
         .lesson-panel.active { display: block; }
-        .home-content-body { line-height: 1.8; font-size: 1.1rem; }
-        .home-content-body img { max-width: 100%; border-radius: 8px; margin: 20px 0; }
         .course-list { list-style: none; padding: 0; margin: 0; }
-        .course-item { border-radius: 5px; overflow: hidden; margin-bottom: 15px; border: 1px solid #ccc; }
-        .course-header { background-color: #f8f9fa; padding: 15px; font-weight: 700; font-size: 1.1rem; cursor: pointer; display: flex; align-items: center; color: #333; }
+        .course-item { border-radius: 8px; overflow: hidden; margin-bottom: 15px; border: 1px solid #ddd; }
+        .course-header { background-color: #f8f9fa; padding: 15px 20px; font-weight: 700; font-size: 1.1rem; cursor: pointer; display: flex; align-items: center; color: #333; }
         .course-header::before { content: '►'; font-size: 0.8em; margin-right: 12px; transition: transform 0.3s ease; }
         .course-header:not(.collapsed)::before { transform: rotate(90deg); }
-        .course-content { background-color: #fff; max-height: 5000px; overflow: hidden; transition: max-height 0.5s ease-in-out; }
-        .course-header.collapsed + .course-content { max-height: 0; }
-        .module-title { background-color: #fff; padding: 15px 20px; font-weight: 700; color: #333; border-top: 1px solid #eee; }
+        .course-content { background-color: #fff; max-height: 0; overflow: hidden; transition: max-height 0.4s ease-out; }
+        .module-title { background-color: #fff; padding: 12px 20px; font-weight: 700; font-size: 1rem; color: #333; border-top: 1px solid #eee; border-bottom: 1px solid #eee; text-align: left; }
         .unit-list { list-style: none; padding: 0; margin: 0; }
         .unit-item a { display: flex; align-items: center; padding: 12px 20px 12px 45px; text-decoration: none; color: var(--color-primary-dark); border-top: 1px solid #eee; }
-        .unit-item a::before { font-family: sans-serif; margin-right: 12px; font-size: 1.2rem; }
-        .unit-item[data-unit-type="text"] a::before { content: '📄'; }
-        .unit-item[data-unit-type="video"] a::before { content: '▶️'; }
-        .unit-item[data-unit-type="image"] a::before { content: '🖼️'; }
+        .unit-list .unit-item:first-child a { border-top: none; }
         .unit-item a:hover { background-color: #f5f0fa; }
         .resource-list { list-style: none; padding: 0; margin: 0; }
         .resource-item a { display: block; padding: 15px; border-bottom: 1px solid #eee; text-decoration: none; font-weight: 700; }
+        #home-content-panel { line-height: 1.8; font-size: 1.1rem; }
+        #home-content-panel figure { margin: 30px 0; }
+        #home-content-panel img { max-width: 100%; border-radius: 8px; }
+        #home-content-panel figcaption { font-size: 0.9rem; color: #6c757d; text-align: center; margin-top: 10px; }
     </style>
 </head>
 <body data-current-page="lessons">
@@ -44,16 +43,10 @@
     <main>
         <section class="section">
             <div class="container page-specific-content">
-                <div class="page-header-container">
-                    <h1 id="subject-title-main" style="font-size: 1.8rem; font-weight: 900; margin: 0;"></h1>
-                    <div class="page-header-actions">
-                        <button id="collapse-all-btn">Collapse All</button>
-                    </div>
-                </div>
                 <div class="lesson-layout">
                     <aside class="lesson-sidebar">
+                        <a class="sidebar-back-link" href="lessons.html">← Back to all lessons</a>
                         <ul class="lesson-sidebar-nav">
-                            <li><a class="back-link" href="lessons.html">← Back to all lessons</a></li>
                             <li><a href="#" class="lesson-nav-link active" data-panel="home">Home</a></li>
                             <li><a href="#" class="lesson-nav-link" data-panel="modules">Modules</a></li>
                             <li><a href="#" class="lesson-nav-link" data-panel="discussions">Discussions</a></li>
@@ -61,9 +54,12 @@
                         </ul>
                     </aside>
                     <div class="lesson-main-content">
+                        <h1 id="subject-title-main" style="font-size: 2.2rem; font-weight: 900; margin: 0 0 30px 0;"></h1>
                         <div id="home-panel" class="lesson-panel active"></div>
                         <div id="modules-panel" class="lesson-panel"></div>
-                        <div id="discussions-panel" class="lesson-panel"><div id="disqus_thread"></div></div>
+                        <div id="discussions-panel" class="lesson-panel">
+                            <div id="disqus_thread"></div>
+                        </div>
                         <div id="resources-panel" class="lesson-panel">
                             <h2 style="font-weight: 900;">Resources</h2>
                             <ul id="resource-list-container" class="resource-list"></ul>
@@ -83,12 +79,14 @@
         const db = getFirestore(app);
         const populateHome = (subject, lang) => {
             const container = document.getElementById('home-panel');
-            let contentHTML = '<div class="home-content-body">';
-            (subject.homeContentBlocks || []).forEach(block => {
-                if (block.type === 'text') contentHTML += block[`content_${lang}`] || '';
-                else if (block.type === 'image') contentHTML += `<figure><img src="${block.url}" alt="${block[`caption_${lang}`] || ''}"><figcaption>${block[`caption_${lang}`] || ''}</figcaption></figure>`;
+            let contentHTML = '';
+            (subject.home_content || []).forEach(block => {
+                if (block.type === 'text') {
+                    contentHTML += block[`content_${lang}`] || '';
+                } else if (block.type === 'image') {
+                    contentHTML += `<figure><img src="${block.url}" alt="${block[`caption_${lang}`] || ''}"><figcaption>${block[`caption_${lang}`] || ''}</figcaption></figure>`;
+                }
             });
-            contentHTML += '</div>';
             container.innerHTML = contentHTML;
         };
         const populateModules = (subject, lang) => {
@@ -100,27 +98,34 @@
                 let contentHTML = '';
                 (course.modules || []).forEach((module, moduleIndex) => {
                     contentHTML += `<div class="module-title">${module[`title_${lang}`]}</div>`;
-                    let unitsHTML = (module.units || []).map((unit, unitIndex) => `<li class="unit-item" data-unit-type="${unit.type || 'text'}"><a href="course-unit.html?subjectId=${subject.id}&courseIndex=${courseIndex}&moduleIndex=${moduleIndex}&unitIndex=${unitIndex}">${unit[`title_${lang}`]}</a></li>`).join('');
+                    let unitsHTML = (module.units || []).map((unit, unitIndex) => `<li class="unit-item"><a href="course-unit.html?subjectId=${subject.id}&courseIndex=${courseIndex}&moduleIndex=${moduleIndex}&unitIndex=${unitIndex}">${unit[`title_${lang}`]}</a></li>`).join('');
                     contentHTML += `<ul class="unit-list">${unitsHTML}</ul>`;
                 });
                 courseItem.innerHTML = `<div class="course-header collapsed">${course[`title_${lang}`]}</div><div class="course-content">${contentHTML}</div>`;
                 container.appendChild(courseItem);
             });
-            container.querySelectorAll('.course-header').forEach(header => header.addEventListener('click', () => header.classList.toggle('collapsed')));
+            container.querySelectorAll('.course-header').forEach(header => {
+                header.addEventListener('click', () => {
+                    header.classList.toggle('collapsed');
+                    const content = header.nextElementSibling;
+                    if (content.style.maxHeight) {
+                        content.style.maxHeight = null;
+                    } else {
+                        content.style.maxHeight = content.scrollHeight + "px";
+                    }
+                });
+            });
         };
         const populateResources = async (subjectId, lang) => {
             const container = document.getElementById('resource-list-container');
             container.innerHTML = '<li>Loading...</li>';
             const q = query(collection(db, "resources"), where("subject_id", "==", subjectId));
-            const querySnapshot = await getDocs(q);
-            if(querySnapshot.empty) {
-                container.innerHTML = `<li><span class="lang-switch" data-en="No resources available." data-es="No hay recursos disponibles."></span></li>`;
-                return;
-            }
-            container.innerHTML = querySnapshot.docs.map(doc => `<li class="resource-item"><a href="${doc.data().url}" target="_blank" rel="noopener noreferrer">${doc.data()[`title_${lang}`]}</a></li>`).join('');
+            const snapshot = await getDocs(q);
+            container.innerHTML = snapshot.empty ? `<li>No resources available.</li>` : snapshot.docs.map(doc => `<li class="resource-item"><a href="${doc.data().url}" target="_blank" rel="noopener noreferrer">${doc.data()[`title_${lang}`]}</a></li>`).join('');
         };
         const initDisqus = (subjectId) => {
             const container = document.getElementById('discussions-panel');
+            if(container.classList.contains('disqus-loaded')) return;
             container.innerHTML = '<div id="disqus_thread"></div>';
             if (window.DISQUS) {
                 window.DISQUS.reset({ reload: true, config: function () { this.page.url = window.location.href; this.page.identifier = subjectId; } });
@@ -131,12 +136,12 @@
                 s.setAttribute('data-timestamp', +new Date());
                 (d.head || d.body).appendChild(s);
             }
+            container.classList.add('disqus-loaded');
         };
-        const switchPanel = (panelId, subjectId) => {
+        const switchPanel = (panelId) => {
             document.querySelectorAll('.lesson-panel').forEach(p => p.classList.remove('active'));
             document.getElementById(`${panelId}-panel`).classList.add('active');
             document.querySelectorAll('.lesson-nav-link').forEach(l => l.classList.toggle('active', l.dataset.panel === panelId));
-            if (panelId === 'discussions') initDisqus(subjectId);
         };
         document.addEventListener('DOMContentLoaded', async () => {
             const urlParams = new URLSearchParams(window.location.search);
@@ -148,18 +153,22 @@
             const subject = { id: docSnap.id, ...docSnap.data() };
             const updateUIForLanguage = (lang) => {
                 document.title = `${subject[`title_${lang}`]} | Literary Speaking`;
-                document.getElementById('subject-title-main').textContent = `${subject.id} | ${subject[`title_${lang}`]}`;
+                document.getElementById('subject-title-main').textContent = subject[`title_${lang}`];
                 populateHome(subject, lang);
                 populateModules(subject, lang);
                 populateResources(subjectId, lang);
                 if (window.siteRouter) siteRouter.applyLanguage(lang);
             };
             updateUIForLanguage(localStorage.getItem('language') || 'en');
-            document.querySelectorAll('.lesson-nav-link').forEach(link => link.addEventListener('click', e => { e.preventDefault(); switchPanel(e.target.dataset.panel, subjectId); }));
-            document.addEventListener('languageChanged', e => updateUIForLanguage(e.detail.lang));
-            document.getElementById('collapse-all-btn').addEventListener('click', () => {
-                document.querySelectorAll('#modules-panel .course-header').forEach(header => header.classList.add('collapsed'));
+            document.querySelectorAll('.lesson-nav-link').forEach(link => {
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const panelId = e.target.dataset.panel;
+                    switchPanel(panelId);
+                    if (panelId === 'discussions') initDisqus(subjectId);
+                });
             });
+            document.addEventListener('languageChanged', (e) => updateUIForLanguage(e.detail.lang));
         });
     </script>
 </body>
