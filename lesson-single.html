@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="style.css">
     <style>
         .course-list { list-style: none; padding: 0; margin: 0; }
+        .course-title { font-size: 1.8rem; font-weight: 700; margin-top: 40px; margin-bottom: 15px; padding-bottom: 10px; border-bottom: 2px solid var(--color-primary-light); }
         .course-item { margin-bottom: 20px; border: 1px solid #ddd; border-radius: 8px; overflow: hidden; }
         .course-header { background-color: #f8f9fa; padding: 15px 20px; font-weight: 900; font-size: 1.2rem; cursor: pointer; display: flex; justify-content: space-between; align-items: center; }
         .course-header::after { content: '▼'; transition: transform 0.3s ease; }
@@ -27,7 +28,7 @@
             <div class="container page-specific-content">
                 <a class="back-link nav-link" data-page-id="lessons">← <span class="lang-switch" data-en="Back to all lessons" data-es="Volver a todas las lecciones"></span></a>
                 <h1 id="subject-title-main" style="font-size: 2.5rem; font-weight: 900; margin-bottom: 30px;"></h1>
-                <ul id="course-list-container" class="course-list"></ul>
+                <div id="course-list-container"></div>
             </div>
         </section>
     </main>
@@ -56,23 +57,41 @@
             const courseListContainer = document.getElementById('course-list-container');
             courseListContainer.innerHTML = '';
 
+            // The data structure is: subject -> courses -> modules -> units
+            // We need to loop through each level correctly.
             (subject.courses || []).forEach((course, courseIndex) => {
-                const courseItem = document.createElement('li');
-                courseItem.className = 'course-item';
+                // Create a title for the "Course" (or "Class")
+                const courseTitle = document.createElement('h2');
+                courseTitle.className = 'course-title';
+                courseTitle.textContent = course[`title_${lang}`];
+                courseListContainer.appendChild(courseTitle);
                 
-                let unitsHTML = (course.units || []).map((unit, unitIndex) => `
-                    <li class="unit-item">
-                        <a href="course-unit.html?subjectId=${subject.id}&courseIndex=${courseIndex}&unitIndex=${unitIndex}">${unit[`title_${lang}`]}</a>
-                    </li>
-                `).join('');
+                const moduleList = document.createElement('ul');
+                moduleList.className = 'course-list';
 
-                courseItem.innerHTML = `
-                    <div class="course-header">${course[`title_${lang}`]}</div>
-                    <ul class="unit-list">${unitsHTML}</ul>
-                `;
-                courseListContainer.appendChild(courseItem);
+                // Now, loop through the "Modules" within this course
+                (course.modules || []).forEach((module, moduleIndex) => {
+                    const moduleItem = document.createElement('li');
+                    moduleItem.className = 'course-item';
+                    
+                    // Create the list of "Units" for this module
+                    let unitsHTML = (module.units || []).map((unit, unitIndex) => `
+                        <li class="unit-item">
+                            <a href="course-unit.html?subjectId=${subject.id}&courseIndex=${courseIndex}&moduleIndex=${moduleIndex}&unitIndex=${unitIndex}">${unit[`title_${lang}`]}</a>
+                        </li>
+                    `).join('');
+
+                    // The collapsible header is the "Module"
+                    moduleItem.innerHTML = `
+                        <div class="course-header">${module[`title_${lang}`]}</div>
+                        <ul class="unit-list">${unitsHTML}</ul>
+                    `;
+                    moduleList.appendChild(moduleItem);
+                });
+                courseListContainer.appendChild(moduleList);
             });
 
+            // Add click listeners to all collapsible headers
             courseListContainer.querySelectorAll('.course-header').forEach(header => {
                 header.addEventListener('click', () => {
                     header.classList.toggle('collapsed');
@@ -91,12 +110,17 @@
             
             const subject = { id: docSnap.id, ...docSnap.data() };
             
-            populatePage(subject, localStorage.getItem('language') || 'en');
-            siteRouter.applyLanguage(localStorage.getItem('language') || 'en');
+            const currentLang = localStorage.getItem('language') || 'en';
+            populatePage(subject, currentLang);
+            if (window.siteRouter) {
+                siteRouter.applyLanguage(currentLang);
+            }
 
             document.addEventListener('languageChanged', (e) => {
                 populatePage(subject, e.detail.lang);
-                siteRouter.applyLanguage(e.detail.lang);
+                if (window.siteRouter) {
+                    siteRouter.applyLanguage(e.detail.lang);
+                }
             });
         });
     </script>
