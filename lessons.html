@@ -4,37 +4,30 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" type="image/png" href="https://i.imgur.com/WPy5YDY.png">
-    <title>Lessons | Literary Speaking</title>
+    <title>Lesson | Literary Speaking</title>
     <link rel="stylesheet" href="style.css">
     <style>
-        .hero-banner{height:60vh;min-height:400px;display:flex;align-items:center;justify-content:center;color:#fff;text-align:center;position:relative;padding:0 20px;background-image:url(https://i.imgur.com/f9KmpRG.jpeg);background-attachment:fixed;background-position:center;background-repeat:no-repeat;background-size:cover}
-        .hero-banner .overlay{position:absolute;top:0;left:0;width:100%;height:100%;background-color:rgba(0,0,0,.5);z-index:2}
-        .hero-banner .content{position:relative;z-index:3}
-        .hero-banner h1{font-size:3.8rem;font-weight:900;margin:0;line-height:1.2}
-        
-        .lesson-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:30px;margin-top:50px}
-        .lesson-card{background-color:#fff;border-radius:16px;overflow:hidden;text-align:center;box-shadow:0 8px 24px rgba(0,0,0,0.08);transition:transform .3s ease, box-shadow .3s ease; display:flex; flex-direction:column; text-decoration: none;}
-        .lesson-card:hover{transform:translateY(-8px);box-shadow:0 12px 32px rgba(0,0,0,0.12);}
-        .lesson-card-image-wrapper{width:100%;aspect-ratio:16/9;overflow:hidden;background-color:#e6f2ff;}
-        .lesson-card-image{width:100%;height:100%;object-fit:cover;}
-        .lesson-card-content{padding:25px;flex-grow:1;}
-        .lesson-card-title{font-size:1.5rem;font-weight:900;margin:0;color:var(--color-text);}
-        
-        @media (max-width:768px){.hero-banner{background-attachment:scroll}.hero-banner h1{font-size:2.2rem}}
+        .course-list { list-style: none; padding: 0; margin: 0; }
+        .course-item { margin-bottom: 20px; border: 1px solid #ddd; border-radius: 8px; overflow: hidden; }
+        .course-header { background-color: #f8f9fa; padding: 15px 20px; font-weight: 900; font-size: 1.2rem; cursor: pointer; display: flex; justify-content: space-between; align-items: center; }
+        .course-header::after { content: '▼'; transition: transform 0.3s ease; }
+        .course-header.collapsed::after { transform: rotate(-90deg); }
+        .unit-list { list-style: none; padding: 10px 20px 20px 40px; margin: 0; max-height: 1000px; transition: max-height 0.5s ease-in-out, padding 0.5s ease-in-out; }
+        .course-header.collapsed + .unit-list { max-height: 0; padding-top: 0; padding-bottom: 0; overflow: hidden; }
+        .unit-item a { display: block; padding: 10px; text-decoration: none; color: var(--color-primary-dark); border-radius: 5px; }
+        .unit-item a:hover { background-color: #f0e6fa; }
+        .back-link {display:inline-block; margin-bottom: 20px; font-weight: 700; color: var(--color-purple-dark); text-decoration: none;}
+        .back-link:hover {text-decoration: underline;}
     </style>
 </head>
 <body data-current-page="lessons">
     <header class="site-header" id="header"></header>
     <main>
-        <section class="hero-banner">
-            <div class="overlay"></div>
-            <div class="content scroll-animated">
-                <h1 class="lang-switch" data-en="Lessons" data-es="Lecciones"></h1>
-            </div>
-        </section>
-        <section class="section" style="--section-bg: #e6f2ff;">
-            <div class="container">
-                <div id="lesson-grid-container" class="lesson-grid"></div>
+        <section class="section">
+            <div class="container page-specific-content">
+                <a class="back-link nav-link" data-page-id="lessons">← <span class="lang-switch" data-en="Back to all lessons" data-es="Volver a todas las lecciones"></span></a>
+                <h1 id="subject-title-main" style="font-size: 2.5rem; font-weight: 900; margin-bottom: 30px;"></h1>
+                <ul id="course-list-container" class="course-list"></ul>
             </div>
         </section>
     </main>
@@ -42,7 +35,7 @@
     <script src="router.js"></script>
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
-        import { getFirestore, collection, getDocs, query, orderBy } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
+        import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyD0qVihpuLI0cF0PZ32o8tFBLfTgjlqB6A",
@@ -55,47 +48,56 @@
         };
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
+        
+        const populatePage = (subject, lang) => {
+            if (!subject) return;
+            document.title = `${subject[`title_${lang}`]} | Literary Speaking`;
+            document.getElementById('subject-title-main').textContent = subject[`title_${lang}`];
+            const courseListContainer = document.getElementById('course-list-container');
+            courseListContainer.innerHTML = '';
+
+            (subject.courses || []).forEach((course, courseIndex) => {
+                const courseItem = document.createElement('li');
+                courseItem.className = 'course-item';
+                
+                let unitsHTML = (course.units || []).map((unit, unitIndex) => `
+                    <li class="unit-item">
+                        <a href="course-unit.html?subjectId=${subject.id}&courseIndex=${courseIndex}&unitIndex=${unitIndex}">${unit[`title_${lang}`]}</a>
+                    </li>
+                `).join('');
+
+                courseItem.innerHTML = `
+                    <div class="course-header">${course[`title_${lang}`]}</div>
+                    <ul class="unit-list">${unitsHTML}</ul>
+                `;
+                courseListContainer.appendChild(courseItem);
+            });
+
+            courseListContainer.querySelectorAll('.course-header').forEach(header => {
+                header.addEventListener('click', () => {
+                    header.classList.toggle('collapsed');
+                });
+            });
+        };
 
         document.addEventListener('DOMContentLoaded', async () => {
-            const lessonsQuery = query(collection(db, "lessons"), orderBy("title_en"));
-            const querySnapshot = await getDocs(lessonsQuery);
-            const lessons = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-            const gridContainer = document.getElementById('lesson-grid-container');
+            const urlParams = new URLSearchParams(window.location.search);
+            const subjectId = urlParams.get('id');
+            if (!subjectId) return siteRouter.navigateTo('lessons');
 
-            const populateGrid = (lang) => {
-                if (!gridContainer) return;
-                gridContainer.innerHTML = '';
-                if (lessons.length === 0) {
-                    gridContainer.innerHTML = `<p class="lang-switch" data-en="Lessons are coming soon!" data-es="¡Pronto habrá lecciones!"></p>`;
-                    siteRouter.applyLanguage(lang);
-                    return;
-                }
-                lessons.forEach(lesson => {
-                    const card = document.createElement('a');
-                    card.className = 'lesson-card scroll-animated';
-                    card.href = `lesson-single.html?id=${lesson.id}`;
-                    card.innerHTML = `
-                        <div class="lesson-card-image-wrapper"><img src="${lesson.thumbnail_url || 'https://i.imgur.com/3Yj6bA1.png'}" alt="" class="lesson-card-image"></div>
-                        <div class="lesson-card-content"><h3 class="lesson-card-title">${lesson[`title_${lang}`]}</h3></div>
-                    `;
-                    gridContainer.appendChild(card);
-                });
-            };
-
-            const initialLang = localStorage.getItem('language') || 'en';
-            populateGrid(initialLang);
+            const docRef = doc(db, "lessons", subjectId);
+            const docSnap = await getDoc(docRef);
+            if (!docSnap.exists()) return siteRouter.navigateTo('lessons');
             
-            document.addEventListener('languageChanged', e => populateGrid(e.detail.lang));
+            const subject = { id: docSnap.id, ...docSnap.data() };
+            
+            populatePage(subject, localStorage.getItem('language') || 'en');
+            siteRouter.applyLanguage(localStorage.getItem('language') || 'en');
 
-            const observer = new IntersectionObserver((entries) => {
-                entries.forEach(entry => {
-                    if (entry.isIntersecting) {
-                        entry.target.classList.add('is-visible');
-                        observer.unobserve(entry.target);
-                    }
-                });
-            }, { threshold: 0.1 });
-            document.querySelectorAll('main .scroll-animated').forEach(el => observer.observe(el));
+            document.addEventListener('languageChanged', (e) => {
+                populatePage(subject, e.detail.lang);
+                siteRouter.applyLanguage(e.detail.lang);
+            });
         });
     </script>
 </body>
