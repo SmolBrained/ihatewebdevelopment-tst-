@@ -25,6 +25,7 @@
             display: flex;
             align-items: center;
             color: #333;
+            text-align: left;
         }
         .course-header::before {
             content: '▼';
@@ -53,6 +54,7 @@
             font-size: 1rem;
             color: #333;
             border-bottom: 1px solid #e9ecef;
+            text-align: left;
         }
         .unit-list {
             list-style: none;
@@ -66,6 +68,7 @@
             text-decoration: none;
             color: var(--color-primary-dark);
             border-top: 1px solid #e9ecef;
+            text-align: left;
         }
         .unit-list .unit-item:first-child a {
             border-top: none;
@@ -139,6 +142,7 @@
                 header.addEventListener('click', () => {
                     header.classList.toggle('collapsed');
                 });
+                header.classList.add('collapsed');
             });
         };
 
