@@ -14,6 +14,7 @@ const siteRouter = {
         "article-single": "article-single.html",
         "lessons": "lessons.html",
         "lesson-single": "lesson-single.html",
+        "course-unit": "course-unit.html",
         "member": "members.html"
     },
     members: {},
@@ -38,6 +39,9 @@ const siteRouter = {
     },
     applyLanguage(lang) {
         document.querySelectorAll('[data-en], [data-es]').forEach(el => {
+            if (el.closest('.page-specific-content')) {
+                return;
+            }
             const text = el.dataset[lang];
             if (text !== undefined) {
                  el.innerHTML = text;
@@ -47,9 +51,6 @@ const siteRouter = {
         const isEn = lang === 'en';
         document.querySelectorAll('#lang-en-btn, #lang-en-btn-mobile').forEach(btn => btn.classList.toggle('active', isEn));
         document.querySelectorAll('#lang-es-btn, #lang-es-btn-mobile').forEach(btn => btn.classList.toggle('active', !isEn));
-        
-        const langChangeEvent = new CustomEvent('languageChanged', { detail: { lang: lang } });
-        document.dispatchEvent(langChangeEvent);
     },
     init() {
         const headerContainer = document.getElementById('header');
@@ -158,7 +159,7 @@ const siteRouter = {
         const body = document.body;
         
         const path = window.location.pathname;
-        const isSinglePage = path.endsWith('article-single.html') || path.endsWith('news-single.html') || path.endsWith('members.html') || path.endsWith('lesson-single.html');
+        const isSinglePage = path.endsWith('article-single.html') || path.endsWith('news-single.html') || path.endsWith('members.html') || path.endsWith('lesson-single.html') || path.endsWith('course-unit.html');
 
         if (isSinglePage) {
             header?.classList.add('scrolled');
@@ -189,8 +190,8 @@ const siteRouter = {
                 link.addEventListener('click', (event) => {
                     event.preventDefault();
                     const pageId = link.dataset.pageId;
-                    const memberId = link.dataset.memberId;
-                    this.navigateTo(pageId, memberId);
+                    const id = link.dataset.id;
+                    this.navigateTo(pageId, id);
                     closeMenu();
                 });
             }
