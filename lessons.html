@@ -62,15 +62,6 @@
             const lessons = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
             const gridContainer = document.getElementById('lesson-grid-container');
 
-            const observer = new IntersectionObserver((entries) => {
-                entries.forEach(entry => {
-                    if (entry.isIntersecting) {
-                        entry.target.classList.add('is-visible');
-                        observer.unobserve(entry.target);
-                    }
-                });
-            }, { threshold: 0.1 });
-
             const populateGrid = (lang) => {
                 if (!gridContainer) return;
                 gridContainer.innerHTML = '';
@@ -88,19 +79,23 @@
                         <div class="lesson-card-content"><h3 class="lesson-card-title">${lesson[`title_${lang}`]}</h3></div>
                     `;
                     gridContainer.appendChild(card);
-                    observer.observe(card);
                 });
             };
 
             const initialLang = localStorage.getItem('language') || 'en';
             populateGrid(initialLang);
             
-            const langObserver = new MutationObserver(() => populateGrid(document.documentElement.lang));
-            langObserver.observe(document.documentElement, { attributes: true, attributeFilter: ['lang'] });
+            document.addEventListener('languageChanged', e => populateGrid(e.detail.lang));
 
-            document.querySelectorAll('main .scroll-animated').forEach(el => {
-                observer.observe(el);
-            });
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('is-visible');
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, { threshold: 0.1 });
+            document.querySelectorAll('main .scroll-animated').forEach(el => observer.observe(el));
         });
     </script>
 </body>
