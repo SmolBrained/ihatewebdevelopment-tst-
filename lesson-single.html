@@ -162,11 +162,11 @@
             const subject = { id: docSnap.id, ...docSnap.data() };
             const updateUIForLanguage = (lang) => {
                 document.title = `${subject[`title_${lang}`]} | Literary Speaking`;
-                document.getElementById('subject-title-main').textContent = `${subject.id} | ${subject[`title_${lang}`]}`;
+                document.getElementById('subject-title-main').textContent = subject[`title_${lang}`];
                 populateHome(subject, lang);
                 populateModules(subject, lang);
                 populateResources(subjectId, lang);
-                if (window.siteRouter) window.siteRouter.applyLanguage(lang);
+                if (window.siteRouter) siteRouter.applyLanguage(lang);
             };
             updateUIForLanguage(localStorage.getItem('language') || 'en');
             document.querySelectorAll('.lesson-nav-link').forEach(link => link.addEventListener('click', e => { e.preventDefault(); switchPanel(e.target.dataset.panel, subjectId); }));
