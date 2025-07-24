@@ -88,7 +88,7 @@
     </script>
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
-        import { getFirestore, collection, getDocs, query, where, orderBy } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
+        import { getFirestore, collection, getDocs, query, orderBy } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyD0qVihpuLI0cF0PZ32o8tFBLfTgjlqB6A",
@@ -104,9 +104,9 @@
 
         document.addEventListener('DOMContentLoaded', async () => {
             await siteRouter.loadMembers();
-            const newsQuery = query(collection(db, "news"), where("isPublished", "==", true), orderBy("date", "desc"));
+            const newsQuery = query(collection(db, "news"), orderBy("date", "desc"));
             const querySnapshot = await getDocs(newsQuery);
-            const allNewsItems = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+            const allNewsItems = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })).filter(item => item.isPublished === true);
             
             const featuredItems = allNewsItems.filter(item => item.isFeatured);
             const sidebarItems = allNewsItems.filter(item => !item.isFeatured);
