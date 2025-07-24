@@ -206,6 +206,8 @@ const siteRouter = {
         const setLanguage = (lang) => {
             this.applyLanguage(lang);
             localStorage.setItem('language', lang);
+            // *** THIS IS THE NEW LINE ***
+            document.dispatchEvent(new CustomEvent('languageChanged', { detail: { lang } }));
         };
 
         const toggleLanguage = () => {
