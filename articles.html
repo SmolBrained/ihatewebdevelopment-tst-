@@ -71,7 +71,7 @@
     <script src="router.js"></script>
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
-        import { getFirestore, collection, getDocs, query, orderBy } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
+        import { getFirestore, collection, getDocs, query, where, orderBy } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyD0qVihpuLI0cF0PZ32o8tFBLfTgjlqB6A",
@@ -89,7 +89,7 @@
         document.addEventListener('DOMContentLoaded', async () => {
             await siteRouter.loadMembers();
             
-            const articlesQuery = query(collection(db, "articles"), orderBy("date", "desc"));
+            const articlesQuery = query(collection(db, "articles"), where("isPublished", "==", true), orderBy("date", "desc"));
             const querySnapshot = await getDocs(articlesQuery);
             const articles = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 
@@ -98,7 +98,7 @@
             
             let currentFilters = { author: 'all', archive: 'all', category: 'all' };
 
-            if (!gridContainer || !articles || !sidebarContainer) return;
+            if (!gridContainer || !sidebarContainer) return;
 
             const observer = new IntersectionObserver((entries) => {
                 entries.forEach(entry => {
@@ -139,7 +139,6 @@
             };
 
             const populateSidebar = (lang) => {
-                const { authors, archives, categories } = getUniqueSidebarData(lang);
                 sidebarContainer.innerHTML = `
                     <div class="sidebar-widget">
                         <h3 class="sidebar-widget-title lang-switch" data-en="Authors" data-es="Autores">Authors</h3>
@@ -182,6 +181,12 @@
 
             const populateGrid = (lang) => {
                 gridContainer.innerHTML = '';
+                if (articles.length === 0) {
+                    gridContainer.innerHTML = `<p class="lang-switch" data-en="No published articles yet. Check back soon!" data-es="Aún no hay artículos publicados. ¡Vuelve pronto!"></p>`;
+                    siteRouter.applyLanguage(lang);
+                    return;
+                }
+
                 articles.forEach(article => {
                     const author = siteRouter.members[article.author_id];
                     const authorName = author ? author.name : 'Anonymous';
