@@ -1,250 +1,153 @@
-const siteRouter = {
-    pages: {
-        "home": "./index.html",
-        "about": "about.html",
-        "news": "news.html",
-        "news-single": "news-single.html",
-        "the-team": "team.html",
-        "contact": "contact.html",
-        "receive-tutoring": "receive-tutoring.html",
-        "become-a-tutor": "become-a-tutor.html",
-        "become-a-volunteer": "become-a-volunteer.html",
-        "support": "support.html",
-        "articles": "articles.html",
-        "article-single": "article-single.html",
-        "lessons": "lessons.html",
-        "lesson-single": "lesson-single.html",
-        "course-unit": "course-unit.html",
-        "member": "members.html"
-    },
-    members: {},
-    async loadMembers() {
-        try {
-            const response = await fetch('members.json');
-            this.members = await response.json();
-        } catch (error) {
-            console.error("Could not load members data:", error);
-        }
-    },
-    navigateTo(pageId, params = null) {
-        let url = this.pages[pageId];
-        if (url) {
-            if ((pageId === 'member' || pageId === 'article-single' || pageId === 'news-single' || pageId === 'lesson-single') && params) {
-                url += `?id=${params}`;
-            }
-            window.location.href = url;
-        } else {
-            window.location.href = this.pages['home'];
-        }
-    },
-    applyLanguage(lang) {
-        document.querySelectorAll('[data-en], [data-es]').forEach(el => {
-            if (el.closest('.page-specific-content')) {
-                return;
-            }
-            const text = el.dataset[lang];
-            if (text !== undefined) {
-                 el.innerHTML = text;
-            }
-        });
-        document.documentElement.lang = lang;
-        const isEn = lang === 'en';
-        document.querySelectorAll('#lang-en-btn, #lang-en-btn-mobile').forEach(btn => btn.classList.toggle('active', isEn));
-        document.querySelectorAll('#lang-es-btn, #lang-es-btn-mobile').forEach(btn => btn.classList.toggle('active', !isEn));
-    },
-    init() {
-        const headerContainer = document.getElementById('header');
-        const footerContainer = document.querySelector('.site-footer');
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="https://i.imgur.com/WPy5YDY.png">
+    <title>Course Unit | Literary Speaking</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .unit-container { max-width: 800px; margin: 0 auto; }
+        .breadcrumbs { padding: 15px 0; font-size: 0.9rem; color: var(--color-text-muted); }
+        .breadcrumbs a { color: var(--color-purple-dark); text-decoration: none; }
+        .breadcrumbs a:hover { text-decoration: underline; }
+        .breadcrumbs span { margin: 0 8px; }
+        .unit-header { text-align: left; border-bottom: 1px solid #eee; padding-bottom: 20px; margin-bottom: 30px; }
+        .unit-title { font-size: 2.8rem; font-weight: 900; margin: 0; line-height: 1.2; }
+        .unit-body { text-align: left; line-height: 2; font-size: 1.1rem; }
+        .unit-body p { margin: 0 0 1.5em; }
+        .unit-body figure { margin: 30px 0; }
+        .unit-body img { width: 100%; max-width: 800px; border-radius: 16px; margin: 0 auto; display: block; }
+        .unit-body figcaption { font-size: 0.9rem; color: var(--color-text-light); text-align: center; margin-top: 10px; font-style: italic; }
+        .video-container { position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; max-width: 100%; background: #000; border-radius: 16px; margin: 30px 0; }
+        .video-container iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
+        .back-link { display: inline-block; margin-bottom: 20px; font-weight: 700; color: var(--color-purple-dark); text-decoration: none; }
+        .back-link:hover { text-decoration: underline; }
+        @media (max-width:768px){ .unit-title { font-size: 2rem; } }
+    </style>
+</head>
+<body data-current-page="lessons">
+    <header class="site-header" id="header"></header>
 
-        const headerHTML = `
-            <div class="container">
-                <div class="lang-switcher-mobile-wrapper"><div class="lang-switcher"><button id="lang-en-btn-mobile">EN</button><button id="lang-es-btn-mobile">ES</button></div></div>
-                <a data-page-id="home" class="logo nav-link"><img src="https://i.imgur.com/vyE0G43.png" alt="Literary Speaking Logo" class="logo-unscrolled"><img src="https://i.imgur.com/UnpZvgZ.png" alt="Literary Speaking Logo" class="logo-scrolled"></a>
-                <nav class="desktop-nav">
-                    <div class="nav-item dropdown">
-                        <div class="nav-link dropdown-toggle lang-switch" data-page-group="get-to-know-us" data-en="Get to Know Us" data-es="Conócenos"></div>
-                        <div class="dropdown-menu">
-                            <a data-page-id="about" class="lang-switch nav-link" data-en="About Us" data-es="Sobre Nosotros"></a>
-                            <a data-page-id="the-team" class="lang-switch nav-link" data-en="The Team" data-es="El Equipo"></a>
-                            <a data-page-id="news" class="lang-switch nav-link" data-en="News" data-es="Noticias"></a>
-                            <a data-page-id="contact" class="lang-switch nav-link" data-en="Contact" data-es="Contacto"></a>
-                        </div>
-                    </div>
-                    <div class="nav-item dropdown">
-                        <div class="nav-link dropdown-toggle lang-switch" data-page-group="get-involved" data-en="Get Involved" data-es="Involúcrate"></div>
-                        <div class="dropdown-menu">
-                            <a data-page-id="receive-tutoring" class="lang-switch nav-link" data-en="Receive Tutoring" data-es="Recibir Tutoría"></a>
-                            <a data-page-id="become-a-tutor" class="lang-switch nav-link" data-en="Become a Tutor" data-es="Conviértete en Tutor"></a>
-                            <a data-page-id="become-a-volunteer" class="lang-switch nav-link" data-en="Become a Volunteer" data-es="Conviértete en Voluntario"></a>
-                            <a data-page-id="support" class="lang-switch nav-link" data-en="Support Us" data-es="Apóyanos"></a>
-                        </div>
-                    </div>
-                    <div class="nav-item dropdown">
-                         <div class="nav-link dropdown-toggle lang-switch" data-page-group="resources" data-en="Resources" data-es="Recursos"></div>
-                        <div class="dropdown-menu">
-                            <a data-page-id="articles" class="lang-switch nav-link" data-en="Articles" data-es="Artículos"></a>
-                            <a data-page-id="lessons" class="lang-switch nav-link" data-en="Lessons" data-es="Lecciones"></a>
-                            <a data-page-id="report-time" class="lang-switch nav-link" data-en="Report Time" data-es="Reportar Horas"></a>
-                        </div>
-                    </div>
-                    <div class="lang-switcher"><button id="lang-en-btn">EN</button><button id="lang-es-btn">ES</button></div>
-                </nav>
-                <button class="menu-toggle" aria-label="Toggle navigation"><span></span><span></span><span></span></button>
-            </div>
-            <nav class="mobile-nav">
-                <h3 class="lang-switch mobile-nav-title" data-en="Get to Know Us" data-es="Conócenos"></h3>
-                <a data-page-id="about" class="lang-switch nav-link" data-en="About Us" data-es="Sobre Nosotros"></a>
-                <a data-page-id="the-team" class="lang-switch nav-link" data-en="The Team" data-es="El Equipo"></a>
-                <a data-page-id="news" class="lang-switch nav-link" data-en="News" data-es="Noticias"></a>
-                <a data-page-id="contact" class="lang-switch nav-link" data-en="Contact" data-es="Contacto"></a>
-
-                <h3 class="lang-switch mobile-nav-title" data-en="Get Involved" data-es="Involúcrate"></h3>
-                <a data-page-id="receive-tutoring" class="lang-switch nav-link" data-en="Receive Tutoring" data-es="Recibir Tutoría"></a>
-                <a data-page-id="become-a-tutor" class="lang-switch nav-link" data-en="Become a Tutor" data-es="Conviértete en Tutor"></a>
-                <a data-page-id="become-a-volunteer" class="lang-switch nav-link" data-en="Become a Volunteer" data-es="Conviértete en Voluntario"></a>
-                <a data-page-id="support" class="lang-switch nav-link" data-en="Support Us" data-es="Apóyanos"></a>
-
-                <h3 class="lang-switch mobile-nav-title" data-en="Resources" data-es="Recursos"></h3>
-                <a data-page-id="articles" class="lang-switch nav-link" data-en="Articles" data-es="Artículos"></a>
-                <a data-page-id="lessons" class="lang-switch nav-link" data-en="Lessons" data-es="Lecciones"></a>
-                <a data-page-id="report-time" class="lang-switch nav-link" data-en="Report Time" data-es="Reportar Horas"></a>
-            </nav>
-        `;
-
-        const footerHTML = `
-            <div class="container">
-                <a data-page-id="home" class="nav-link"><img src="https://i.imgur.com/vyE0G43.png" alt="Literary Speaking Footer Logo" class="scroll-animated"></a>
-                <div class="footer-grid">
-                    <div class="footer-col">
-                        <h3 class="lang-switch" data-en="Get to Know Us" data-es="Conócenos"></h3>
-                        <a data-page-id="about" class="lang-switch nav-link" data-en="About Us" data-es="Sobre Nosotros"></a>
-                        <a data-page-id="the-team" class="lang-switch nav-link" data-en="The Team" data-es="El Equipo"></a>
-                        <a data-page-id="news" class="lang-switch nav-link" data-en="News" data-es="Noticias"></a>
-                        <a data-page-id="contact" class="lang-switch nav-link" data-en="Contact" data-es="Contacto"></a>
-                    </div>
-                    <div class="footer-col">
-                        <h3 class="lang-switch" data-en="Get Involved" data-es="Involúcrate"></h3>
-                        <a data-page-id="receive-tutoring" class="lang-switch nav-link" data-en="Receive Tutoring" data-es="Recibir Tutoría"></a>
-                        <a data-page-id="become-a-tutor" class="lang-switch nav-link" data-en="Become a Tutor" data-es="Conviértete en Tutor"></a>
-                        <a data-page-id="become-a-volunteer" class="lang-switch nav-link" data-en="Become a Volunteer" data-es="Conviértete en Voluntario"></a>
-                        <a data-page-id="support" class="lang-switch nav-link" data-en="Support Us" data-es="Apóyanos"></a>
-                    </div>
-                    <div class="footer-col">
-                        <h3 class="lang-switch" data-en="Follow Us" data-es="Síguenos"></h3>
-                        <div class="social-icons">
-                           <a href="https://www.linkedin.com/company/literary-speaking/" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/></svg>
-                           </a>
-                           <a href="https://www.instagram.com/literaryspeakingtutoring/" target="_blank" rel="noopener noreferrer" aria-label="Instagram">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
-                           </a>
-                           <a href="https://www.facebook.com/people/Literary-Speaking-Tutoring-Mentorship/61578261005769/" target="_blank" rel="noopener noreferrer" aria-label="Facebook">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M22.675 0h-21.35c-.732 0-1.325.593-1.325 1.325v21.351c0 .731.593 1.324 1.325 1.324h11.495v-9.294h-3.128v-3.622h3.128v-2.671c0-3.1 1.893-4.788 4.659-4.788 1.325 0 2.463.099 2.795.143v3.24l-1.918.001c-1.504 0-1.795.715-1.795 1.763v2.313h3.587l-.467 3.622h-3.12v9.293h6.116c.73 0 1.323-.593 1.323-1.325v-21.35c0-.732-.593-1.325-1.325-1.325z"/></svg>
-                           </a>
-                           <a href="https://www.youtube.com/@LiterarySpeakingTutoringMentor" target="_blank" rel="noopener noreferrer" aria-label="YouTube">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0-3.897.266-4.356 2.62-4.385 8.816.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0 3.897-.266 4.356-2.62 4.385-8.816-.029-6.185-.484-8.549-4.385-8.816zm-10.615 12.816v-8l8 3.993-8 4.007z"/></svg>
-                           </a>
-                        </div>
-                    </div>
+    <main>
+        <section class="section">
+            <div class="container page-specific-content">
+                <div id="unit-content-wrapper" class="unit-container">
+                    <!-- Content will be dynamically injected here -->
                 </div>
-                <p class="copyright lang-switch scroll-animated" data-en="Copyright © 2025 Literary Speaking Tutoring | Privacy Policy" data-es="Copyright © 2025 Tutoría de Literary Speaking | Política de Privacidad"></p>
             </div>
-        `;
+        </section>
+    </main>
 
-        if (headerContainer) headerContainer.innerHTML = headerHTML;
-        if (footerContainer) footerContainer.innerHTML = footerHTML;
+    <footer class="site-footer"></footer>
 
-        const header = document.getElementById('header');
-        const menuToggle = document.querySelector('.menu-toggle');
-        const body = document.body;
-        
-        const path = window.location.pathname;
-        const isSinglePage = path.endsWith('article-single.html') || path.endsWith('news-single.html') || path.endsWith('members.html') || path.endsWith('lesson-single.html') || path.endsWith('course-unit.html');
+    <script src="router.js"></script>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
+        import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
 
-        if (isSinglePage) {
-            header?.classList.add('scrolled');
-        } else {
-            const handleScroll = () => {
-                header?.classList.toggle('scrolled', window.pageYOffset > 50);
-            };
-            window.addEventListener('scroll', handleScroll);
-            handleScroll();
-        }
-
-        const closeMenu = () => {
-            body.classList.remove('menu-open');
-            if (menuToggle) menuToggle.classList.remove('active');
-            if (header) header.classList.remove('menu-active-state');
+        const firebaseConfig = {
+            apiKey: "AIzaSyD0qVihpuLI0cF0PZ32o8tFBLfTgjlqB6A",
+            authDomain: "literary-speaking.firebaseapp.com",
+            projectId: "literary-speaking",
+            storageBucket: "literary-speaking.appspot.com",
+            messagingSenderId: "699059463612",
+            appId: "1:699059463612:web:ecb2e784d627c6b93937b9",
+            measurementId: "G-0L1V3XXGGR"
         };
 
-        if (menuToggle) {
-            menuToggle.addEventListener('click', () => {
-                const isOpen = body.classList.toggle('menu-open');
-                menuToggle.classList.toggle('active', isOpen);
-                if (header) header.classList.toggle('menu-active-state', isOpen);
-            });
-        }
-        
-        document.querySelectorAll('.nav-link').forEach(link => {
-            if (link.dataset.pageId) {
-                link.addEventListener('click', (event) => {
-                    event.preventDefault();
-                    const pageId = link.dataset.pageId;
-                    const id = link.dataset.id;
-                    this.navigateTo(pageId, id);
-                    closeMenu();
-                });
-            }
-        });
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
 
-        document.querySelectorAll('.desktop-nav .dropdown-toggle').forEach(toggle => {
-            toggle.addEventListener('click', (e) => {
-                e.preventDefault();
-            });
-        });
-
-        const setLanguage = (lang) => {
-            this.applyLanguage(lang);
-            localStorage.setItem('language', lang);
+        const getYouTubeID = (url) => {
+            const regex = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
+            const match = url.match(regex);
+            return (match && match[2].length === 11) ? match[2] : url;
         };
 
-        const toggleLanguage = () => {
-            const currentLang = localStorage.getItem('language') || 'en';
-            setLanguage(currentLang === 'en' ? 'es' : 'en');
-        };
+        const renderUnit = (subject, course, module, unit, lang) => {
+            const contentWrapper = document.getElementById('unit-content-wrapper');
+            if (!contentWrapper || !unit) return;
 
-        document.querySelectorAll('.lang-switcher').forEach(el => el.addEventListener('click', toggleLanguage));
+            document.title = `${unit[`title_${lang}`]} | Literary Speaking`;
 
-        const pageGroups = {
-            'about': 'get-to-know-us', 'the-team': 'get-to-know-us', 'news': 'get-to-know-us', 'contact': 'get-to-know-us',
-            'receive-tutoring': 'get-involved', 'become-a-tutor': 'get-involved', 'become-a-volunteer': 'get-involved', 'support': 'get-involved',
-            'articles': 'resources', 'lessons': 'resources', 'report-time': 'resources'
-        };
-        
-        const currentPage = document.body.dataset.currentPage;
-        if (currentPage) {
-            document.querySelectorAll(`.nav-link[data-page-id="${currentPage}"]`).forEach(link => link.classList.add('active-page-link'));
-            const currentGroup = pageGroups[currentPage];
-            if (currentGroup) {
-                document.querySelectorAll(`.dropdown-toggle[data-page-group="${currentGroup}"]`).forEach(link => link.classList.add('active-page-link'));
-            }
-        }
-        
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.classList.add('is-visible');
-                    observer.unobserve(entry.target);
+            let contentBlocksHTML = '';
+            (unit.contentBlocks || []).forEach(block => {
+                const caption = block[`caption_${lang}`] || '';
+                switch (block.type) {
+                    case 'text':
+                        contentBlocksHTML += block[`content_${lang}`] || '';
+                        break;
+                    case 'image':
+                        contentBlocksHTML += `<figure><img src="${block.url}" alt="${caption}"><figcaption>${caption}</figcaption></figure>`;
+                        break;
+                    case 'video':
+                        const videoId = getYouTubeID(block.videoId || '');
+                        contentBlocksHTML += `
+                            <figure>
+                                <div class="video-container">
+                                    <iframe src="https://www.youtube.com/embed/${videoId}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                                </div>
+                                <figcaption>${caption}</figcaption>
+                            </figure>
+                        `;
+                        break;
                 }
             });
-        }, { threshold: 0.1 });
 
-        document.querySelectorAll('.site-footer .scroll-animated').forEach(el => observer.observe(el));
-        
-        setLanguage(localStorage.getItem('language') || 'en');
-    }
-};
+            contentWrapper.innerHTML = `
+                <a class="back-link" href="lesson-single.html?id=${subject.id}">← <span class="lang-switch" data-en="Back to Modules" data-es="Volver a Módulos"></span></a>
+                <div class="breadcrumbs">
+                    <a href="lesson-single.html?id=${subject.id}">${subject[`title_${lang}`]}</a>
+                    <span>></span>
+                    <span>${course[`title_${lang}`]}</span>
+                    <span>></span>
+                    <span>${module[`title_${lang}`]}</span>
+                </div>
+                <div class="unit-header">
+                    <h1 class="unit-title">${unit[`title_${lang}`]}</h1>
+                </div>
+                <div class="unit-body">${contentBlocksHTML}</div>
+            `;
+            
+            siteRouter.applyLanguage(lang);
+        };
 
-document.addEventListener('DOMContentLoaded', () => {
-    siteRouter.init();
-});
+        document.addEventListener('DOMContentLoaded', async () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const subjectId = urlParams.get('subjectId');
+            const courseIndex = parseInt(urlParams.get('courseIndex'), 10);
+            const moduleIndex = parseInt(urlParams.get('moduleIndex'), 10);
+            const unitIndex = parseInt(urlParams.get('unitIndex'), 10);
+
+            if (!subjectId || isNaN(courseIndex) || isNaN(moduleIndex) || isNaN(unitIndex)) {
+                return siteRouter.navigateTo('lessons');
+            }
+
+            const docRef = doc(db, "lessons", subjectId);
+            const docSnap = await getDoc(docRef);
+
+            if (!docSnap.exists()) {
+                return siteRouter.navigateTo('lessons');
+            }
+
+            const subject = { id: docSnap.id, ...docSnap.data() };
+            const course = subject.courses?.[courseIndex];
+            const module = course?.modules?.[moduleIndex];
+            const unit = module?.units?.[unitIndex];
+
+            if (!unit) {
+                console.error("Could not find the specified unit with the provided indices.");
+                return siteRouter.navigateTo('lessons');
+            }
+
+            const initialLang = localStorage.getItem('language') || 'en';
+            renderUnit(subject, course, module, unit, initialLang);
+
+            document.addEventListener('languageChanged', (e) => {
+                renderUnit(subject, course, module, unit, e.detail.lang);
+            });
+        });
+    </script>
+</body>
+</html>
