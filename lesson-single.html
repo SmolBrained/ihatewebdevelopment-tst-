@@ -27,8 +27,10 @@
         .course-header { background-color: #f8f9fa; padding: 15px; font-weight: 700; font-size: 1.1rem; cursor: pointer; display: flex; align-items: center; color: #333; }
         .course-header::before { content: '►'; font-size: 0.8em; margin-right: 12px; transition: transform 0.3s ease; }
         .course-header:not(.collapsed)::before { transform: rotate(90deg); }
-        .course-content { background-color: #fff; max-height: 5000px; overflow: hidden; transition: max-height 0.5s ease-in-out; border-top: 1px solid #ccc; }
-        .course-header.collapsed + .course-content { max-height: 0; border-top: none; }
+        .course-content-wrapper { display: grid; grid-template-rows: 0fr; transition: grid-template-rows 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
+        .course-header:not(.collapsed) + .course-content-wrapper { grid-template-rows: 1fr; }
+        .course-content { overflow: hidden; background-color: #fff; border-top: 1px solid #ccc; }
+        .course-header.collapsed + .course-content-wrapper .course-content { border-top: none; }
         .module-title { background-color: #fff; padding: 15px 20px; font-weight: 700; color: #333; border-top: 1px solid #eee; text-align: left; }
         .unit-list { list-style: none; padding: 0; margin: 0; }
         .unit-item a { display: flex; align-items: center; padding: 12px 20px 12px 45px; text-decoration: none; color: var(--color-primary-dark); border-top: 1px solid #eee; }
@@ -123,7 +125,7 @@
                     ).join('');
                     contentHTML += `<ul class="unit-list">${unitsHTML}</ul>`;
                 });
-                courseItem.innerHTML = `<div class="course-header">${course[`title_${lang}`]}</div><div class="course-content">${contentHTML}</div>`;
+                courseItem.innerHTML = `<div class="course-header">${course[`title_${lang}`]}</div><div class="course-content-wrapper"><div class="course-content">${contentHTML}</div></div>`;
                 courseListContainer.appendChild(courseItem);
             });
             container.appendChild(courseListContainer);
