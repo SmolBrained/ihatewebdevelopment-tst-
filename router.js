@@ -39,9 +39,7 @@ const siteRouter = {
     },
     applyLanguage(lang) {
         document.querySelectorAll('[data-en], [data-es]').forEach(el => {
-            if (el.closest('.page-specific-content')) {
-                return;
-            }
+            // THE PROBLEMATIC 'IF' STATEMENT HAS BEEN REMOVED FROM HERE
             const text = el.dataset[lang];
             if (text !== undefined) {
                  el.innerHTML = text;
@@ -206,7 +204,6 @@ const siteRouter = {
         const setLanguage = (lang) => {
             this.applyLanguage(lang);
             localStorage.setItem('language', lang);
-            // *** THIS IS THE NEW LINE ***
             document.dispatchEvent(new CustomEvent('languageChanged', { detail: { lang } }));
         };
 
