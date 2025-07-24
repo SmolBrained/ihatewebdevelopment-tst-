@@ -98,7 +98,7 @@
             
             let currentFilters = { author: 'all', archive: 'all', category: 'all' };
 
-            if (!gridContainer || !sidebarContainer) return;
+            if (!gridContainer || !articles || !sidebarContainer) return;
 
             const observer = new IntersectionObserver((entries) => {
                 entries.forEach(entry => {
@@ -139,6 +139,7 @@
             };
 
             const populateSidebar = (lang) => {
+                const { authors, archives, categories } = getUniqueSidebarData(lang);
                 sidebarContainer.innerHTML = `
                     <div class="sidebar-widget">
                         <h3 class="sidebar-widget-title lang-switch" data-en="Authors" data-es="Autores">Authors</h3>
@@ -181,12 +182,6 @@
 
             const populateGrid = (lang) => {
                 gridContainer.innerHTML = '';
-                if (articles.length === 0) {
-                    gridContainer.innerHTML = `<p class="lang-switch" data-en="No published articles yet. Check back soon!" data-es="Aún no hay artículos publicados. ¡Vuelve pronto!"></p>`;
-                    siteRouter.applyLanguage(lang);
-                    return;
-                }
-
                 articles.forEach(article => {
                     const author = siteRouter.members[article.author_id];
                     const authorName = author ? author.name : 'Anonymous';
