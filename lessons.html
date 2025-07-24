@@ -42,7 +42,7 @@
     <script src="router.js"></script>
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
-        import { getFirestore, collection, getDocs, query, where, orderBy } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
+        import { getFirestore, collection, getDocs, query, orderBy } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyD0qVihpuLI0cF0PZ32o8tFBLfTgjlqB6A",
@@ -57,9 +57,9 @@
         const db = getFirestore(app);
 
         document.addEventListener('DOMContentLoaded', async () => {
-            const lessonsQuery = query(collection(db, "lessons"), where("isPublished", "==", true), orderBy("title_en"));
+            const lessonsQuery = query(collection(db, "lessons"), orderBy("title_en"));
             const querySnapshot = await getDocs(lessonsQuery);
-            const lessons = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+            const lessons = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })).filter(lesson => lesson.isPublished === true);
             const gridContainer = document.getElementById('lesson-grid-container');
 
             const observer = new IntersectionObserver((entries) => {
