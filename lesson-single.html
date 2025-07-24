@@ -45,18 +45,15 @@
             <div class="container page-specific-content">
                 <div class="page-header-container">
                     <h1 id="subject-title-main" style="font-size: 1.8rem; font-weight: 900; margin: 0;"></h1>
-                    <div class="page-header-actions">
-                        <button id="collapse-all-btn" class="lang-switch" data-en="Collapse All" data-es="Contraer Todo">Collapse All</button>
-                    </div>
                 </div>
                 <div class="lesson-layout">
                     <aside class="lesson-sidebar">
                         <ul class="lesson-sidebar-nav">
-                            <li><a class="back-link" href="lessons.html">← <span class="lang-switch" data-en="Back to all lessons" data-es="Volver a todas las lecciones">Back to all lessons</span></a></li>
-                            <li><a href="#" class="lesson-nav-link active lang-switch" data-panel="home" data-en="Home" data-es="Inicio">Home</a></li>
-                            <li><a href="#" class="lesson-nav-link lang-switch" data-panel="modules" data-en="Modules" data-es="Módulos">Modules</a></li>
-                            <li><a href="#" class="lesson-nav-link lang-switch" data-panel="discussions" data-en="Discussions" data-es="Discusiones">Discussions</a></li>
-                            <li><a href="#" class="lesson-nav-link lang-switch" data-panel="resources" data-en="More Resources" data-es="Más Recursos">More Resources</a></li>
+                            <li><a class="back-link" href="lessons.html"><span class="lang-switch" data-en="← Back to all lessons" data-es="← Volver a todas las lecciones"></span></a></li>
+                            <li><a href="#" class="lesson-nav-link active lang-switch" data-panel="home" data-en="Home" data-es="Inicio"></a></li>
+                            <li><a href="#" class="lesson-nav-link lang-switch" data-panel="modules" data-en="Modules" data-es="Módulos"></a></li>
+                            <li><a href="#" class="lesson-nav-link lang-switch" data-panel="discussions" data-en="Discussions" data-es="Discusiones"></a></li>
+                            <li><a href="#" class="lesson-nav-link lang-switch" data-panel="resources" data-en="More Resources" data-es="Más Recursos"></a></li>
                         </ul>
                     </aside>
                     <div class="lesson-main-content">
@@ -64,7 +61,7 @@
                         <div id="modules-panel" class="lesson-panel"></div>
                         <div id="discussions-panel" class="lesson-panel"><div id="disqus_thread"></div></div>
                         <div id="resources-panel" class="lesson-panel">
-                            <h2 style="font-weight: 900;" class="lang-switch" data-en="Resources" data-es="Recursos">Resources</h2>
+                            <h2 style="font-weight: 900;" class="lang-switch" data-en="Resources" data-es="Recursos"></h2>
                             <ul id="resource-list-container" class="resource-list"></ul>
                         </div>
                     </div>
@@ -95,11 +92,26 @@
         };
         const populateModules = (subject, lang) => {
             const container = document.getElementById('modules-panel');
-            container.innerHTML = '';
+            container.innerHTML = ''; 
+            const headerDiv = document.createElement('div');
+            headerDiv.className = 'page-header-container';
+            headerDiv.style.cssText = "border-bottom: none; padding-bottom: 0; margin-bottom: 20px; align-items: flex-start;";
+            headerDiv.innerHTML = `
+                <h2 style="font-weight: 900;" class="lang-switch" data-en="Modules" data-es="Módulos"></h2>
+                <div class="page-header-actions">
+                    <button id="collapse-all-btn"></button>
+                </div>
+            `;
+            container.appendChild(headerDiv);
+            const collapseBtn = headerDiv.querySelector('#collapse-all-btn');
+            const actionsContainer = headerDiv.querySelector('.page-header-actions');
             if (!subject.courses || subject.courses.length === 0) {
-                container.innerHTML = `<p><span class="lang-switch" data-en="No modules are available for this subject yet." data-es="Aún no hay módulos disponibles para esta materia."></span></p>`;
+                container.innerHTML += `<p><span class="lang-switch" data-en="No modules are available for this subject yet." data-es="Aún no hay módulos disponibles para esta materia."></span></p>`;
+                actionsContainer.style.display = 'none';
                 return;
             }
+            actionsContainer.style.display = 'block';
+            const courseListContainer = document.createElement('div');
             (subject.courses || []).forEach((course, courseIndex) => {
                 const courseItem = document.createElement('div');
                 courseItem.className = 'course-item';
@@ -111,10 +123,35 @@
                     ).join('');
                     contentHTML += `<ul class="unit-list">${unitsHTML}</ul>`;
                 });
-                courseItem.innerHTML = `<div class="course-header collapsed">${course[`title_${lang}`]}</div><div class="course-content">${contentHTML}</div>`;
-                container.appendChild(courseItem);
+                courseItem.innerHTML = `<div class="course-header">${course[`title_${lang}`]}</div><div class="course-content">${contentHTML}</div>`;
+                courseListContainer.appendChild(courseItem);
             });
-            container.querySelectorAll('.course-header').forEach(header => header.addEventListener('click', () => header.classList.toggle('collapsed')));
+            container.appendChild(courseListContainer);
+            container.querySelectorAll('.course-header').forEach(header => {
+                header.classList.add('collapsed');
+                header.addEventListener('click', () => header.classList.toggle('collapsed'));
+            });
+            let allCollapsed = true;
+            const updateButtonText = () => {
+                const currentLang = localStorage.getItem('language') || 'en';
+                if (allCollapsed) {
+                    collapseBtn.textContent = currentLang === 'es' ? 'Expandir Todo' : 'Expand All';
+                } else {
+                    collapseBtn.textContent = currentLang === 'es' ? 'Contraer Todo' : 'Collapse All';
+                }
+            };
+            collapseBtn.addEventListener('click', () => {
+                allCollapsed = !allCollapsed;
+                container.querySelectorAll('.course-header').forEach(header => {
+                    if (allCollapsed) {
+                        header.classList.add('collapsed');
+                    } else {
+                        header.classList.remove('collapsed');
+                    }
+                });
+                updateButtonText();
+            });
+            updateButtonText();
         };
         const populateResources = async (subjectId, lang) => {
             const container = document.getElementById('resource-list-container');
@@ -171,9 +208,6 @@
             updateUIForLanguage(localStorage.getItem('language') || 'en');
             document.querySelectorAll('.lesson-nav-link').forEach(link => link.addEventListener('click', e => { e.preventDefault(); switchPanel(e.target.dataset.panel, subjectId); }));
             document.addEventListener('languageChanged', e => updateUIForLanguage(e.detail.lang));
-            document.getElementById('collapse-all-btn').addEventListener('click', () => {
-                document.querySelectorAll('#modules-panel .course-header').forEach(header => header.classList.add('collapsed'));
-            });
         });
     </script>
 </body>
