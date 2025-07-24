@@ -39,7 +39,6 @@ const siteRouter = {
     },
     applyLanguage(lang) {
         document.querySelectorAll('[data-en], [data-es]').forEach(el => {
-            // THE PROBLEMATIC 'IF' STATEMENT HAS BEEN REMOVED FROM HERE
             const text = el.dataset[lang];
             if (text !== undefined) {
                  el.innerHTML = text;
