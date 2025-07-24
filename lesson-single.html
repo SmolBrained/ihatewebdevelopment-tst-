@@ -46,17 +46,17 @@
                 <div class="page-header-container">
                     <h1 id="subject-title-main" style="font-size: 1.8rem; font-weight: 900; margin: 0;"></h1>
                     <div class="page-header-actions">
-                        <button id="collapse-all-btn">Collapse All</button>
+                        <button id="collapse-all-btn" class="lang-switch" data-en="Collapse All" data-es="Contraer Todo">Collapse All</button>
                     </div>
                 </div>
                 <div class="lesson-layout">
                     <aside class="lesson-sidebar">
                         <ul class="lesson-sidebar-nav">
-                            <li><a class="back-link" href="lessons.html">← Back to all lessons</a></li>
-                            <li><a href="#" class="lesson-nav-link active" data-panel="home">Home</a></li>
-                            <li><a href="#" class="lesson-nav-link" data-panel="modules">Modules</a></li>
-                            <li><a href="#" class="lesson-nav-link" data-panel="discussions">Discussions</a></li>
-                            <li><a href="#" class="lesson-nav-link" data-panel="resources">More Resources</a></li>
+                            <li><a class="back-link" href="lessons.html">← <span class="lang-switch" data-en="Back to all lessons" data-es="Volver a todas las lecciones">Back to all lessons</span></a></li>
+                            <li><a href="#" class="lesson-nav-link active lang-switch" data-panel="home" data-en="Home" data-es="Inicio">Home</a></li>
+                            <li><a href="#" class="lesson-nav-link lang-switch" data-panel="modules" data-en="Modules" data-es="Módulos">Modules</a></li>
+                            <li><a href="#" class="lesson-nav-link lang-switch" data-panel="discussions" data-en="Discussions" data-es="Discusiones">Discussions</a></li>
+                            <li><a href="#" class="lesson-nav-link lang-switch" data-panel="resources" data-en="More Resources" data-es="Más Recursos">More Resources</a></li>
                         </ul>
                     </aside>
                     <div class="lesson-main-content">
@@ -64,7 +64,7 @@
                         <div id="modules-panel" class="lesson-panel"></div>
                         <div id="discussions-panel" class="lesson-panel"><div id="disqus_thread"></div></div>
                         <div id="resources-panel" class="lesson-panel">
-                            <h2 style="font-weight: 900;">Resources</h2>
+                            <h2 style="font-weight: 900;" class="lang-switch" data-en="Resources" data-es="Recursos">Resources</h2>
                             <ul id="resource-list-container" class="resource-list"></ul>
                         </div>
                     </div>
