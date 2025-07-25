@@ -32,6 +32,19 @@
         .pdf-embed embed { width: 100%; height: 500px; }
         .back-link { display: inline-block; margin-bottom: 20px; font-weight: 700; color: var(--color-purple-dark); text-decoration: none; }
         .back-link:hover { text-decoration: underline; }
+        .mcq-system{width:100%;max-width:700px;margin:30px auto;}
+        .mcq-question,.mcq-answer,.mcq-explanation{background:var(--color-surface);border:1.5px solid var(--color-text,#222);border-radius:16px;padding:25px;margin-bottom:15px;text-align:center;font-size:1.1rem;font-weight:500;}
+        .mcq-answers{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:15px;}
+        .mcq-answer{margin:0;cursor:pointer;transition:all .3s;}
+        .mcq-answer:hover{border-color:var(--color-primary,#4b0082);background:#f8f9fa;}
+        .mcq-answer.correct,.mcq-answer.incorrect{color:#fff;cursor:default;}
+        .mcq-answer.correct{background:#28a745;border-color:#28a745;}
+        .mcq-answer.incorrect{background:var(--color-danger,#dc3545);border-color:var(--color-danger,#dc3545);}
+        .mcq-system.answered .mcq-answer:not(.correct){cursor:not-allowed;opacity:.6;}
+        .mcq-system.answered .mcq-answer:not(.correct):hover{background:var(--color-surface,#fff);border-color:var(--color-text,#222);}
+        .mcq-system.answered .mcq-answer.incorrect:hover{background:var(--color-danger,#dc3545);border-color:var(--color-danger,#dc3545);}
+        .mcq-explanation{display:none;margin-top:15px;text-align:left;border-color:var(--color-border,#dee2e6);}
+        .mcq-explanation.visible{display:block;}
         @media (max-width:768px){ .unit-title { font-size: 2rem; } .lesson-layout { flex-direction: column; } .lesson-sidebar { width: 100%; } .lesson-sidebar-nav { position: static; } }
     </style>
 </head>
@@ -98,6 +111,18 @@
                         break;
                     case 'pdf':
                          contentHTML += `<div class="pdf-embed"><details><summary>${title}</summary><embed src="${block.url}" type="application/pdf"></details></div>`;
+                        break;
+                    case 'mcq':
+                        const answersHTML = (block.answers || []).map(answer =>
+                            `<div class="mcq-answer" data-correct="${answer.correct || false}">${answer.text}</div>`
+                        ).join('');
+                        contentHTML += `
+                            <div class="mcq-system">
+                                <div class="mcq-question">${block.question || 'No question provided.'}</div>
+                                <div class="mcq-answers">${answersHTML}</div>
+                                ${block.explanation ? `<div class="mcq-explanation"><strong>Explanation:</strong> ${block.explanation}</div>` : ''}
+                            </div>
+                        `;
                         break;
                 }
             });
@@ -172,6 +197,25 @@
             document.addEventListener('languageChanged', (e) => {
                 renderUnit(subject, course, module, unit, e.detail.lang);
             });
+        });
+
+        document.addEventListener('click', e => {
+            const selectedAnswer = e.target.closest('.mcq-answer');
+            if (!selectedAnswer) return;
+            const system = selectedAnswer.closest('.mcq-system');
+            if (!system || system.classList.contains('answered')) return;
+            const isCorrect = selectedAnswer.dataset.correct === 'true';
+            if (isCorrect) {
+                selectedAnswer.classList.add('correct');
+                system.classList.add('answered');
+                const expl = system.querySelector('.mcq-explanation');
+                if (expl && expl.innerHTML.trim() !== '') {
+                    expl.classList.add('visible');
+                }
+            } else {
+                selectedAnswer.classList.add('incorrect');
+                selectedAnswer.style.pointerEvents = 'none';
+            }
         });
     </script>
 </body>
