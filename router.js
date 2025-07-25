@@ -17,6 +17,41 @@ const siteRouter = {
         "course-unit": "course-unit.html",
         "member": "members.html"
     },
+    members: {},
+    async loadMembers() {
+        // This function now fetches from Firestore instead of members.json
+        // It's a temporary solution until full migration is complete.
+        // We need to dynamically import firebase functions here.
+        const { getFirestore, collection, getDocs, query, orderBy } = await import("https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js");
+        const { initializeApp, getApps } = await import("https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js");
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyD0qVihpuLI0cF0PZ32o8tFBLfTgjlqB6A",
+            authDomain: "literary-speaking.firebaseapp.com",
+            projectId: "literary-speaking",
+            storageBucket: "literary-speaking.appspot.com",
+            messagingSenderId: "699059463612",
+            appId: "1:699059463612:web:ecb2e784d627c6b93937b9",
+            measurementId: "G-0L1V3XXGGR"
+        };
+
+        if (!getApps().length) {
+            initializeApp(firebaseConfig);
+        }
+        const db = getFirestore();
+
+        try {
+            const membersQuery = query(collection(db, "members"), orderBy("order", "asc"));
+            const querySnapshot = await getDocs(membersQuery);
+            const membersMap = {};
+            querySnapshot.forEach(doc => {
+                membersMap[doc.id] = doc.data();
+            });
+            this.members = membersMap;
+        } catch (error) {
+            console.error("Could not load members data from Firestore:", error);
+        }
+    },
     navigateTo(pageId, params = null) {
         let url = this.pages[pageId];
         if (url) {
