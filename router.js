@@ -19,9 +19,6 @@ const siteRouter = {
     },
     members: {},
     async loadMembers() {
-        // This function now fetches from Firestore instead of members.json
-        // It's a temporary solution until full migration is complete.
-        // We need to dynamically import firebase functions here.
         const { getFirestore, collection, getDocs, query, orderBy } = await import("https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js");
         const { initializeApp, getApps } = await import("https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js");
 
