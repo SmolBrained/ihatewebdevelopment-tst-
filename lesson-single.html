@@ -18,10 +18,15 @@
         .lesson-main-content { flex-grow: 1; }
         .lesson-panel { display: none; }
         .lesson-panel.active { display: block; }
-        .home-content-body { line-height: 1.8; font-size: 1.1rem; text-align: left; }
-        .home-content-body img { max-width: 100%; border-radius: 8px; margin: 20px 0; }
-        .home-content-body figure { margin: 20px 0; }
-        .home-content-body figcaption { font-size: 0.9rem; color: #6c757d; text-align: center; margin-top: 5px; }
+        .content-body { line-height: 1.8; font-size: 1.1rem; text-align: left; }
+        .content-body img { max-width: 100%; border-radius: 8px; margin: 20px 0; }
+        .content-body figure { margin: 20px 0; }
+        .content-body figcaption { font-size: 0.9rem; color: #6c757d; text-align: center; margin-top: 5px; }
+        .video-container { position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; max-width: 100%; background: #000; border-radius: 16px; margin: 30px 0; }
+        .video-container iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
+        .pdf-embed details { border: 1px solid #ccc; border-radius: 8px; margin: 20px 0; }
+        .pdf-embed summary { padding: 15px; font-weight: 700; cursor: pointer; background-color: #f8f9fa; }
+        .pdf-embed embed { width: 100%; height: 500px; }
         .course-list { list-style: none; padding: 0; margin: 0; }
         .course-item { border-radius: 5px; overflow: hidden; margin-bottom: 15px; border: 1px solid #ccc; }
         .course-header { background-color: #f8f9fa; padding: 15px; font-weight: 700; font-size: 1.1rem; cursor: pointer; display: flex; align-items: center; color: #333; }
@@ -36,8 +41,6 @@
         .unit-item a { display: flex; align-items: center; padding: 12px 20px 12px 45px; text-decoration: none; color: var(--color-primary-dark); border-top: 1px solid #eee; }
         .unit-item a::before { content: '📄'; font-family: sans-serif; margin-right: 12px; font-size: 1.2rem; }
         .unit-item a:hover { background-color: #f5f0fa; }
-        .resource-list { list-style: none; padding: 0; margin: 0; }
-        .resource-item a { display: block; padding: 15px; border-bottom: 1px solid #eee; text-decoration: none; font-weight: 700; }
     </style>
 </head>
 <body data-current-page="lessons">
@@ -62,10 +65,7 @@
                         <div id="home-panel" class="lesson-panel active"></div>
                         <div id="modules-panel" class="lesson-panel"></div>
                         <div id="discussions-panel" class="lesson-panel"><div id="disqus_thread"></div></div>
-                        <div id="resources-panel" class="lesson-panel">
-                            <h2 style="font-weight: 900;" class="lang-switch" data-en="Resources" data-es="Recursos"></h2>
-                            <ul id="resource-list-container" class="resource-list"></ul>
-                        </div>
+                        <div id="resources-panel" class="lesson-panel"></div>
                     </div>
                 </div>
             </div>
@@ -75,23 +75,47 @@
     <script src="router.js"></script>
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
-        import { getFirestore, doc, getDoc, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
+        import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
         const firebaseConfig = { apiKey: "AIzaSyD0qVihpuLI0cF0PZ32o8tFBLfTgjlqB6A", authDomain: "literary-speaking.firebaseapp.com", projectId: "literary-speaking", storageBucket: "literary-speaking.appspot.com", messagingSenderId: "699059463612", appId: "1:699059463612:web:ecb2e784d627c6b93937b9", measurementId: "G-0L1V3XXGGR" };
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
-        const populateHome = (subject, lang) => {
-            const container = document.getElementById('home-panel');
-            let contentHTML = '<div class="home-content-body">';
-            (subject.contentBlocks || []).forEach(block => {
-                if (block.type === 'text') {
-                    contentHTML += block[`content_${lang}`] || '';
-                } else if (block.type === 'image') {
-                    contentHTML += `<figure><img src="${block.url}" alt="${block[`caption_${lang}`] || ''}"><figcaption>${block[`caption_${lang}`] || ''}</figcaption></figure>`;
+
+        const getYouTubeID = (url) => {
+            const regex = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
+            const match = url.match(regex);
+            return (match && match[2].length === 11) ? match[2] : url;
+        };
+
+        const renderContentBlocks = (blocks, lang) => {
+            if (!blocks || blocks.length === 0) return '<p>No content available.</p>';
+            let contentHTML = '';
+            blocks.forEach(block => {
+                const caption = block[`caption_${lang}`] || '';
+                const title = block[`title_${lang}`] || '';
+                switch (block.type) {
+                    case 'text':
+                        contentHTML += block[`content_${lang}`] || '';
+                        break;
+                    case 'image':
+                        contentHTML += `<figure><img src="${block.url}" alt="${caption}"><figcaption>${caption}</figcaption></figure>`;
+                        break;
+                    case 'video':
+                        const videoId = getYouTubeID(block.videoId || '');
+                        contentHTML += `<figure><div class="video-container"><iframe src="https://www.youtube.com/embed/${videoId}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe></div><figcaption>${caption}</figcaption></figure>`;
+                        break;
+                    case 'pdf':
+                         contentHTML += `<div class="pdf-embed"><details><summary>${title}</summary><embed src="${block.url}" type="application/pdf"></details></div>`;
+                        break;
                 }
             });
-            contentHTML += '</div>';
-            container.innerHTML = contentHTML;
+            return contentHTML;
         };
+
+        const populateHome = (subject, lang) => {
+            const container = document.getElementById('home-panel');
+            container.innerHTML = `<div class="content-body">${renderContentBlocks(subject.contentBlocks, lang)}</div>`;
+        };
+
         const populateModules = (subject, lang) => {
             const container = document.getElementById('modules-panel');
             container.innerHTML = ''; 
@@ -155,17 +179,12 @@
             });
             updateButtonText();
         };
-        const populateResources = async (subjectId, lang) => {
-            const container = document.getElementById('resource-list-container');
-            container.innerHTML = '<li>Loading...</li>';
-            const q = query(collection(db, "resources"), where("subject_id", "==", subjectId));
-            const querySnapshot = await getDocs(q);
-            if(querySnapshot.empty) {
-                container.innerHTML = `<li><span class="lang-switch" data-en="No resources available." data-es="No hay recursos disponibles."></span></li>`;
-                return;
-            }
-            container.innerHTML = querySnapshot.docs.map(doc => `<li class="resource-item"><a href="${doc.data().url}" target="_blank" rel="noopener noreferrer">${doc.data()[`title_${lang}`]}</a></li>`).join('');
+
+        const populateResources = (subject, lang) => {
+            const container = document.getElementById('resources-panel');
+            container.innerHTML = `<div class="content-body">${renderContentBlocks(subject.resourcesBlocks, lang)}</div>`;
         };
+
         const initDisqus = (subjectId) => {
             const container = document.getElementById('discussions-panel');
             container.innerHTML = '<div id="disqus_thread"></div>';
@@ -179,12 +198,14 @@
                 (d.head || d.body).appendChild(s);
             }
         };
+
         const switchPanel = (panelId, subjectId) => {
             document.querySelectorAll('.lesson-panel').forEach(p => p.classList.remove('active'));
             document.getElementById(`${panelId}-panel`).classList.add('active');
             document.querySelectorAll('.lesson-nav-link').forEach(l => l.classList.toggle('active', l.dataset.panel === panelId));
             if (panelId === 'discussions') initDisqus(subjectId);
         };
+
         document.addEventListener('DOMContentLoaded', async () => {
             const urlParams = new URLSearchParams(window.location.search);
             const subjectId = urlParams.get('id');
@@ -204,7 +225,7 @@
                 document.getElementById('subject-title-main').textContent = subject[`title_${lang}`];
                 populateHome(subject, lang);
                 populateModules(subject, lang);
-                populateResources(subjectId, lang);
+                populateResources(subject, lang);
                 if (window.siteRouter) siteRouter.applyLanguage(lang);
             };
             updateUIForLanguage(localStorage.getItem('language') || 'en');
