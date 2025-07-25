@@ -6,6 +6,19 @@
     <link rel="icon" type="image/png" href="https://i.imgur.com/WPy5YDY.png">
     <title>Lesson | Literary Speaking</title>
     <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.10/dist/katex.min.css" integrity="sha384-wcIxkf4k558sdqoTMN12pdftDZSPJ2sHLqOA1i79JqFxdpNLs4mx9C+rB2IscBqt" crossorigin="anonymous">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.10/dist/katex.min.js" integrity="sha384-hIoBPJpTUs74ddyc4bFZSM1aTjxPWPl1qweoTudGFFLPwEAOTUeg9tGiuB21B4sY" crossorigin="anonymous"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.10/dist/contrib/auto-render.min.js" integrity="sha384-43gviWU0YVjaDtb/GhzOouOXtZMP/7XUzwPTstBeZFe/+rCMvRwr4yROQP43s0Xk" crossorigin="anonymous"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            renderMathInElement(document.body, {
+                delimiters: [
+                    {left: '$$', right: '$$', display: true},
+                    {left: '$', right: '$', display: false}
+                ]
+            });
+        });
+    </script>
     <style>
         .page-header-container { padding-bottom: 15px; border-bottom: 1px solid #ddd; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; }
         .page-header-actions button { background-color: #f8f9fa; border: 1px solid #ccc; border-radius: 5px; padding: 8px 15px; font-weight: 700; cursor: pointer; }
@@ -130,13 +143,13 @@
                         break;
                     case 'mcq':
                         const answersHTML = (block.answers || []).map(answer =>
-                            `<div class="mcq-answer" data-correct="${answer.correct || false}">${answer.text}</div>`
+                            `<div class="mcq-answer" data-correct="${answer.correct || false}">${answer[`text_${lang}`]}</div>`
                         ).join('');
                         contentHTML += `
                             <div class="mcq-system">
-                                <div class="mcq-question">${block.question || 'No question provided.'}</div>
+                                <div class="mcq-question">${block[`question_${lang}`] || 'No question provided.'}</div>
                                 <div class="mcq-answers">${answersHTML}</div>
-                                ${block.explanation ? `<div class="mcq-explanation"><strong>Explanation:</strong> ${block.explanation}</div>` : ''}
+                                ${block[`explanation_${lang}`] ? `<div class="mcq-explanation"><strong>Explanation:</strong> ${block[`explanation_${lang}`]}</div>` : ''}
                             </div>
                         `;
                         break;
@@ -245,6 +258,17 @@
             document.querySelectorAll('.lesson-nav-link').forEach(l => l.classList.toggle('active', l.dataset.panel === panelId));
             if (panelId === 'discussions') initDisqus(subjectId);
         };
+        
+        const renderAllMath = () => {
+            if (window.renderMathInElement) {
+                renderMathInElement(document.body, {
+                    delimiters: [
+                        {left: '$$', right: '$$', display: true},
+                        {left: '$', right: '$', display: false}
+                    ]
+                });
+            }
+        };
 
         document.addEventListener('DOMContentLoaded', async () => {
             const urlParams = new URLSearchParams(window.location.search);
@@ -269,6 +293,7 @@
                 populateModules(subject, lang);
                 populateResources(subject, lang);
                 if (window.siteRouter) siteRouter.applyLanguage(lang);
+                renderAllMath();
             };
             updateUIForLanguage(localStorage.getItem('language') || 'en');
             switchPanel(panelToShow, subjectId);
