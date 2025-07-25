@@ -148,24 +148,22 @@
             </div>
         </section>
 
-        <section class="section section-theme-purple-2">
+        <section class="section section-theme-green-2">
             <div class="container">
                 <div class="title-box scroll-animated"><div class="title-number">6</div><h2 class="title-main lang-switch" data-en="Newsletter" data-es="Boletín Informativo"></h2></div>
                 <div class="image-grid-2 scroll-animated">
                     <img src="https://i.imgur.com/PmqrHBx.jpeg" alt="Newsletter Image" class="placeholder-img">
                     <div class="form-container" style="text-align: left; padding: 0;">
-                        <h3 class="lang-switch" data-en="Sign Up for Our Seasonal Newsletter" data-es="Suscríbete a Nuestro Boletín de Temporada"></h3>
-                        <p class="lang-switch" data-en="Receive updates on our program, articles, and news!" data-es="¡Recibe notificaciones sobre nuestro programa, artículos y noticias!"></p>
                         <form id="newsletter-form">
+                            <h3 class="lang-switch" data-en="Sign Up for Our Seasonal Newsletter" data-es="Suscríbete a Nuestro Boletín de Temporada"></h3>
+                            <p class="lang-switch" data-en="Receive updates on our program, articles, and news!" data-es="¡Recibe notificaciones sobre nuestro programa, artículos y noticias!"></p>
                             <div class="form-group">
                                 <label for="newsletter-email" class="lang-switch" data-en="EMAIL *" data-es="CORREO ELECTRÓNICO *"></label>
                                 <input type="email" id="newsletter-email" name="email" required>
                             </div>
                             <button type="submit" class="btn lang-switch" data-en="Subscribe" data-es="Suscribir"></button>
                         </form>
-                        <div id="newsletter-confirmation" class="form-confirmation hidden">
-                            <p class="lang-switch" data-en="Thank you for subscribing!" data-es="¡Gracias por suscribirte!"></p>
-                        </div>
+                        <div id="newsletter-confirmation" class="form-confirmation hidden" data-en="Thank you for subscribing!" data-es="¡Gracias por suscribirte!"></div>
                     </div>
                 </div>
             </div>
@@ -183,9 +181,7 @@
                         <div class="form-group"><label for="contact-comment" class="lang-switch" data-en="COMMENT *" data-es="COMENTARIO *"></label><textarea id="contact-comment" name="message" required></textarea></div>
                         <button type="submit" class="btn lang-switch" data-en="Submit" data-es="Enviar"></button>
                     </form>
-                    <div id="form-confirmation" class="form-confirmation hidden">
-                        <p class="lang-switch" data-en="Thank you for your message! We'll get back to you soon." data-es="¡Gracias por tu mensaje! Nos pondremos en contacto contigo pronto."></p>
-                    </div>
+                    <div id="form-confirmation" class="form-confirmation hidden" data-en="Thank you for your message! We'll get back to you soon." data-es="¡Gracias por tu mensaje! Nos pondremos en contacto contigo pronto."></div>
                 </div>
             </div>
         </section>
@@ -232,6 +228,8 @@
                             message: message,
                             timestamp: serverTimestamp()
                         });
+                        const lang = localStorage.getItem('language') || 'en';
+                        confirmationMessage.textContent = confirmationMessage.dataset[lang];
                         contactForm.style.display = 'none';
                         confirmationMessage.classList.remove('hidden');
                     } catch (error) {
@@ -250,6 +248,8 @@
                             email: email,
                             timestamp: serverTimestamp()
                         });
+                        const lang = localStorage.getItem('language') || 'en';
+                        newsletterConfirmation.textContent = newsletterConfirmation.dataset[lang];
                         newsletterForm.style.display = 'none';
                         newsletterConfirmation.classList.remove('hidden');
                     } catch (error) {
