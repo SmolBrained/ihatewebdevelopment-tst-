@@ -198,6 +198,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
         import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
+        import { getAuth, sendSignInLinkToEmail, isSignInWithEmailLink, signInWithEmailLink } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyD0qVihpuLI0cF0PZ32o8tFBLfTgjlqB6A",
@@ -211,12 +212,48 @@
 
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
+        const auth = getAuth(app);
 
         document.addEventListener('DOMContentLoaded', () => {
             const contactForm = document.getElementById('contact-form');
             const confirmationMessage = document.getElementById('form-confirmation');
             const newsletterForm = document.getElementById('newsletter-form');
             const newsletterConfirmation = document.getElementById('newsletter-confirmation');
+
+            const handleEmailVerification = async () => {
+                if (isSignInWithEmailLink(auth, window.location.href)) {
+                    let email = window.localStorage.getItem('emailForSignIn');
+                    if (!email) {
+                        email = window.prompt('Please provide your email for confirmation');
+                    }
+                    if (!email) return;
+
+                    try {
+                        await signInWithEmailLink(auth, email, window.location.href);
+                        window.localStorage.removeItem('emailForSignIn');
+                        
+                        await addDoc(collection(db, "newsletter_subscribers"), {
+                            email: email,
+                            timestamp: serverTimestamp(),
+                            verified: true
+                        });
+
+                        const newsletterSection = document.querySelector('.section-theme-purple-2 .container');
+                        if(newsletterSection) {
+                            newsletterSection.innerHTML = `<h2 style="text-align:center;">Thank you!</h2><p style="text-align:center;">Your email has been verified and you are now subscribed to the newsletter.</p>`;
+                        }
+                        
+                    } catch (error) {
+                        console.error("Error signing in with email link:", error);
+                        alert('There was an error verifying your email. The link may be invalid or expired.');
+                    } finally {
+                        if (window.history && window.history.replaceState) {
+                            window.history.replaceState({}, document.title, window.location.pathname);
+                        }
+                    }
+                }
+            };
+            handleEmailVerification();
 
             if (contactForm) {
                 contactForm.addEventListener('submit', async (event) => {
@@ -246,16 +283,17 @@
                 newsletterForm.addEventListener('submit', async (event) => {
                     event.preventDefault();
                     const email = newsletterForm.email.value;
+                    const actionCodeSettings = {
+                        url: window.location.href.split('?')[0],
+                        handleCodeInApp: true,
+                    };
                     try {
-                        await addDoc(collection(db, "newsletter_subscribers"), {
-                            email: email,
-                            timestamp: serverTimestamp(),
-                            verified: true // Simplified: Auto-verified on signup
-                        });
+                        await sendSignInLinkToEmail(auth, email, actionCodeSettings);
+                        window.localStorage.setItem('emailForSignIn', email);
                         newsletterForm.style.display = 'none';
                         newsletterConfirmation.classList.remove('hidden');
                     } catch (error) {
-                        console.error("Error adding subscriber: ", error);
+                        console.error("Error sending subscription link: ", error);
                         alert('There was an error with your subscription. Please try again.');
                     }
                 });
