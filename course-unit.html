@@ -6,6 +6,19 @@
     <link rel="icon" type="image/png" href="https://i.imgur.com/WPy5YDY.png">
     <title>Course Unit | Literary Speaking</title>
     <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.10/dist/katex.min.css" integrity="sha384-wcIxkf4k558sdqoTMN12pdftDZSPJ2sHLqOA1i79JqFxdpNLs4mx9C+rB2IscBqt" crossorigin="anonymous">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.10/dist/katex.min.js" integrity="sha384-hIoBPJpTUs74ddyc4bFZSM1aTjxPWPl1qweoTudGFFLPwEAOTUeg9tGiuB21B4sY" crossorigin="anonymous"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.10/dist/contrib/auto-render.min.js" integrity="sha384-43gviWU0YVjaDtb/GhzOouOXtZMP/7XUzwPTstBeZFe/+rCMvRwr4yROQP43s0Xk" crossorigin="anonymous"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            renderMathInElement(document.body, {
+                delimiters: [
+                    {left: '$$', right: '$$', display: true},
+                    {left: '$', right: '$', display: false}
+                ]
+            });
+        });
+    </script>
     <style>
         .lesson-layout { display: flex; gap: 40px; }
         .lesson-sidebar { width: 220px; flex-shrink: 0; }
@@ -114,19 +127,30 @@
                         break;
                     case 'mcq':
                         const answersHTML = (block.answers || []).map(answer =>
-                            `<div class="mcq-answer" data-correct="${answer.correct || false}">${answer.text}</div>`
+                            `<div class="mcq-answer" data-correct="${answer.correct || false}">${answer[`text_${lang}`]}</div>`
                         ).join('');
                         contentHTML += `
                             <div class="mcq-system">
-                                <div class="mcq-question">${block.question || 'No question provided.'}</div>
+                                <div class="mcq-question">${block[`question_${lang}`] || 'No question provided.'}</div>
                                 <div class="mcq-answers">${answersHTML}</div>
-                                ${block.explanation ? `<div class="mcq-explanation"><strong>Explanation:</strong> ${block.explanation}</div>` : ''}
+                                ${block[`explanation_${lang}`] ? `<div class="mcq-explanation"><strong>Explanation:</strong> ${block[`explanation_${lang}`]}</div>` : ''}
                             </div>
                         `;
                         break;
                 }
             });
             return contentHTML;
+        };
+        
+        const renderAllMath = () => {
+            if (window.renderMathInElement) {
+                renderMathInElement(document.body, {
+                    delimiters: [
+                        {left: '$$', right: '$$', display: true},
+                        {left: '$', right: '$', display: false}
+                    ]
+                });
+            }
         };
 
         const renderUnit = (subject, course, module, unit, lang, fromPanel) => {
@@ -137,18 +161,18 @@
             document.title = `${unit[`title_${lang}`]} | Literary Speaking`;
 
             sidebarNav.innerHTML = `
-                <li><a class="back-link" href="lesson-single.html?id=${subject.id}&panel=${fromPanel}"><span class="lang-switch" data-en="← Back to Modules" data-es="← Volver a Módulos"></span></a></li>
-                <li><a href="lesson-single.html?id=${subject.id}&panel=home" class="lesson-nav-link lang-switch" data-en="Home" data-es="Inicio"></a></li>
-                <li><a href="lesson-single.html?id=${subject.id}&panel=modules" class="lesson-nav-link active lang-switch" data-en="Modules" data-es="Módulos"></a></li>
-                <li><a href="lesson-single.html?id=${subject.id}&panel=discussions" class="lesson-nav-link lang-switch" data-en="Discussions" data-es="Discusiones"></a></li>
-                <li><a href="lesson-single.html?id=${subject.id}&panel=resources" class="lesson-nav-link lang-switch" data-en="More Resources" data-es="Más Recursos"></a></li>
+                <li><a class="back-link" href="lesson-viewer.html?id=${subject.id}&panel=${fromPanel}"><span class="lang-switch" data-en="← Back to Modules" data-es="← Volver a Módulos"></span></a></li>
+                <li><a href="lesson-viewer.html?id=${subject.id}&panel=home" class="lesson-nav-link lang-switch" data-en="Home" data-es="Inicio"></a></li>
+                <li><a href="lesson-viewer.html?id=${subject.id}&panel=modules" class="lesson-nav-link active lang-switch" data-en="Modules" data-es="Módulos"></a></li>
+                <li><a href="lesson-viewer.html?id=${subject.id}&panel=discussions" class="lesson-nav-link lang-switch" data-en="Discussions" data-es="Discusiones"></a></li>
+                <li><a href="lesson-viewer.html?id=${subject.id}&panel=resources" class="lesson-nav-link lang-switch" data-en="More Resources" data-es="Más Recursos"></a></li>
             `;
             
             const contentBlocksHTML = renderContentBlocks(unit.contentBlocks, lang);
 
             contentWrapper.innerHTML = `
                 <div class="breadcrumbs">
-                    <a href="lesson-single.html?id=${subject.id}&panel=modules">${subject[`title_${lang}`]}</a>
+                    <a href="lesson-viewer.html?id=${subject.id}&panel=modules">${subject[`title_${lang}`]}</a>
                     <span>></span>
                     <span>${course[`title_${lang}`]}</span>
                     <span>></span>
@@ -161,6 +185,7 @@
             `;
             
             siteRouter.applyLanguage(lang);
+            renderAllMath();
         };
 
         document.addEventListener('DOMContentLoaded', async () => {
