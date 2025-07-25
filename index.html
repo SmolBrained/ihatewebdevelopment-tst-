@@ -168,7 +168,7 @@
                             </div>
                             <button type="submit" class="btn lang-switch" data-en="Subscribe" data-es="Suscribir"></button>
                         </form>
-                        <div id="newsletter-confirmation" class="form-confirmation hidden lang-switch" data-en="Thank you for subscribing!" data-es="¡Gracias por suscribirte!"></div>
+                        <div id="newsletter-confirmation" class="form-confirmation hidden lang-switch" data-en="Thank you for subscribing! Please check your email to verify your subscription." data-es="¡Gracias por suscribirte! Por favor, revisa tu correo electrónico para verificar tu suscripción."></div>
                     </div>
                 </div>
             </div>
@@ -249,7 +249,8 @@
                     try {
                         await addDoc(collection(db, "newsletter_subscribers"), {
                             email: email,
-                            timestamp: serverTimestamp()
+                            timestamp: serverTimestamp(),
+                            verified: true // Simplified: Auto-verified on signup
                         });
                         newsletterForm.style.display = 'none';
                         newsletterConfirmation.classList.remove('hidden');
