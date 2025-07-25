@@ -49,23 +49,10 @@
     <footer class="site-footer"></footer>
 
     <script src="router.js"></script>
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
-        import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
-
-        const firebaseConfig = {
-            apiKey: "AIzaSyD0qVihpuLI0cF0PZ32o8tFBLfTgjlqB6A",
-            authDomain: "literary-speaking.firebaseapp.com",
-            projectId: "literary-speaking",
-            storageBucket: "literary-speaking.appspot.com",
-            messagingSenderId: "699059463612",
-            appId: "1:699059463612:web:ecb2e784d627c6b93937b9",
-            measurementId: "G-0L1V3XXGGR"
-        };
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
-
+    <script>
         document.addEventListener('DOMContentLoaded', async () => {
+            await siteRouter.loadMembers();
+
             function hexToHSL(hex) {
                 if (!hex) return { h: 0, s: 0, l: 96 };
                 let r = 0, g = 0, b = 0;
@@ -95,22 +82,11 @@
 
             const urlParams = new URLSearchParams(window.location.search);
             const memberId = urlParams.get('id');
-
-            if (!memberId) {
-                return siteRouter.navigateTo('the-team');
-            }
-
-            const docRef = doc(db, "members", memberId);
-            const docSnap = await getDoc(docRef);
-
-            if (!docSnap.exists()) {
-                console.error("No such member document!");
-                return siteRouter.navigateTo('the-team');
-            }
-            
-            const member = docSnap.data();
+            const member = siteRouter.members[memberId];
 
             const updateDynamicText = (lang) => {
+                if (!member) return;
+                
                 const bioEl = document.querySelector('.member-bio');
                 const factsList = document.querySelector('.quick-facts ul');
                 
@@ -131,48 +107,53 @@
                 }
             };
 
-            document.title = `${member.name} - Literary Speaking`;
-            
-            const profileSection = document.getElementById('member-profile');
-            if (profileSection) profileSection.style.backgroundColor = member.color || '#fff';
+            if(memberId && member){
+                document.title = `${member.name} - Literary Speaking`;
+                
+                const profileSection = document.getElementById('member-profile');
+                if (profileSection) profileSection.style.backgroundColor = member.color || '#fff';
 
-            document.querySelector('.member-name').textContent = member.name;
-            const portraitEl = document.querySelector('.member-portrait');
-            portraitEl.src = member.portrait;
-            portraitEl.alt = member.name;
-            
-            const bioEl = document.querySelector('.member-bio');
-            if(member.bio_en && member.bio_en.trim() !== ''){
-                bioEl.style.display = 'block';
+                document.querySelector('.member-name').textContent = member.name;
+                const portraitEl = document.querySelector('.member-portrait');
+                portraitEl.src = member.portrait;
+                portraitEl.alt = member.name;
+                
+                const bioEl = document.querySelector('.member-bio');
+                if(member.bio_en && member.bio_en.trim() !== ''){
+                    bioEl.style.display = 'block';
+                } else {
+                    bioEl.style.display = 'none';
+                }
+
+                const factsContainer = document.querySelector('.quick-facts');
+                if(member.facts_en && member.facts_en.length > 0){
+                    factsContainer.style.display = 'block';
+                    const hsl = hexToHSL(member.color);
+                    factsContainer.style.backgroundColor = `hsl(${hsl.h}, ${hsl.s}%, 96%)`;
+                    factsContainer.style.color = `hsl(${hsl.h}, ${hsl.s}%, 20%)`;
+                } else {
+                    factsContainer.style.display = 'none';
+                }
+
+                const secondaryImageEl = document.querySelector('.secondary-image');
+                if(member.secondaryImage){
+                    secondaryImageEl.src = member.secondaryImage;
+                    secondaryImageEl.alt = `${member.name} secondary image`;
+                    secondaryImageEl.style.display = 'block';
+                } else {
+                    secondaryImageEl.style.display = 'none';
+                }
+
+                const initialLang = localStorage.getItem('language') || 'en';
+                updateDynamicText(initialLang);
+
+                document.addEventListener('languageChanged', (e) => {
+                    updateDynamicText(e.detail.lang);
+                });
+
             } else {
-                bioEl.style.display = 'none';
+                siteRouter.navigateTo('the-team');
             }
-
-            const factsContainer = document.querySelector('.quick-facts');
-            if(member.facts_en && member.facts_en.length > 0){
-                factsContainer.style.display = 'block';
-                const hsl = hexToHSL(member.color);
-                factsContainer.style.backgroundColor = `hsl(${hsl.h}, ${hsl.s}%, 96%)`;
-                factsContainer.style.color = `hsl(${hsl.h}, ${hsl.s}%, 20%)`;
-            } else {
-                factsContainer.style.display = 'none';
-            }
-
-            const secondaryImageEl = document.querySelector('.secondary-image');
-            if(member.secondaryImage){
-                secondaryImageEl.src = member.secondaryImage;
-                secondaryImageEl.alt = `${member.name} secondary image`;
-                secondaryImageEl.style.display = 'block';
-            } else {
-                secondaryImageEl.style.display = 'none';
-            }
-
-            const initialLang = localStorage.getItem('language') || 'en';
-            updateDynamicText(initialLang);
-
-            document.addEventListener('languageChanged', (e) => {
-                updateDynamicText(e.detail.lang);
-            });
         });
     </script>
 </body>
