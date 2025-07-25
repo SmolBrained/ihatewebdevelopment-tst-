@@ -7,7 +7,13 @@
     <title>Course Unit | Literary Speaking</title>
     <link rel="stylesheet" href="style.css">
     <style>
-        .unit-container { max-width: 800px; margin: 0 auto; }
+        .lesson-layout { display: flex; gap: 40px; }
+        .lesson-sidebar { width: 220px; flex-shrink: 0; }
+        .lesson-sidebar-nav { list-style: none; padding: 0; margin: 0; position: sticky; top: 120px; }
+        .lesson-sidebar-nav .back-link { display: block; padding: 10px 0; font-weight: 700; color: var(--color-primary); text-decoration: none; margin-bottom: 15px; text-align: left; }
+        .lesson-sidebar-nav a.lesson-nav-link { display: block; padding: 10px 15px; text-decoration: none; color: #333; font-weight: 700; border-left: 3px solid transparent; text-align: left; }
+        .lesson-sidebar-nav a.lesson-nav-link.active { border-left-color: #333; }
+        .lesson-main-content { flex-grow: 1; }
         .breadcrumbs { padding: 15px 0; font-size: 0.9rem; color: var(--color-text-muted); }
         .breadcrumbs a { color: var(--color-purple-dark); text-decoration: none; }
         .breadcrumbs a:hover { text-decoration: underline; }
@@ -23,7 +29,7 @@
         .video-container iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
         .back-link { display: inline-block; margin-bottom: 20px; font-weight: 700; color: var(--color-purple-dark); text-decoration: none; }
         .back-link:hover { text-decoration: underline; }
-        @media (max-width:768px){ .unit-title { font-size: 2rem; } }
+        @media (max-width:768px){ .unit-title { font-size: 2rem; } .lesson-layout { flex-direction: column; } .lesson-sidebar { width: 100%; } .lesson-sidebar-nav { position: static; } }
     </style>
 </head>
 <body data-current-page="lessons">
@@ -32,8 +38,13 @@
     <main>
         <section class="section">
             <div class="container page-specific-content">
-                <div id="unit-content-wrapper" class="unit-container">
-                    <!-- Content will be dynamically injected here -->
+                <div class="lesson-layout">
+                    <aside class="lesson-sidebar">
+                        <ul id="lesson-sidebar-nav" class="lesson-sidebar-nav">
+                        </ul>
+                    </aside>
+                    <div id="unit-content-wrapper" class="lesson-main-content">
+                    </div>
                 </div>
             </div>
         </section>
@@ -67,9 +78,18 @@
 
         const renderUnit = (subject, course, module, unit, lang) => {
             const contentWrapper = document.getElementById('unit-content-wrapper');
-            if (!contentWrapper || !unit) return;
+            const sidebarNav = document.getElementById('lesson-sidebar-nav');
+            if (!contentWrapper || !sidebarNav || !unit) return;
 
             document.title = `${unit[`title_${lang}`]} | Literary Speaking`;
+
+            sidebarNav.innerHTML = `
+                <li><a class="back-link" href="lessons.html"><span class="lang-switch" data-en="← Back to all lessons" data-es="← Volver a todas las lecciones"></span></a></li>
+                <li><a href="lesson-single.html?id=${subject.id}" class="lesson-nav-link lang-switch" data-en="Home" data-es="Inicio"></a></li>
+                <li><a href="lesson-single.html?id=${subject.id}" class="lesson-nav-link active lang-switch" data-en="Modules" data-es="Módulos"></a></li>
+                <li><a href="lesson-single.html?id=${subject.id}" class="lesson-nav-link lang-switch" data-en="Discussions" data-es="Discusiones"></a></li>
+                <li><a href="lesson-single.html?id=${subject.id}" class="lesson-nav-link lang-switch" data-en="More Resources" data-es="Más Recursos"></a></li>
+            `;
 
             let contentBlocksHTML = '';
             (unit.contentBlocks || []).forEach(block => {
@@ -96,7 +116,6 @@
             });
 
             contentWrapper.innerHTML = `
-                <a class="back-link" href="lesson-single.html?id=${subject.id}">← <span class="lang-switch" data-en="Back to Modules" data-es="Volver a Módulos"></span></a>
                 <div class="breadcrumbs">
                     <a href="lesson-single.html?id=${subject.id}">${subject[`title_${lang}`]}</a>
                     <span>></span>
