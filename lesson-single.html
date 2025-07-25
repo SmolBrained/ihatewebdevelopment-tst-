@@ -170,7 +170,7 @@
                 (course.modules || []).forEach((module, moduleIndex) => {
                     contentHTML += `<div class="module-title">${module[`title_${lang}`]}</div>`;
                     let unitsHTML = (module.units || []).map((unit, unitIndex) => 
-                        `<li class="unit-item"><a href="course-unit.html?subjectId=${subject.id}&courseIndex=${courseIndex}&moduleIndex=${moduleIndex}&unitIndex=${unitIndex}">${unit[`title_${lang}`]}</a></li>`
+                        `<li class="unit-item"><a href="course-unit.html?subjectId=${subject.id}&courseIndex=${courseIndex}&moduleIndex=${moduleIndex}&unitIndex=${unitIndex}&fromPanel=modules">${unit[`title_${lang}`]}</a></li>`
                     ).join('');
                     contentHTML += `<ul class="unit-list">${unitsHTML}</ul>`;
                 });
@@ -234,6 +234,8 @@
         document.addEventListener('DOMContentLoaded', async () => {
             const urlParams = new URLSearchParams(window.location.search);
             const subjectId = urlParams.get('id');
+            const panelToShow = urlParams.get('panel') || 'home';
+
             if (!subjectId) {
                 if (window.siteRouter) window.siteRouter.navigateTo('lessons');
                 return;
@@ -254,6 +256,7 @@
                 if (window.siteRouter) siteRouter.applyLanguage(lang);
             };
             updateUIForLanguage(localStorage.getItem('language') || 'en');
+            switchPanel(panelToShow, subjectId);
             document.querySelectorAll('.lesson-nav-link').forEach(link => link.addEventListener('click', e => { e.preventDefault(); switchPanel(e.target.dataset.panel, subjectId); }));
             document.addEventListener('languageChanged', e => updateUIForLanguage(e.detail.lang));
             
