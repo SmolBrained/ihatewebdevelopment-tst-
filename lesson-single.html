@@ -249,8 +249,7 @@
             if (panelId === 'discussions') initDisqus(subjectId);
         };
         
-        const initializePage = (subjectId) => {
-            // Render Math
+        const finalizePageSetup = (subjectId) => {
             if (window.renderMathInElement) {
                 renderMathInElement(document.body, {
                     delimiters: [
@@ -260,7 +259,6 @@
                 });
             }
 
-            // Attach Panel Switching Listeners
             document.querySelectorAll('.lesson-nav-link').forEach(link => {
                 link.addEventListener('click', e => {
                     e.preventDefault();
@@ -268,8 +266,7 @@
                 });
             });
 
-            // Attach MCQ Listeners
-            document.addEventListener('click', e => {
+            document.body.addEventListener('click', e => {
                 const selectedAnswer = e.target.closest('.mcq-answer');
                 if (!selectedAnswer) return;
                 const system = selectedAnswer.closest('.mcq-system');
@@ -286,7 +283,7 @@
                     selectedAnswer.classList.add('incorrect');
                     selectedAnswer.style.pointerEvents = 'none';
                 }
-            });
+            }, { once: true });
         };
 
         document.addEventListener('DOMContentLoaded', async () => {
@@ -313,7 +310,7 @@
                 populateModules(subject, lang);
                 populateResources(subject, lang);
                 if (window.siteRouter) siteRouter.applyLanguage(lang);
-                initializePage(subjectId);
+                finalizePageSetup(subjectId);
             };
 
             updateUIForLanguage(localStorage.getItem('language') || 'en');
