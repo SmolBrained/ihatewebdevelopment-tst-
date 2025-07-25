@@ -9,16 +9,6 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.10/dist/katex.min.css" integrity="sha384-wcIxkf4k558sdqoTMN12pdftDZSPJ2sHLqOA1i79JqFxdpNLs4mx9C+rB2IscBqt" crossorigin="anonymous">
     <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.10/dist/katex.min.js" integrity="sha384-hIoBPJpTUs74ddyc4bFZSM1aTjxPWPl1qweoTudGFFLPwEAOTUeg9tGiuB21B4sY" crossorigin="anonymous"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.10/dist/contrib/auto-render.min.js" integrity="sha384-43gviWU0YVjaDtb/GhzOouOXtZMP/7XUzwPTstBeZFe/+rCMvRwr4yROQP43s0Xk" crossorigin="anonymous"></script>
-    <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            renderMathInElement(document.body, {
-                delimiters: [
-                    {left: '$$', right: '$$', display: true},
-                    {left: '$', right: '$', display: false}
-                ]
-            });
-        });
-    </script>
     <style>
         .page-header-container { padding-bottom: 15px; border-bottom: 1px solid #ddd; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; }
         .page-header-actions button { background-color: #f8f9fa; border: 1px solid #ccc; border-radius: 5px; padding: 8px 15px; font-weight: 700; cursor: pointer; }
@@ -259,7 +249,8 @@
             if (panelId === 'discussions') initDisqus(subjectId);
         };
         
-        const renderAllMath = () => {
+        const initializePage = (subjectId) => {
+            // Render Math
             if (window.renderMathInElement) {
                 renderMathInElement(document.body, {
                     delimiters: [
@@ -268,38 +259,16 @@
                     ]
                 });
             }
-        };
 
-        document.addEventListener('DOMContentLoaded', async () => {
-            const urlParams = new URLSearchParams(window.location.search);
-            const subjectId = urlParams.get('id');
-            const panelToShow = urlParams.get('panel') || 'home';
+            // Attach Panel Switching Listeners
+            document.querySelectorAll('.lesson-nav-link').forEach(link => {
+                link.addEventListener('click', e => {
+                    e.preventDefault();
+                    switchPanel(e.target.dataset.panel, subjectId);
+                });
+            });
 
-            if (!subjectId) {
-                if (window.siteRouter) window.siteRouter.navigateTo('lessons');
-                return;
-            }
-            const docRef = doc(db, "lessons", subjectId);
-            const docSnap = await getDoc(docRef);
-            if (!docSnap.exists()) {
-                if (window.siteRouter) window.siteRouter.navigateTo('lessons');
-                return;
-            }
-            const subject = { id: docSnap.id, ...docSnap.data() };
-            const updateUIForLanguage = (lang) => {
-                document.title = `${subject[`title_${lang}`]} | Literary Speaking`;
-                document.getElementById('subject-title-main').textContent = subject[`title_${lang}`];
-                populateHome(subject, lang);
-                populateModules(subject, lang);
-                populateResources(subject, lang);
-                if (window.siteRouter) siteRouter.applyLanguage(lang);
-                renderAllMath();
-            };
-            updateUIForLanguage(localStorage.getItem('language') || 'en');
-            switchPanel(panelToShow, subjectId);
-            document.querySelectorAll('.lesson-nav-link').forEach(link => link.addEventListener('click', e => { e.preventDefault(); switchPanel(e.target.dataset.panel, subjectId); }));
-            document.addEventListener('languageChanged', e => updateUIForLanguage(e.detail.lang));
-            
+            // Attach MCQ Listeners
             document.addEventListener('click', e => {
                 const selectedAnswer = e.target.closest('.mcq-answer');
                 if (!selectedAnswer) return;
@@ -318,6 +287,39 @@
                     selectedAnswer.style.pointerEvents = 'none';
                 }
             });
+        };
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const subjectId = urlParams.get('id');
+            const panelToShow = urlParams.get('panel') || 'home';
+
+            if (!subjectId) {
+                if (window.siteRouter) window.siteRouter.navigateTo('lessons');
+                return;
+            }
+            const docRef = doc(db, "lessons", subjectId);
+            const docSnap = await getDoc(docRef);
+            if (!docSnap.exists()) {
+                if (window.siteRouter) window.siteRouter.navigateTo('lessons');
+                return;
+            }
+            const subject = { id: docSnap.id, ...docSnap.data() };
+            
+            const updateUIForLanguage = (lang) => {
+                document.title = `${subject[`title_${lang}`]} | Literary Speaking`;
+                document.getElementById('subject-title-main').textContent = subject[`title_${lang}`];
+                populateHome(subject, lang);
+                populateModules(subject, lang);
+                populateResources(subject, lang);
+                if (window.siteRouter) siteRouter.applyLanguage(lang);
+                initializePage(subjectId);
+            };
+
+            updateUIForLanguage(localStorage.getItem('language') || 'en');
+            switchPanel(panelToShow, subjectId);
+            
+            document.addEventListener('languageChanged', e => updateUIForLanguage(e.detail.lang));
         });
     </script>
 </body>
