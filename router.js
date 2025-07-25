@@ -17,15 +17,6 @@ const siteRouter = {
         "course-unit": "course-unit.html",
         "member": "members.html"
     },
-    members: {},
-    async loadMembers() {
-        try {
-            const response = await fetch('members.json');
-            this.members = await response.json();
-        } catch (error) {
-            console.error("Could not load members data:", error);
-        }
-    },
     navigateTo(pageId, params = null) {
         let url = this.pages[pageId];
         if (url) {
