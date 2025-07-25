@@ -27,6 +27,9 @@
         .unit-body figcaption { font-size: 0.9rem; color: var(--color-text-light); text-align: center; margin-top: 10px; font-style: italic; }
         .video-container { position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; max-width: 100%; background: #000; border-radius: 16px; margin: 30px 0; }
         .video-container iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
+        .pdf-embed details { border: 1px solid #ccc; border-radius: 8px; margin: 20px 0; }
+        .pdf-embed summary { padding: 15px; font-weight: 700; cursor: pointer; background-color: #f8f9fa; }
+        .pdf-embed embed { width: 100%; height: 500px; }
         .back-link { display: inline-block; margin-bottom: 20px; font-weight: 700; color: var(--color-purple-dark); text-decoration: none; }
         .back-link:hover { text-decoration: underline; }
         @media (max-width:768px){ .unit-title { font-size: 2rem; } .lesson-layout { flex-direction: column; } .lesson-sidebar { width: 100%; } .lesson-sidebar-nav { position: static; } }
@@ -76,6 +79,31 @@
             return (match && match[2].length === 11) ? match[2] : url;
         };
 
+        const renderContentBlocks = (blocks, lang) => {
+            if (!blocks || blocks.length === 0) return '<p>No content available.</p>';
+            let contentHTML = '';
+            blocks.forEach(block => {
+                const caption = block[`caption_${lang}`] || '';
+                const title = block[`title_${lang}`] || '';
+                switch (block.type) {
+                    case 'text':
+                        contentHTML += block[`content_${lang}`] || '';
+                        break;
+                    case 'image':
+                        contentHTML += `<figure><img src="${block.url}" alt="${caption}"><figcaption>${caption}</figcaption></figure>`;
+                        break;
+                    case 'video':
+                        const videoId = getYouTubeID(block.videoId || '');
+                        contentHTML += `<figure><div class="video-container"><iframe src="https://www.youtube.com/embed/${videoId}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe></div><figcaption>${caption}</figcaption></figure>`;
+                        break;
+                    case 'pdf':
+                         contentHTML += `<div class="pdf-embed"><details><summary>${title}</summary><embed src="${block.url}" type="application/pdf"></details></div>`;
+                        break;
+                }
+            });
+            return contentHTML;
+        };
+
         const renderUnit = (subject, course, module, unit, lang) => {
             const contentWrapper = document.getElementById('unit-content-wrapper');
             const sidebarNav = document.getElementById('lesson-sidebar-nav');
@@ -84,36 +112,14 @@
             document.title = `${unit[`title_${lang}`]} | Literary Speaking`;
 
             sidebarNav.innerHTML = `
-                <li><a class="back-link" href="lessons.html"><span class="lang-switch" data-en="← Back to all lessons" data-es="← Volver a todas las lecciones"></span></a></li>
+                <li><a class="back-link" href="lesson-single.html?id=${subject.id}"><span class="lang-switch" data-en="← Back to Modules" data-es="← Volver a Módulos"></span></a></li>
                 <li><a href="lesson-single.html?id=${subject.id}" class="lesson-nav-link lang-switch" data-en="Home" data-es="Inicio"></a></li>
                 <li><a href="lesson-single.html?id=${subject.id}" class="lesson-nav-link active lang-switch" data-en="Modules" data-es="Módulos"></a></li>
                 <li><a href="lesson-single.html?id=${subject.id}" class="lesson-nav-link lang-switch" data-en="Discussions" data-es="Discusiones"></a></li>
                 <li><a href="lesson-single.html?id=${subject.id}" class="lesson-nav-link lang-switch" data-en="More Resources" data-es="Más Recursos"></a></li>
             `;
-
-            let contentBlocksHTML = '';
-            (unit.contentBlocks || []).forEach(block => {
-                const caption = block[`caption_${lang}`] || '';
-                switch (block.type) {
-                    case 'text':
-                        contentBlocksHTML += block[`content_${lang}`] || '';
-                        break;
-                    case 'image':
-                        contentBlocksHTML += `<figure><img src="${block.url}" alt="${caption}"><figcaption>${caption}</figcaption></figure>`;
-                        break;
-                    case 'video':
-                        const videoId = getYouTubeID(block.videoId || '');
-                        contentBlocksHTML += `
-                            <figure>
-                                <div class="video-container">
-                                    <iframe src="https://www.youtube.com/embed/${videoId}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-                                </div>
-                                <figcaption>${caption}</figcaption>
-                            </figure>
-                        `;
-                        break;
-                }
-            });
+            
+            const contentBlocksHTML = renderContentBlocks(unit.contentBlocks, lang);
 
             contentWrapper.innerHTML = `
                 <div class="breadcrumbs">
