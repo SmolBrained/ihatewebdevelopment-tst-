@@ -118,29 +118,9 @@ Tutoría y Mentoría de Literary Speaking"></p>
     <footer class="site-footer"></footer>
 
     <script src="router.js"></script>
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
-        import { getFirestore, collection, getDocs, query, orderBy } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
-
-        const firebaseConfig = {
-            apiKey: "AIzaSyD0qVihpuLI0cF0PZ32o8tFBLfTgjlqB6A",
-            authDomain: "literary-speaking.firebaseapp.com",
-            projectId: "literary-speaking",
-            storageBucket: "literary-speaking.appspot.com",
-            messagingSenderId: "699059463612",
-            appId: "1:699059463612:web:ecb2e784d627c6b93937b9",
-            measurementId: "G-0L1V3XXGGR"
-        };
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
-
+    <script>
         document.addEventListener('DOMContentLoaded', async () => {
-            const membersQuery = query(collection(db, "members"), orderBy("order", "asc"));
-            const querySnapshot = await getDocs(membersQuery);
-            const membersMap = {};
-            querySnapshot.forEach(doc => {
-                membersMap[doc.id] = doc.data();
-            });
+            await siteRouter.loadMembers();
             
             const pwbBoard = [
                 { id: 'aitana-avila000', title_en: 'Vice President', title_es: 'Vicepresidenta' },
@@ -177,13 +157,13 @@ Tutoría y Mentoría de Literary Speaking"></p>
 
             const populateTeamSection = (containerSelector, membersList, lang) => {
                 const grid = document.querySelector(containerSelector);
-                if (!grid) return;
+                if (!grid || !siteRouter.members) return;
                 grid.innerHTML = '';
 
                 membersList.forEach(item => {
                     const hasTitle = typeof item === 'object';
                     const memberId = hasTitle ? item.id : item;
-                    const memberData = membersMap[memberId];
+                    const memberData = siteRouter.members[memberId];
 
                     if (!memberData) return;
 
