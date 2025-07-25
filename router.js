@@ -21,7 +21,7 @@ const siteRouter = {
     async loadMembers() {
         if (Object.keys(this.members).length > 0) return; // Only fetch once
 
-        const { getFirestore, collection, getDocs, query, orderBy } = await import("https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js");
+        const { getFirestore, collection, getDocs, query } = await import("https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js");
         const { initializeApp, getApps } = await import("https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js");
 
         const firebaseConfig = {
@@ -40,6 +40,7 @@ const siteRouter = {
         const db = getFirestore();
 
         try {
+            // CORRECTED QUERY: Removed orderBy("order") to fetch ALL members
             const membersQuery = query(collection(db, "members"));
             const querySnapshot = await getDocs(membersQuery);
             const membersMap = {};
