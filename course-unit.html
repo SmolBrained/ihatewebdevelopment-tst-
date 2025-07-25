@@ -129,7 +129,7 @@
             return contentHTML;
         };
 
-        const renderUnit = (subject, course, module, unit, lang) => {
+        const renderUnit = (subject, course, module, unit, lang, fromPanel) => {
             const contentWrapper = document.getElementById('unit-content-wrapper');
             const sidebarNav = document.getElementById('lesson-sidebar-nav');
             if (!contentWrapper || !sidebarNav || !unit) return;
@@ -137,18 +137,18 @@
             document.title = `${unit[`title_${lang}`]} | Literary Speaking`;
 
             sidebarNav.innerHTML = `
-                <li><a class="back-link" href="lesson-single.html?id=${subject.id}"><span class="lang-switch" data-en="← Back to Modules" data-es="← Volver a Módulos"></span></a></li>
-                <li><a href="lesson-single.html?id=${subject.id}" class="lesson-nav-link lang-switch" data-en="Home" data-es="Inicio"></a></li>
-                <li><a href="lesson-single.html?id=${subject.id}" class="lesson-nav-link active lang-switch" data-en="Modules" data-es="Módulos"></a></li>
-                <li><a href="lesson-single.html?id=${subject.id}" class="lesson-nav-link lang-switch" data-en="Discussions" data-es="Discusiones"></a></li>
-                <li><a href="lesson-single.html?id=${subject.id}" class="lesson-nav-link lang-switch" data-en="More Resources" data-es="Más Recursos"></a></li>
+                <li><a class="back-link" href="lesson-single.html?id=${subject.id}&panel=${fromPanel}"><span class="lang-switch" data-en="← Back to Modules" data-es="← Volver a Módulos"></span></a></li>
+                <li><a href="lesson-single.html?id=${subject.id}&panel=home" class="lesson-nav-link lang-switch" data-en="Home" data-es="Inicio"></a></li>
+                <li><a href="lesson-single.html?id=${subject.id}&panel=modules" class="lesson-nav-link active lang-switch" data-en="Modules" data-es="Módulos"></a></li>
+                <li><a href="lesson-single.html?id=${subject.id}&panel=discussions" class="lesson-nav-link lang-switch" data-en="Discussions" data-es="Discusiones"></a></li>
+                <li><a href="lesson-single.html?id=${subject.id}&panel=resources" class="lesson-nav-link lang-switch" data-en="More Resources" data-es="Más Recursos"></a></li>
             `;
             
             const contentBlocksHTML = renderContentBlocks(unit.contentBlocks, lang);
 
             contentWrapper.innerHTML = `
                 <div class="breadcrumbs">
-                    <a href="lesson-single.html?id=${subject.id}">${subject[`title_${lang}`]}</a>
+                    <a href="lesson-single.html?id=${subject.id}&panel=modules">${subject[`title_${lang}`]}</a>
                     <span>></span>
                     <span>${course[`title_${lang}`]}</span>
                     <span>></span>
@@ -169,6 +169,7 @@
             const courseIndex = parseInt(urlParams.get('courseIndex'), 10);
             const moduleIndex = parseInt(urlParams.get('moduleIndex'), 10);
             const unitIndex = parseInt(urlParams.get('unitIndex'), 10);
+            const fromPanel = urlParams.get('fromPanel') || 'modules';
 
             if (!subjectId || isNaN(courseIndex) || isNaN(moduleIndex) || isNaN(unitIndex)) {
                 return siteRouter.navigateTo('lessons');
@@ -192,10 +193,10 @@
             }
 
             const initialLang = localStorage.getItem('language') || 'en';
-            renderUnit(subject, course, module, unit, initialLang);
+            renderUnit(subject, course, module, unit, initialLang, fromPanel);
 
             document.addEventListener('languageChanged', (e) => {
-                renderUnit(subject, course, module, unit, e.detail.lang);
+                renderUnit(subject, course, module, unit, e.detail.lang, fromPanel);
             });
         });
 
