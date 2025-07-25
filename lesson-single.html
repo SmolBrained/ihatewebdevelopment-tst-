@@ -143,7 +143,7 @@
 
         const populateModules = (subject, lang) => {
             const container = document.getElementById('modules-panel');
-            container.innerHTML = ''; 
+            container.innerHTML = '';
             const headerDiv = document.createElement('div');
             headerDiv.className = 'page-header-container';
             headerDiv.style.cssText = "border-bottom: none; padding-bottom: 0; margin-bottom: 20px; align-items: flex-start;";
@@ -169,7 +169,7 @@
                 let contentHTML = '';
                 (course.modules || []).forEach((module, moduleIndex) => {
                     contentHTML += `<div class="module-title">${module[`title_${lang}`]}</div>`;
-                    let unitsHTML = (module.units || []).map((unit, unitIndex) => 
+                    let unitsHTML = (module.units || []).map((unit, unitIndex) =>
                         `<li class="unit-item"><a href="course-unit.html?subjectId=${subject.id}&courseIndex=${courseIndex}&moduleIndex=${moduleIndex}&unitIndex=${unitIndex}&fromPanel=modules">${unit[`title_${lang}`]}</a></li>`
                     ).join('');
                     contentHTML += `<ul class="unit-list">${unitsHTML}</ul>`;
@@ -178,31 +178,38 @@
                 courseListContainer.appendChild(courseItem);
             });
             container.appendChild(courseListContainer);
-            container.querySelectorAll('.course-header').forEach(header => {
-                header.classList.add('collapsed');
-                header.addEventListener('click', () => header.classList.toggle('collapsed'));
-            });
-            let allCollapsed = true;
+
+            const allCourseHeaders = container.querySelectorAll('.course-header');
+            let areAllCollapsed;
+
             const updateButtonText = () => {
                 const currentLang = localStorage.getItem('language') || 'en';
-                if (allCollapsed) {
-                    collapseBtn.textContent = currentLang === 'es' ? 'Expandir Todo' : 'Expand All';
-                } else {
-                    collapseBtn.textContent = currentLang === 'es' ? 'Contraer Todo' : 'Collapse All';
-                }
+                collapseBtn.textContent = areAllCollapsed ? (currentLang === 'es' ? 'Expandir Todo' : 'Expand All') : (currentLang === 'es' ? 'Contraer Todo' : 'Collapse All');
             };
-            collapseBtn.addEventListener('click', () => {
-                allCollapsed = !allCollapsed;
-                container.querySelectorAll('.course-header').forEach(header => {
-                    if (allCollapsed) {
-                        header.classList.add('collapsed');
-                    } else {
-                        header.classList.remove('collapsed');
-                    }
-                });
+
+            const checkCollapseState = () => {
+                const collapsedCount = container.querySelectorAll('.course-header.collapsed').length;
+                areAllCollapsed = collapsedCount === allCourseHeaders.length;
                 updateButtonText();
+            };
+
+            allCourseHeaders.forEach(header => {
+                header.classList.add('collapsed');
+                header.addEventListener('click', () => {
+                    header.classList.toggle('collapsed');
+                    checkCollapseState();
+                });
             });
-            updateButtonText();
+
+            collapseBtn.addEventListener('click', () => {
+                const shouldCollapse = !areAllCollapsed;
+                allCourseHeaders.forEach(header => {
+                    header.classList.toggle('collapsed', shouldCollapse);
+                });
+                checkCollapseState();
+            });
+
+            checkCollapseState();
         };
 
         const populateResources = (subject, lang) => {
