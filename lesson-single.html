@@ -30,7 +30,16 @@
         .course-list { list-style: none; padding: 0; margin: 0; }
         .course-item { border-radius: 5px; overflow: hidden; margin-bottom: 15px; border: 1px solid #ccc; }
         .course-header { background-color: #f8f9fa; padding: 15px; font-weight: 700; font-size: 1.1rem; cursor: pointer; display: flex; align-items: center; color: #333; }
-        .course-header::before { content: '►'; font-size: 0.8em; margin-right: 12px; transition: transform 0.3s ease; }
+        .course-header::before {
+            content: '';
+            width: 0;
+            height: 0;
+            border-top: 6px solid transparent;
+            border-bottom: 6px solid transparent;
+            border-left: 9px solid #333;
+            margin-right: 12px;
+            transition: transform 0.3s ease;
+        }
         .course-header:not(.collapsed)::before { transform: rotate(90deg); }
         .course-content-wrapper { display: grid; grid-template-rows: 0fr; transition: grid-template-rows 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
         .course-header:not(.collapsed) + .course-content-wrapper { grid-template-rows: 1fr; }
@@ -208,7 +217,7 @@
                 checkCollapseState();
             });
 
-            checkCollapseState();
+            checkCollapseState(); 
         };
 
         const populateResources = (subject, lang) => {
