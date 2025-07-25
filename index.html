@@ -235,7 +235,8 @@
                         await addDoc(collection(db, "newsletter_subscribers"), {
                             email: email,
                             timestamp: serverTimestamp(),
-                            verified: true
+                            verified: true,
+                            isArchived: false
                         });
 
                         const newsletterSection = document.querySelector('.section-theme-purple-2 .container');
