@@ -25,6 +25,15 @@
         .member-portrait{max-width:300px;margin:0 auto 30px}
         }
     </style>
+    <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
+    <script>
+      window.OneSignalDeferred = window.OneSignalDeferred || [];
+      OneSignalDeferred.push(async function(OneSignal) {
+        await OneSignal.init({
+          appId: "d12debe4-4f24-4db4-bfa5-9f6ee5f38d48",
+        });
+      });
+    </script>
 </head>
 <body data-current-page="member">
     <header class="site-header" id="header"></header>
