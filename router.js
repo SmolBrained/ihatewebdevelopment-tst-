@@ -112,7 +112,6 @@ const siteRouter = {
                             <a data-page-id="articles" class="lang-switch nav-link" data-en="Articles" data-es="Artículos"></a>
                             <a data-page-id="lessons" class="lang-switch nav-link" data-en="Lessons" data-es="Lecciones"></a>
                             <a data-page-id="report-time" class="lang-switch nav-link" data-en="Report Time" data-es="Reportar Horas"></a>
-                            <a data-page-id="store" class="lang-switch nav-link" data-en="Store" data-es="Tienda"></a>
                         </div>
                     </div>
                     <div class="lang-switcher"><button id="lang-en-btn">EN</button><button id="lang-es-btn">ES</button></div>
@@ -136,7 +135,6 @@ const siteRouter = {
                 <a data-page-id="articles" class="lang-switch nav-link" data-en="Articles" data-es="Artículos"></a>
                 <a data-page-id="lessons" class="lang-switch nav-link" data-en="Lessons" data-es="Lecciones"></a>
                 <a data-page-id="report-time" class="lang-switch nav-link" data-en="Report Time" data-es="Reportar Horas"></a>
-                <a data-page-id="store" class="lang-switch nav-link" data-en="Store" data-es="Tienda"></a>
             </nav>
         `;
 
@@ -249,7 +247,7 @@ const siteRouter = {
         const pageGroups = {
             'about': 'get-to-know-us', 'the-team': 'get-to-know-us', 'news': 'get-to-know-us', 'contact': 'get-to-know-us',
             'receive-tutoring': 'get-involved', 'become-a-tutor': 'get-involved', 'become-a-volunteer': 'get-involved', 'support': 'get-involved',
-            'articles': 'resources', 'lessons': 'resources', 'report-time': 'resources', 'lesson-single': 'resources', 'course-unit': 'resources', 'store': 'resources'
+            'articles': 'resources', 'lessons': 'resources', 'report-time': 'resources', 'lesson-single': 'resources', 'course-unit': 'resources'
         };
         
         if (currentPage) {
