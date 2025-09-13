@@ -1,7 +1,7 @@
 const siteRouter = {
     pages: {
-        "home": "/",
-        "about": "/about",
+        "home": "/ihatewebdevelopment-tst-/",
+        "about": "/ihatewebdevelopment-tst-/about",
         "news": "/news",
         "news-single": "/news-single",
         "the-team": "/team",
