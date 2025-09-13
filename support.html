@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" type="image/png" href="https://i.imgur.com/WPy5YDY.png">
     <title>Support Us | Literary Speaking</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="../styles/style.css">
     <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
     <script>
       window.OneSignalDeferred = window.OneSignalDeferred || [];
@@ -16,7 +16,7 @@
       });
     </script>
     <style>
-        .support-hero-banner{height:60vh;min-height:400px;display:flex;align-items:center;justify-content:center;color:#fff;text-align:center;position:relative;padding:0 20px;background-image:url(https://i.imgur.com/rVLGsVm.png);background-attachment:fixed;background-position:center;background-repeat:no-repeat;background-size:cover}
+        .support-hero-banner{height:60vh;min-height:400px;display:flex;align-items:center;justify-content:center;color:#fff;text-align:center;position:relative;padding:0 20px;background-color:black;background-image:url(https://i.imgur.com/rVLGsVm.png);background-attachment:fixed;background-position:center;background-repeat:no-repeat;background-size:cover}
         .support-hero-banner .overlay{position:absolute;top:0;left:0;width:100%;height:100%;background-color:rgba(0,0,0,.5);z-index:2}
         .support-hero-banner .content{position:relative;z-index:3}
         .support-hero-banner h1{font-size:3.8rem;font-weight:900;margin:0;line-height:1.2}
@@ -25,6 +25,11 @@
         .support-details ul{list-style:disc;padding-left:20px;line-height:1.8;margin-bottom:30px}
         .support-details p{line-height:1.6}
         .gfm-embed{max-width:400px;width:100%;margin:auto}
+        .store-promo-section{background-color:var(--color-purple);padding:80px 0;text-align:center}
+        .store-promo-section h2{font-size:2.5rem;font-weight:900;color:var(--color-purple-dark);margin-bottom:15px}
+        .store-promo-section p{font-size:1.2rem;color:var(--color-text-light);max-width:600px;margin:0 auto 30px}
+        .store-promo-section .btn{background-color:var(--color-purple-dark);color:#fff;border-color:var(--color-purple-dark)}
+        .store-promo-section .btn:hover{background-color:transparent;color:var(--color-purple-dark)}
         @media (max-width:900px){.support-content{grid-template-columns:1fr;gap:60px}}
         @media (max-width:768px){.support-hero-banner{background-attachment:scroll}.support-hero-banner h1{font-size:2.2rem}}
     </style>
@@ -45,11 +50,11 @@
                     <div class="support-details scroll-animated">
                         <h3 class="lang-switch" data-en="We need help with purchasing:" data-es="Necesitamos ayuda con la compra de:"></h3>
                         <ul>
-                            <li class="lang-switch" data-en="Purchasing school supplies (many students are low-income and cannot afford the supplies they need to succeed)." data-es="Comprar útiles escolares (muchos estudiantes son de bajos ingresos y no pueden pagar los útiles que necesitan para tener éxito)."></li>
-                            <li class="lang-switch" data-en="Purchasing snacks and food (many students are hungry after school, and food is part of the annual award ceremony)." data-es="Comprar bocadillos y comida (muchos estudiantes tienen hambre después de la escuela y la comida es parte de la ceremonia anual de premiación)."></li>
-                            <li class="lang-switch" data-en="Purchasing award certificates, medals, and plaques." data-es="Comprar certificados de premios, medallas y placas."></li>
-                            <li class="lang-switch" data-en="Purchasing shirts with program logo for volunteers." data-es="Comprar camisetas con el logo del programa para voluntarios."></li>
-                            <li class="lang-switch" data-en="Purchasing seasonal goodies to award students and volunteers." data-es="Comprar obsequios de temporada para premiar a estudiantes y voluntarios."></li>
+                            <li class="lang-switch" data-en="school supplies (many students are low-income and cannot afford the supplies they need to succeed)." data-es="útiles escolares (muchos estudiantes son de bajos ingresos y no pueden pagar los útiles que necesitan para tener éxito)."></li>
+                            <li class="lang-switch" data-en="snacks and food (many students are hungry after school, and food is part of the annual award ceremony)." data-es="bocadillos y comida (muchos estudiantes tienen hambre después de la escuela y la comida es parte de la ceremonia anual de premiación)."></li>
+                            <li class="lang-switch" data-en="award certificates, medals, and plaques." data-es="certificados de premios, medallas y placas."></li>
+                            <li class="lang-switch" data-en="shirts with program logo for volunteers." data-es="camisetas con el logo del programa para voluntarios."></li>
+                            <li class="lang-switch" data-en="seasonal goodies to award students and volunteers." data-es="obsequios de temporada para premiar a estudiantes y voluntarios."></li>
                         </ul>
                         <p class="lang-switch" data-en="Any donations are greatly appreciated. Thank you for helping our students!" data-es="Cualquier donación es muy apreciada. ¡Gracias por ayudar a nuestros estudiantes!"></p>
                         <br>
@@ -60,11 +65,19 @@
                 </div>
             </div>
         </section>
+
+        <section class="store-promo-section">
+            <div class="container">
+                <h2 class="lang-switch" data-en="Shop Our Merchandise" data-es="Compra Nuestra Mercancía"></h2>
+                <p class="lang-switch" data-en="Another great way to support our mission is by purchasing items from our online store." data-es="Otra gran manera de apoyar nuestra misión es comprando artículos de nuestra tienda en línea."></p>
+                <a href="#" class="btn btn-rounded nav-link" data-page-id="store"><span class="lang-switch" data-en="Visit the Store" data-es="Visitar la Tienda"></span></a>
+            </div>
+        </section>
     </main>
 
     <footer class="site-footer"></footer>
 
-    <script src="router.js"></script>
+    <script src="../router.js"></script>
     <script defer src="https://www.gofundme.com/static/js/embed.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
