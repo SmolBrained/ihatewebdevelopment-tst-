@@ -105,9 +105,14 @@ const populateProductGrid = (container, productList) => {
         const card = document.createElement('a');
         card.className = 'product-card';
         card.href = `product-single.html?id=${product.id}`;
+
+        const baseImage = product.imageUrl || 'https://i.imgur.com/3Yj6bA1.png';
+        const hoverImage = (product.altImages && product.altImages.length > 0) ? product.altImages[0] : baseImage;
+
         card.innerHTML = `
             <div class="product-card-image-wrapper">
-                <img src="${product.imageUrl || 'https://i.imgur.com/3Yj6bA1.png'}" alt="${product[`name_${lang}`]}" class="product-card-image">
+                <img src="${baseImage}" alt="${product[`name_${lang}`]}" class="product-card-image base-image">
+                <img src="${hoverImage}" alt="${product[`name_${lang}`]} Hover" class="product-card-image hover-image">
             </div>
             <div class="product-card-content">
                 <h3 class="product-card-name">${product[`name_${lang}`]}</h3>
