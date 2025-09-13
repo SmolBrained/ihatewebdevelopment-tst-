@@ -35,15 +35,17 @@
         .cart-header h3{margin:0;font-size:1.5rem}
         .close-cart-btn{background:0 0;border:0;font-size:2rem;cursor:pointer;line-height:1}
         .cart-items{flex-grow:1;overflow-y:auto;padding:20px}
-        .cart-item{display:flex;margin-bottom:20px;gap:15px}
+        .cart-item{display:flex;margin-bottom:20px;gap:15px;align-items:center}
         .cart-item-image{width:80px;height:80px;object-fit:cover;border-radius:8px}
         .cart-item-details{flex-grow:1}
         .cart-item-name{font-weight:700;margin:0 0 5px}
         .cart-item-price{color:var(--color-text-light);margin-bottom:10px}
-        .cart-item-quantity{display:flex;align-items:center}
-        .cart-item-quantity button{width:25px;height:25px;border:1px solid #ccc;background-color:#f5f5f5;cursor:pointer}
-        .cart-item-quantity input{width:40px;text-align:center;border:1px solid #ccc;border-left:0;border-right:0;height:25px}
-        .remove-item-btn{background:0 0;border:0;color:#b22222;cursor:pointer;margin-left:auto}
+        .cart-item-quantity{display:flex;align-items:center;gap:5px}
+        .cart-item-quantity button{width:28px;height:28px;border:1px solid var(--color-border);background-color:transparent;cursor:pointer;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.2rem;font-weight:bold;line-height:1;transition:background-color .2s}
+        .cart-item-quantity button:hover{background-color:#f0f0f0}
+        .cart-item-quantity span{font-weight:bold;min-width:20px;text-align:center}
+        .remove-item-btn{background:0 0;border:0;color:var(--color-text-muted);cursor:pointer;font-size:1.5rem;font-weight:bold;margin-left:auto;transition:color .2s}
+        .remove-item-btn:hover{color:var(--color-danger)}
         .cart-footer{padding:20px;border-top:1px solid #eee}
         .cart-total{display:flex;justify-content:space-between;font-size:1.2rem;font-weight:700;margin-bottom:20px}
         .checkout-btn{display:block;width:100%;padding:15px;background-color:var(--color-purple-dark);color:#fff;text-align:center;text-decoration:none;font-size:1.1rem;font-weight:700;border-radius:8px;border:0;cursor:pointer}
@@ -67,12 +69,6 @@
                 <p style="text-align: center;">Loading products...</p>
             </div>
         </div>
-        <section id="you-may-also-like-section" class="hidden">
-            <div class="container">
-                <h2 class="section-title-bar lang-switch" data-en="You May Also Like" data-es="También te puede gustar"></h2>
-                <div class="product-grid" id="you-may-also-like-grid"></div>
-            </div>
-        </section>
         <section class="mission-section">
             <div class="container" style="display: contents;">
                 <img src="https://i.imgur.com/3Yj6bA1.png" alt="Volunteers helping the community">
