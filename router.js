@@ -1,25 +1,29 @@
 const siteRouter = {
     pages: {
-        "home": "./index.html",
-        "about": "about.html",
-        "news": "news.html",
-        "news-single": "news-single.html",
-        "the-team": "team.html",
-        "contact": "contact.html",
-        "receive-tutoring": "receive-tutoring.html",
-        "become-a-tutor": "become-a-tutor.html",
-        "become-a-volunteer": "become-a-volunteer.html",
-        "support": "support.html",
-        "articles": "articles.html",
-        "article-single": "article-single.html",
-        "lessons": "lessons.html",
-        "lesson-single": "lesson-single.html",
-        "course-unit": "course-unit.html",
-        "member": "members.html"
+        "home": "/",
+        "about": "/about",
+        "news": "/news",
+        "news-single": "/news-single",
+        "the-team": "/team",
+        "contact": "/contact",
+        "receive-tutoring": "/receive-tutoring",
+        "become-a-tutor": "/become-a-tutor",
+        "become-a-volunteer": "/become-a-volunteer",
+        "support": "/support",
+        "articles": "/articles",
+        "article-single": "/article-single",
+        "lessons": "/lessons",
+        "lesson-single": "/lesson-single",
+        "course-unit": "/course-unit",
+        "member": "/members",
+        "report-time": "/report-time",
+        "store": "/store",
+        "product-single": "/product-single",
+        "checkout": "/checkout"
     },
     members: {},
     async loadMembers() {
-        if (Object.keys(this.members).length > 0) return; // Only fetch once
+        if (Object.keys(this.members).length > 0) return;
 
         const { getFirestore, collection, getDocs, query } = await import("https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js");
         const { initializeApp, getApps } = await import("https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js");
@@ -40,7 +44,6 @@ const siteRouter = {
         const db = getFirestore();
 
         try {
-            // CORRECTED QUERY: Removed orderBy("order") to fetch ALL members
             const membersQuery = query(collection(db, "members"));
             const querySnapshot = await getDocs(membersQuery);
             const membersMap = {};
@@ -55,7 +58,8 @@ const siteRouter = {
     navigateTo(pageId, params = null) {
         let url = this.pages[pageId];
         if (url) {
-            if ((pageId === 'member' || pageId === 'article-single' || pageId === 'news-single' || pageId === 'lesson-single') && params) {
+            const paramsPages = ['member', 'article-single', 'news-single', 'lesson-single', 'course-unit', 'product-single'];
+            if (paramsPages.includes(pageId) && params) {
                 url += `?id=${params}`;
             }
             window.location.href = url;
@@ -64,13 +68,13 @@ const siteRouter = {
         }
     },
     applyLanguage(lang) {
+        document.documentElement.lang = lang;
         document.querySelectorAll('[data-en], [data-es]').forEach(el => {
             const text = el.dataset[lang];
             if (text !== undefined) {
                  el.innerHTML = text;
             }
         });
-        document.documentElement.lang = lang;
         const isEn = lang === 'en';
         document.querySelectorAll('#lang-en-btn, #lang-en-btn-mobile').forEach(btn => btn.classList.toggle('active', isEn));
         document.querySelectorAll('#lang-es-btn, #lang-es-btn-mobile').forEach(btn => btn.classList.toggle('active', !isEn));
@@ -108,6 +112,7 @@ const siteRouter = {
                             <a data-page-id="articles" class="lang-switch nav-link" data-en="Articles" data-es="Artículos"></a>
                             <a data-page-id="lessons" class="lang-switch nav-link" data-en="Lessons" data-es="Lecciones"></a>
                             <a data-page-id="report-time" class="lang-switch nav-link" data-en="Report Time" data-es="Reportar Horas"></a>
+                            <a data-page-id="store" class="lang-switch nav-link" data-en="Store" data-es="Tienda"></a>
                         </div>
                     </div>
                     <div class="lang-switcher"><button id="lang-en-btn">EN</button><button id="lang-es-btn">ES</button></div>
@@ -131,6 +136,7 @@ const siteRouter = {
                 <a data-page-id="articles" class="lang-switch nav-link" data-en="Articles" data-es="Artículos"></a>
                 <a data-page-id="lessons" class="lang-switch nav-link" data-en="Lessons" data-es="Lecciones"></a>
                 <a data-page-id="report-time" class="lang-switch nav-link" data-en="Report Time" data-es="Reportar Horas"></a>
+                <a data-page-id="store" class="lang-switch nav-link" data-en="Store" data-es="Tienda"></a>
             </nav>
         `;
 
@@ -181,8 +187,9 @@ const siteRouter = {
         const menuToggle = document.querySelector('.menu-toggle');
         const body = document.body;
         
-        const path = window.location.pathname;
-        const isSinglePage = path.endsWith('article-single.html') || path.endsWith('news-single.html') || path.endsWith('members.html') || path.endsWith('lesson-single.html') || path.endsWith('course-unit.html');
+        const currentPage = body.dataset.currentPage;
+        const singlePages = ['article-single', 'news-single', 'members', 'lesson-single', 'course-unit', 'product-single', 'checkout'];
+        const isSinglePage = singlePages.includes(currentPage);
 
         if (isSinglePage) {
             header?.classList.add('scrolled');
@@ -213,7 +220,7 @@ const siteRouter = {
                 link.addEventListener('click', (event) => {
                     event.preventDefault();
                     const pageId = link.dataset.pageId;
-                    const id = link.dataset.id;
+                    const id = link.dataset.productId || link.dataset.id;
                     this.navigateTo(pageId, id);
                     closeMenu();
                 });
@@ -242,10 +249,9 @@ const siteRouter = {
         const pageGroups = {
             'about': 'get-to-know-us', 'the-team': 'get-to-know-us', 'news': 'get-to-know-us', 'contact': 'get-to-know-us',
             'receive-tutoring': 'get-involved', 'become-a-tutor': 'get-involved', 'become-a-volunteer': 'get-involved', 'support': 'get-involved',
-            'articles': 'resources', 'lessons': 'resources', 'report-time': 'resources'
+            'articles': 'resources', 'lessons': 'resources', 'report-time': 'resources', 'lesson-single': 'resources', 'course-unit': 'resources', 'store': 'resources'
         };
         
-        const currentPage = document.body.dataset.currentPage;
         if (currentPage) {
             document.querySelectorAll(`.nav-link[data-page-id="${currentPage}"]`).forEach(link => link.classList.add('active-page-link'));
             const currentGroup = pageGroups[currentPage];
