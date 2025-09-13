@@ -43,12 +43,12 @@ const updateCartDisplay = () => {
                             <p class="cart-item-name">${product[`name_${lang}`]}</p>
                             <p class="cart-item-price">$${(product.price || 0).toFixed(2)}</p>
                             <div class="cart-item-quantity">
-                                <button data-id="${item.id}" class="quantity-change decrease">-</button>
+                                <button data-id="${item.id}" class="quantity-change decrease" aria-label="Decrease quantity">-</button>
                                 <span>${item.quantity}</span>
-                                <button data-id="${item.id}" class="quantity-change increase">+</button>
+                                <button data-id="${item.id}" class="quantity-change increase" aria-label="Increase quantity">+</button>
                             </div>
                         </div>
-                        <button data-id="${item.id}" class="remove-item-btn">&times;</button>
+                        <button data-id="${item.id}" class="remove-item-btn" aria-label="Remove item">&times;</button>
                     `;
                     cartContainer.appendChild(itemElement);
                 }
@@ -243,7 +243,9 @@ function setupCartSidebar() {
         closeCartBtn.addEventListener('click', () => cartSidebar.classList.remove('open'));
         
         document.getElementById('cart-items-container').addEventListener('click', (e) => {
-            const target = e.target;
+            const target = e.target.closest('button');
+            if (!target) return;
+
             const productId = target.dataset.id;
             if (target.classList.contains('quantity-change')) {
                 const item = cart.find(i => i.id === productId);
