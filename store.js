@@ -1,5 +1,6 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
 import { getFirestore, collection, getDocs, doc, getDoc } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
+import { getFunctions, httpsCallable } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-functions.js";
 
 const firebaseConfig = {
     apiKey: "AIzaSyD0qVihpuLI0cF0PZ32o8tFBLfTgjlqB6A",
@@ -13,6 +14,7 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
+const functions = getFunctions(app);
 
 let products = [];
 let cart = JSON.parse(localStorage.getItem('cart')) || [];
@@ -38,7 +40,7 @@ const updateCartDisplay = () => {
                     const itemElement = document.createElement('div');
                     itemElement.className = 'cart-item';
                     itemElement.innerHTML = `
-                        <img src="${product.imageUrl || 'https://i.imgur.com/ACCWptH.jpeg'}" alt="${product[`name_${lang}`]}" class="cart-item-image">
+                        <img src="${product.imageUrl || 'https://i.imgur.com/3Yj6bA1.png'}" alt="${product[`name_${lang}`]}" class="cart-item-image">
                         <div class="cart-item-details">
                             <p class="cart-item-name">${product[`name_${lang}`]}</p>
                             <p class="cart-item-price">$${(product.price || 0).toFixed(2)}</p>
@@ -106,7 +108,7 @@ const populateProductGrid = (container, productList) => {
         card.className = 'product-card';
         card.href = `product-single.html?id=${product.id}`;
 
-        const baseImage = product.imageUrl || 'https://i.imgur.com/ACCWptH.jpeg';
+        const baseImage = product.imageUrl || 'https://i.imgur.com/3Yj6bA1.png';
         const hoverImage = (product.altImages && product.altImages.length > 0) ? product.altImages[0] : baseImage;
 
         card.innerHTML = `
@@ -179,7 +181,7 @@ async function displaySingleProduct() {
             <div class="product-detail-layout">
                 <div class="product-gallery">
                     <div class="product-thumbnails">${thumbnailsHtml}</div>
-                    <div class="product-main-image"><img src="${product.imageUrl || 'https://i.imgur.com/ACCWptH.jpeg'}" alt="${product[`name_${lang}`]}"></div>
+                    <div class="product-main-image"><img src="${product.imageUrl || 'https://i.imgur.com/3Yj6bA1.png'}" alt="${product[`name_${lang}`]}"></div>
                 </div>
                 <div class="product-info">
                     <h1>${product[`name_${lang}`]}</h1>
@@ -278,7 +280,7 @@ function displayCheckoutSummary() {
             const itemElement = document.createElement('div');
             itemElement.className = 'summary-item';
             itemElement.innerHTML = `
-                <img src="${product.imageUrl || 'https://i.imgur.com/ACCWptH.jpeg'}" alt="${product[`name_${lang}`]}">
+                <img src="${product.imageUrl || 'https://i.imgur.com/3Yj6bA1.png'}" alt="${product[`name_${lang}`]}">
                 <div class="summary-item-info">
                     <p>${product[`name_${lang}`]}</p>
                     <span>Qty: ${item.quantity}</span>
@@ -292,24 +294,64 @@ function displayCheckoutSummary() {
     totalEl.textContent = `$${totalPrice.toFixed(2)}`;
 }
 
-function setupStripe() {
+async function setupCheckoutForm() {
+    const form = document.getElementById('payment-form');
+    if (!form) return;
+
+    const payBtn = document.getElementById('pay-btn');
+    const messageContainer = document.getElementById('payment-message');
+    
+    let stripe, elements;
+
     try {
-        const stripe = Stripe('pk_test_YOUR_PUBLISHABLE_KEY');
-        const elements = stripe.elements();
-        const cardElement = elements.create('card');
-        const cardElementContainer = document.getElementById('card-element');
-        if (cardElementContainer) {
-            cardElement.mount('#card-element');
-        }
-        const payBtn = document.getElementById('pay-btn');
-        if (payBtn) {
-            payBtn.addEventListener('click', async () => {
-                alert("Payment processing requires a backend server. This is a front-end demonstration.");
-            });
-        }
+        stripe = Stripe('pk_test_51S70bV4MFc0dXWfusXxk92OcptqNp5YD7HCCH5s9TOtJGTODjdW7UWEVUrGPz2XiCH2cSB5AaivtyWcboXHBiagr00NRrQuueB');
     } catch (e) {
-        console.error("Stripe.js has not loaded. This is expected if you are using an ad-blocker or are offline.");
+        console.error("Stripe.js failed to load.");
+        messageContainer.textContent = "Payment system failed to load. Please disable ad-blockers or try again later.";
+        messageContainer.classList.remove('hidden');
+        return;
     }
+
+    const createPaymentIntent = httpsCallable(functions, 'createPaymentIntent');
+    
+    let clientSecret = null;
+    try {
+        const itemsToPurchase = cart.map(item => ({ id: item.id, quantity: item.quantity }));
+        const result = await createPaymentIntent({ items: itemsToPurchase });
+        clientSecret = result.data.clientSecret;
+    } catch (error) {
+        console.error("Could not create payment intent:", error);
+        messageContainer.textContent = "Could not initialize payment. Please try again.";
+        messageContainer.classList.remove('hidden');
+        return;
+    }
+
+    elements = stripe.elements({ clientSecret });
+    const cardElement = elements.create('card');
+    cardElement.mount('#card-element');
+
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        payBtn.classList.add('processing');
+        payBtn.disabled = true;
+        messageContainer.classList.add('hidden');
+
+        const { error } = await stripe.confirmPayment({
+            elements,
+            confirmParams: {
+                return_url: `${window.location.origin}/thank-you.html`,
+                receipt_email: document.getElementById('email').value,
+            },
+        });
+
+        if (error) {
+            messageContainer.textContent = error.message;
+            messageContainer.classList.remove('hidden');
+            payBtn.classList.remove('processing');
+            payBtn.disabled = false;
+        }
+    });
 }
 
 document.addEventListener('DOMContentLoaded', async () => {
@@ -325,7 +367,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         displaySingleProduct();
     } else if (currentPage === 'checkout') {
         displayCheckoutSummary();
-        setupStripe();
+        setupCheckoutForm();
     }
 
     setupCartSidebar();
