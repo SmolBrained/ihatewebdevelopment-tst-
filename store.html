@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="https://i.imgur.com/WPy5YDY.png">
+    <title>Store | Literary Speaking</title>
+    <link rel="stylesheet" href="../styles/style.css">
+    <script src="https://js.stripe.com/v3/"></script>
+    <style>
+        .store-hero-banner{height:60vh;min-height:400px;display:flex;align-items:center;justify-content:center;color:#fff;text-align:center;position:relative;padding:0 20px;background-image:url(https://i.imgur.com/rVLGsVm.png);background-attachment:fixed;background-position:center;background-repeat:no-repeat;background-size:cover}
+        .store-hero-banner .overlay{position:absolute;top:0;left:0;width:100%;height:100%;background-color:rgba(0,0,0,.5);z-index:2}
+        .store-hero-banner .content{position:relative;z-index:3}
+        .store-hero-banner h1{font-size:3.8rem;font-weight:900;margin:0;line-height:1.2}
+        .product-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:30px;padding:80px 0}
+        .product-card{background-color:#fff;border-radius:16px;overflow:hidden;box-shadow:0 8px 24px rgba(0,0,0,.08);transition:transform .3s ease,box-shadow .3s ease;text-align:left;cursor:pointer}
+        .product-card:hover{transform:translateY(-8px);box-shadow:0 12px 32px rgba(0,0,0,.12)}
+        .product-card-image{width:100%;aspect-ratio:1/1;object-fit:cover}
+        .product-card-content{padding:20px}
+        .product-card-name{font-size:1.2rem;font-weight:700;margin:0 0 10px}
+        .product-card-price{font-size:1.1rem;font-weight:600;color:var(--color-purple-dark)}
+        .cart-sidebar{position:fixed;top:0;right:-450px;width:420px;height:100%;background-color:#fff;box-shadow:-10px 0 30px rgba(0,0,0,.1);z-index:1001;transition:right .4s ease-in-out;display:flex;flex-direction:column}
+        .cart-sidebar.open{right:0}
+        .cart-header{padding:20px;border-bottom:1px solid #eee;display:flex;justify-content:space-between;align-items:center}
+        .cart-header h3{margin:0;font-size:1.5rem}
+        .close-cart-btn{background:0 0;border:0;font-size:2rem;cursor:pointer;line-height:1}
+        .cart-items{flex-grow:1;overflow-y:auto;padding:20px}
+        .cart-item{display:flex;margin-bottom:20px;gap:15px}
+        .cart-item-image{width:80px;height:80px;object-fit:cover;border-radius:8px}
+        .cart-item-details{flex-grow:1}
+        .cart-item-name{font-weight:700;margin:0 0 5px}
+        .cart-item-price{color:var(--color-text-light);margin-bottom:10px}
+        .cart-item-quantity{display:flex;align-items:center}
+        .cart-item-quantity button{width:25px;height:25px;border:1px solid #ccc;background-color:#f5f5f5;cursor:pointer}
+        .cart-item-quantity input{width:40px;text-align:center;border:1px solid #ccc;border-left:0;border-right:0;height:25px}
+        .remove-item-btn{background:0 0;border:0;color:#b22222;cursor:pointer;margin-left:auto}
+        .cart-footer{padding:20px;border-top:1px solid #eee}
+        .cart-total{display:flex;justify-content:space-between;font-size:1.2rem;font-weight:700;margin-bottom:20px}
+        .checkout-btn{display:block;width:100%;padding:15px;background-color:var(--color-purple-dark);color:#fff;text-align:center;text-decoration:none;font-size:1.1rem;font-weight:700;border-radius:8px;border:0;cursor:pointer}
+        .cart-icon{position:fixed;bottom:30px;right:30px;width:60px;height:60px;background-color:var(--color-purple-dark);color:white;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:1000;box-shadow:0 5px 15px rgba(0,0,0,.2)}
+        .cart-item-count{position:absolute;top:-5px;right:-5px;background-color:var(--color-red-dark);color:white;border-radius:50%;width:22px;height:22px;font-size:.8rem;display:flex;align-items:center;justify-content:center}
+        @media (max-width:768px){.store-hero-banner h1{font-size:2.2rem}.cart-sidebar{width:100%;right:-100%}}
+    </style>
+</head>
+<body data-current-page="store">
+    <header class="site-header" id="header"></header>
+
+    <main>
+        <section class="store-hero-banner">
+            <div class="overlay"></div>
+            <div class="content scroll-animated">
+                <h1 class="lang-switch" data-en="Online Store" data-es="Tienda en Línea"></h1>
+            </div>
+        </section>
+        <div class="container">
+            <div class="product-grid" id="product-grid-container"></div>
+        </div>
+    </main>
+    
+    <div class="cart-icon" id="cart-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 16 16"><path d="M0 1.5A.5.5 0 0 1 .5 1H2a.5.5 0 0 1 .485.379L2.89 3H14.5a.5.5 0 0 1 .491.592l-1.5 8A.5.5 0 0 1 13 12H4a.5.5 0 0 1-.491-.408L2.01 3.607 1.61 2H.5a.5.5 0 0 1-.5-.5zM3.102 4l1.313 7h8.17l1.313-7H3.102zM5 12a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm7 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm-7 1a1 1 0 1 1 0 2 1 1 0 0 1 0-2zm7 0a1 1 0 1 1 0 2 1 1 0 0 1 0-2z"/></svg>
+        <span class="cart-item-count" id="cart-item-count">0</span>
+    </div>
+
+    <aside class="cart-sidebar" id="cart-sidebar">
+        <div class="cart-header">
+            <h3 class="lang-switch" data-en="Shopping Cart" data-es="Carrito de Compras"></h3>
+            <button class="close-cart-btn" id="close-cart-btn">&times;</button>
+        </div>
+        <div class="cart-items" id="cart-items-container"></div>
+        <div class="cart-footer">
+            <div class="cart-total">
+                <span class="lang-switch" data-en="Total" data-es="Total"></span>
+                <span id="cart-total-price">$0.00</span>
+            </div>
+            <button class="checkout-btn nav-link" data-page-id="checkout"><span class="lang-switch" data-en="Go to Checkout" data-es="Ir a Pagar"></span></button>
+        </div>
+    </aside>
+
+    <footer class="site-footer"></footer>
+
+    <script src="../router.js"></script>
+    <script type="module" src="../store.js"></script>
+</body>
+</html>
