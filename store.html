@@ -8,10 +8,10 @@
     <link rel="stylesheet" href="style.css">
     <script src="https://js.stripe.com/v3/"></script>
     <style>
-        .store-hero-banner{height:60vh;min-height:400px;display:flex;align-items:center;justify-content:center;color:#fff;text-align:center;position:relative;padding:0 20px;background-image:url(https://i.imgur.com/rVLGsVm.png);background-attachment:fixed;background-position:center;background-repeat:no-repeat;background-size:cover}
-        .store-hero-banner .overlay{position:absolute;top:0;left:0;width:100%;height:100%;background-color:rgba(0,0,0,.5);z-index:2}
-        .store-hero-banner .content{position:relative;z-index:3}
-        .store-hero-banner h1{font-size:3.8rem;font-weight:900;margin:0;line-height:1.2}
+        .hero-banner{height:60vh;min-height:400px;display:flex;align-items:center;justify-content:center;color:#fff;text-align:center;position:relative;padding:0 20px;background-image:url(https://i.imgur.com/rVLGsVm.png);background-attachment:fixed;background-position:center;background-repeat:no-repeat;background-size:cover}
+        .hero-banner .overlay{position:absolute;top:0;left:0;width:100%;height:100%;background-color:rgba(0,0,0,.5);z-index:2}
+        .hero-banner .content{position:relative;z-index:3}
+        .hero-banner h1{font-size:3.8rem;font-weight:900;margin:0;line-height:1.2}
         .product-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:30px;padding:80px 0}
         .product-card{text-align:left;text-decoration:none;color:inherit;display:block}
         .product-card-image-wrapper{overflow:hidden;background-color:#f5f5f5;position:relative;aspect-ratio:1/1}
@@ -51,13 +51,13 @@
         .cart-icon{position:fixed;bottom:30px;right:30px;width:60px;height:60px;background-color:var(--color-purple-dark);color:white;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:1000;box-shadow:0 5px 15px rgba(0,0,0,.2)}
         .cart-item-count{position:absolute;top:-5px;right:-5px;background-color:var(--color-red-dark);color:white;border-radius:50%;width:22px;height:22px;font-size:.8rem;display:flex;align-items:center;justify-content:center}
         @media (max-width:900px){.mission-section{grid-template-columns:1fr}}
-        @media (max-width:768px){.store-hero-banner h1{font-size:2.2rem}.cart-sidebar{width:100%;right:-100%}}
+        @media (max-width:768px){.hero-banner h1{font-size:2.2rem}.cart-sidebar{width:100%;right:-100%}}
     </style>
 </head>
 <body data-current-page="store">
     <header class="site-header" id="header"></header>
     <main>
-        <section class="store-hero-banner">
+        <section class="hero-banner">
             <div class="overlay"></div>
             <div class="content scroll-animated">
                 <h1 class="lang-switch" data-en="Store" data-es="Tienda"></h1>
