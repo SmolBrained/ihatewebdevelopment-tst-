@@ -12,7 +12,6 @@
         .store-hero-banner .overlay{position:absolute;top:0;left:0;width:100%;height:100%;background-color:rgba(0,0,0,.5);z-index:2}
         .store-hero-banner .content{position:relative;z-index:3}
         .store-hero-banner h1{font-size:3.8rem;font-weight:900;margin:0;line-height:1.2}
-        .page-title{font-size:2.8rem;font-weight:900;text-align:center;margin:60px 0 0}
         .product-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:30px;padding:40px 0 80px}
         .product-card{text-align:left;text-decoration:none;color:inherit;display:block}
         .product-card-image-wrapper{overflow:hidden;background-color:#f5f5f5;position:relative;aspect-ratio:1/1}
@@ -24,6 +23,11 @@
         .product-card-name{font-size:1.1rem;font-weight:700;margin:0 0 8px}
         .product-card:hover .product-card-name{text-decoration:underline}
         .product-card-price{font-size:1rem;font-weight:500;color:var(--color-text-light)}
+        .mission-section{display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:center;padding:80px 0;background-color:#f7f7ff}
+        .mission-section img{width:100%;border-radius:12px}
+        .mission-text h2{font-size:2.2rem;font-weight:900;margin-bottom:20px}
+        .mission-text p,.mission-text ul{line-height:1.8;color:var(--color-text-light)}
+        .mission-text ul{padding-left:20px}
         .cart-sidebar{position:fixed;top:0;right:-450px;width:420px;height:100%;background-color:#fff;box-shadow:-10px 0 30px rgba(0,0,0,.1);z-index:1001;transition:right .4s ease-in-out;display:flex;flex-direction:column}
         .cart-sidebar.open{right:0}
         .cart-header{padding:20px;border-bottom:1px solid #eee;display:flex;justify-content:space-between;align-items:center}
@@ -46,6 +50,7 @@
         .checkout-btn{display:block;width:100%;padding:15px;background-color:var(--color-purple-dark);color:#fff;text-align:center;text-decoration:none;font-size:1.1rem;font-weight:700;border-radius:8px;border:0;cursor:pointer}
         .cart-icon{position:fixed;bottom:30px;right:30px;width:60px;height:60px;background-color:var(--color-purple-dark);color:white;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:1000;box-shadow:0 5px 15px rgba(0,0,0,.2)}
         .cart-item-count{position:absolute;top:-5px;right:-5px;background-color:var(--color-red-dark);color:white;border-radius:50%;width:22px;height:22px;font-size:.8rem;display:flex;align-items:center;justify-content:center}
+        @media (max-width:900px){.mission-section{grid-template-columns:1fr}}
         @media (max-width:768px){.store-hero-banner h1{font-size:2.2rem}.cart-sidebar{width:100%;right:-100%}}
     </style>
 </head>
@@ -55,15 +60,30 @@
         <section class="store-hero-banner">
             <div class="overlay"></div>
             <div class="content scroll-animated">
-                <h1 class="lang-switch" data-en="Online Store" data-es="Tienda en Línea"></h1>
+                <h1 class="lang-switch" data-en="Store" data-es="Tienda"></h1>
             </div>
         </section>
         <div class="container">
-            <h1 class="page-title lang-switch" data-en="Store" data-es="Tienda"></h1>
             <div class="product-grid" id="product-grid-container">
                 <p style="text-align: center;">Loading products...</p>
             </div>
         </div>
+        <section class="mission-section">
+            <div class="container" style="display: contents;">
+                <img src="https://i.imgur.com/3Yj6bA1.png" alt="Volunteers helping the community">
+                <div class="mission-text">
+                    <h2 class="lang-switch" data-en="What You Help Us Do" data-es="En qué nos ayudas"></h2>
+                    <p class="lang-switch" data-en="Difference in language shouldn't be a barrier to success. This is why Literary Speaking aims to close this gap. A student-led initiative, Literary Speaking offers free tutoring to middle and high school students taught by student volunteers. We've helped with middle school and high school level English, Math, Science, and preparation for state and college entrance exams. So far, we've helped over 80 students with the dedicated work of our tutors." data-es="La diferencia en el idioma no debería ser una barrera para el éxito. Es por eso que Literary Speaking tiene como objetivo cerrar esta brecha. Una iniciativa dirigida por estudiantes, Literary Speaking ofrece tutoría gratuita a estudiantes de secundaria y preparatoria impartida por estudiantes voluntarios. Hemos ayudado con inglés, matemáticas, ciencias de nivel de secundaria y preparatoria, y preparación para exámenes estatales y de ingreso a la universidad. Hasta ahora, hemos ayudado a más de 80 estudiantes con el trabajo dedicado de nuestros tutores."></p>
+                    <br>
+                    <p class="lang-switch" data-en="We need help with purchasing:" data-es="Necesitamos ayuda para comprar:"></p>
+                    <ul>
+                        <li class="lang-switch" data-en="school supplies (many students are low-income and cannot afford the supplies they need to succeed)." data-es="útiles escolares (muchos estudiantes son de bajos ingresos y no pueden pagar los útiles que necesitan para tener éxito)."></li>
+                        <li class="lang-switch" data-en="snacks and food (many students are hungry after school, and food is part of the annual award ceremony)." data-es="bocadillos y comida (muchos estudiantes tienen hambre después de la escuela y la comida es parte de la ceremonia anual de premiación)."></li>
+                        <li class="lang-switch" data-en="award certificates, medals, and plaques." data-es="certificados de premios, medallas y placas."></li>
+                    </ul>
+                </div>
+            </div>
+        </section>
     </main>
     <div class="cart-icon" id="cart-icon">
         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 16 16"><path d="M0 1.5A.5.5 0 0 1 .5 1H2a.5.5 0 0 1 .485.379L2.89 3H14.5a.5.5 0 0 1 .491.592l-1.5 8A.5.5 0 0 1 13 12H4a.5.5 0 0 1-.491-.408L2.01 3.607 1.61 2H.5a.5.5 0 0 1-.5-.5zM3.102 4l1.313 7h8.17l1.313-7H3.102zM5 12a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm7 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm-7 1a1 1 0 1 1 0 2 1 1 0 0 1 0-2zm7 0a1 1 0 1 1 0 2 1 1 0 0 1 0-2z"/></svg>
