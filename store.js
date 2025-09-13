@@ -38,7 +38,7 @@ const updateCartDisplay = () => {
                     const itemElement = document.createElement('div');
                     itemElement.className = 'cart-item';
                     itemElement.innerHTML = `
-                        <img src="${product.imageUrl || 'https://i.imgur.com/3Yj6bA1.png'}" alt="${product[`name_${lang}`]}" class="cart-item-image">
+                        <img src="${product.imageUrl || 'https://i.imgur.com/ACCWptH.jpeg'}" alt="${product[`name_${lang}`]}" class="cart-item-image">
                         <div class="cart-item-details">
                             <p class="cart-item-name">${product[`name_${lang}`]}</p>
                             <p class="cart-item-price">$${(product.price || 0).toFixed(2)}</p>
@@ -106,7 +106,7 @@ const populateProductGrid = (container, productList) => {
         card.className = 'product-card';
         card.href = `product-single.html?id=${product.id}`;
 
-        const baseImage = product.imageUrl || 'https://i.imgur.com/3Yj6bA1.png';
+        const baseImage = product.imageUrl || 'https://i.imgur.com/ACCWptH.jpeg';
         const hoverImage = (product.altImages && product.altImages.length > 0) ? product.altImages[0] : baseImage;
 
         card.innerHTML = `
@@ -179,7 +179,7 @@ async function displaySingleProduct() {
             <div class="product-detail-layout">
                 <div class="product-gallery">
                     <div class="product-thumbnails">${thumbnailsHtml}</div>
-                    <div class="product-main-image"><img src="${product.imageUrl || 'https://i.imgur.com/3Yj6bA1.png'}" alt="${product[`name_${lang}`]}"></div>
+                    <div class="product-main-image"><img src="${product.imageUrl || 'https://i.imgur.com/ACCWptH.jpeg'}" alt="${product[`name_${lang}`]}"></div>
                 </div>
                 <div class="product-info">
                     <h1>${product[`name_${lang}`]}</h1>
@@ -278,7 +278,7 @@ function displayCheckoutSummary() {
             const itemElement = document.createElement('div');
             itemElement.className = 'summary-item';
             itemElement.innerHTML = `
-                <img src="${product.imageUrl || 'https://i.imgur.com/3Yj6bA1.png'}" alt="${product[`name_${lang}`]}">
+                <img src="${product.imageUrl || 'https://i.imgur.com/ACCWptH.jpeg'}" alt="${product[`name_${lang}`]}">
                 <div class="summary-item-info">
                     <p>${product[`name_${lang}`]}</p>
                     <span>Qty: ${item.quantity}</span>
