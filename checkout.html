@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" type="image/png" href="https://i.imgur.com/WPy5YDY.png">
     <title>Checkout | Literary Speaking</title>
-    <link rel="stylesheet" href="../styles/style.css">
+    <link rel="stylesheet" href="/styles/style.css">
     <style>
         .checkout-layout{display:grid;grid-template-columns:1.5fr 1fr;gap:60px;padding:60px 0;align-items:flex-start}
         .checkout-form h2{font-size:1.8rem;margin-bottom:25px;border-bottom:1px solid #eee;padding-bottom:15px}
@@ -24,7 +24,7 @@
 <body data-current-page="checkout">
     <header class="site-header" id="header"></header>
     <main>
-        <div class="container">
+        <div class="container" style="padding-top: 60px;">
             <div class="checkout-layout">
                 <div class="checkout-form">
                     <section id="contact-info">
@@ -57,7 +57,7 @@
     </main>
     <footer class="site-footer"></footer>
     <script src="https://js.stripe.com/v3/"></script>
-    <script src="../router.js"></script>
-    <script type="module" src="../store.js"></script>
+    <script src="/router.js"></script>
+    <script type="module" src="/store.js"></script>
 </body>
 </html>
