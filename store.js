@@ -38,10 +38,10 @@ const updateCartDisplay = () => {
                     const itemElement = document.createElement('div');
                     itemElement.className = 'cart-item';
                     itemElement.innerHTML = `
-                        <img src="${product.imageUrl}" alt="${product[`name_${lang}`]}" class="cart-item-image">
+                        <img src="${product.imageUrl || 'https://i.imgur.com/3Yj6bA1.png'}" alt="${product[`name_${lang}`]}" class="cart-item-image">
                         <div class="cart-item-details">
                             <p class="cart-item-name">${product[`name_${lang}`]}</p>
-                            <p class="cart-item-price">$${product.price.toFixed(2)}</p>
+                            <p class="cart-item-price">$${(product.price || 0).toFixed(2)}</p>
                             <div class="cart-item-quantity">
                                 <button data-id="${item.id}" class="quantity-change decrease">-</button>
                                 <input type="text" value="${item.quantity}" readonly>
@@ -96,37 +96,46 @@ const removeFromCart = (productId) => {
     updateCartDisplay();
 };
 
-const populateProductGrid = () => {
-    const gridContainer = document.getElementById('product-grid-container');
-    if (!gridContainer) {
-        console.error("Fatal Error: Product grid container not found in HTML.");
-        return;
-    }
+const populateProductGrid = (container, productList) => {
+    if (!container) return;
     const lang = document.documentElement.lang || 'en';
-    gridContainer.innerHTML = '';
+    container.innerHTML = '';
     
-    const publishedProducts = products.filter(p => p.isPublished === true);
-
-    if (publishedProducts.length === 0) {
-        gridContainer.innerHTML = `<p>No products are currently available. Please check back later.</p>`;
-        return;
-    }
-
-    publishedProducts.forEach(product => {
-        const card = document.createElement('div');
+    productList.forEach(product => {
+        const card = document.createElement('a');
         card.className = 'product-card';
-        card.dataset.pageId = 'product-single';
-        card.dataset.productId = product.id;
+        card.href = `product-single.html?id=${product.id}`;
         card.innerHTML = `
-            <img src="${product.imageUrl || 'https://i.imgur.com/3Yj6bA1.png'}" alt="${product[`name_${lang}`]}" class="product-card-image">
+            <div class="product-card-image-wrapper">
+                <img src="${product.imageUrl || 'https://i.imgur.com/3Yj6bA1.png'}" alt="${product[`name_${lang}`]}" class="product-card-image">
+            </div>
             <div class="product-card-content">
                 <h3 class="product-card-name">${product[`name_${lang}`]}</h3>
                 <p class="product-card-price">$${(product.price || 0).toFixed(2)}</p>
             </div>
         `;
-        card.addEventListener('click', () => siteRouter.navigateTo('product-single', product.id));
-        gridContainer.appendChild(card);
+        card.addEventListener('click', (e) => {
+            e.preventDefault();
+            siteRouter.navigateTo('product-single', product.id);
+        });
+        container.appendChild(card);
     });
+};
+
+const populateYouMayAlsoLike = (currentProductId) => {
+    const container = document.getElementById('you-may-also-like-grid');
+    const section = document.getElementById('you-may-also-like-section');
+    if (!container || !section) return;
+
+    const otherProducts = products.filter(p => p.isPublished && p.id !== currentProductId);
+    if (otherProducts.length > 0) {
+        const shuffled = otherProducts.sort(() => 0.5 - Math.random());
+        const selected = shuffled.slice(0, 5);
+        populateProductGrid(container, selected);
+        section.classList.remove('hidden');
+    } else {
+        section.classList.add('hidden');
+    }
 };
 
 async function fetchProducts() {
@@ -134,13 +143,8 @@ async function fetchProducts() {
     try {
         const querySnapshot = await getDocs(collection(db, "products"));
         products = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-        console.log("Products fetched successfully from Firestore:", products);
     } catch (error) {
         console.error("Error fetching products from Firestore:", error);
-        const gridContainer = document.getElementById('product-grid-container');
-        if (gridContainer) {
-            gridContainer.innerHTML = `<p style="color: red; text-align: center;">Error: Could not load products. Please ensure your Firestore database is set up correctly and check the browser console for more details.</p>`;
-        }
     }
 }
 
@@ -150,10 +154,7 @@ async function displaySingleProduct() {
     
     const urlParams = new URLSearchParams(window.location.search);
     const productId = urlParams.get('id');
-    if (!productId) {
-        siteRouter.navigateTo('store');
-        return;
-    }
+    if (!productId) { siteRouter.navigateTo('store'); return; }
 
     const docRef = doc(db, "products", productId);
     const docSnap = await getDoc(docRef);
@@ -162,29 +163,66 @@ async function displaySingleProduct() {
         const product = { id: docSnap.id, ...docSnap.data() };
         const lang = document.documentElement.lang || 'en';
         document.title = `${product[`name_${lang}`]} | Literary Speaking`;
+
+        const allImages = [product.imageUrl, ...(product.altImages || [])].filter(Boolean);
+        const thumbnailsHtml = allImages.map((imgUrl, index) => 
+            `<img src="${imgUrl}" alt="Thumbnail ${index + 1}" class="thumbnail-img ${index === 0 ? 'active' : ''}" data-src="${imgUrl}">`
+        ).join('');
+
         container.innerHTML = `
             <a class="back-link nav-link" data-page-id="store">← <span class="lang-switch" data-en="Back to store" data-es="Volver a la tienda"></span></a>
             <div class="product-detail-layout">
-                <div class="product-image-gallery">
-                    <img src="${product.imageUrl || 'https://i.imgur.com/3Yj6bA1.png'}" alt="${product[`name_${lang}`]}">
+                <div class="product-gallery">
+                    <div class="product-thumbnails">${thumbnailsHtml}</div>
+                    <div class="product-main-image"><img src="${product.imageUrl || 'https://i.imgur.com/3Yj6bA1.png'}" alt="${product[`name_${lang}`]}"></div>
                 </div>
                 <div class="product-info">
                     <h1>${product[`name_${lang}`]}</h1>
                     <p class="price">$${(product.price || 0).toFixed(2)}</p>
-                    <p class="description">${product[`description_${lang}`]}</p>
                     <button class="add-to-cart-btn" data-id="${product.id}">${lang === 'es' ? 'Añadir al Carrito' : 'Add to Cart'}</button>
+                    <div class="details-accordion">
+                        <div class="accordion-item">
+                            <div class="accordion-header lang-switch" data-en="Product Details" data-es="Detalles del Producto"></div>
+                            <div class="accordion-content"><div class="accordion-content-inner">${product[`details_${lang}`] || ''}</div></div>
+                        </div>
+                        <div class="accordion-item">
+                            <div class="accordion-header lang-switch" data-en="Shipping & Returns" data-es="Envío y Devoluciones"></div>
+                            <div class="accordion-content"><div class="accordion-content-inner">${product[`shipping_${lang}`] || ''}</div></div>
+                        </div>
+                    </div>
                 </div>
-            </div>
-        `;
+            </div>`;
+
         siteRouter.applyLanguage(lang);
+        populateYouMayAlsoLike(productId);
+        
         container.querySelector('.add-to-cart-btn').addEventListener('click', (e) => {
             addToCart(e.target.dataset.id);
             document.getElementById('cart-sidebar')?.classList.add('open');
         });
-        container.querySelector('.back-link').addEventListener('click', (e) => {
-            e.preventDefault();
-            siteRouter.navigateTo('store');
+        
+        container.querySelectorAll('.accordion-header').forEach(header => {
+            header.addEventListener('click', () => {
+                const item = header.parentElement;
+                item.classList.toggle('open');
+                const content = header.nextElementSibling;
+                if (item.classList.contains('open')) {
+                    content.style.maxHeight = content.scrollHeight + 'px';
+                } else {
+                    content.style.maxHeight = '0';
+                }
+            });
         });
+
+        const mainImage = container.querySelector('.product-main-image img');
+        container.querySelectorAll('.thumbnail-img').forEach(thumb => {
+            thumb.addEventListener('click', () => {
+                mainImage.src = thumb.dataset.src;
+                container.querySelectorAll('.thumbnail-img').forEach(t => t.classList.remove('active'));
+                thumb.classList.add('active');
+            });
+        });
+
     } else {
         siteRouter.navigateTo('store');
     }
@@ -218,6 +256,7 @@ function setupCartSidebar() {
 
 function displayCheckoutSummary() {
     const container = document.getElementById('summary-items-container');
+    const subtotalEl = document.getElementById('summary-subtotal');
     const totalEl = document.getElementById('summary-total-price');
     if (!container || !totalEl) return;
     
@@ -232,12 +271,17 @@ function displayCheckoutSummary() {
             const itemElement = document.createElement('div');
             itemElement.className = 'summary-item';
             itemElement.innerHTML = `
-                <span>${product[`name_${lang}`]} x ${item.quantity}</span>
-                <span>$${(product.price * item.quantity).toFixed(2)}</span>
+                <img src="${product.imageUrl || 'https://i.imgur.com/3Yj6bA1.png'}" alt="${product[`name_${lang}`]}">
+                <div class="summary-item-info">
+                    <p>${product[`name_${lang}`]}</p>
+                    <span>Qty: ${item.quantity}</span>
+                </div>
+                <span class="summary-item-price">$${(product.price * item.quantity).toFixed(2)}</span>
             `;
             container.appendChild(itemElement);
         }
     });
+    if(subtotalEl) subtotalEl.textContent = `$${totalPrice.toFixed(2)}`;
     totalEl.textContent = `$${totalPrice.toFixed(2)}`;
 }
 
@@ -250,11 +294,10 @@ function setupStripe() {
         if (cardElementContainer) {
             cardElement.mount('#card-element');
         }
-
         const payBtn = document.getElementById('pay-btn');
         if (payBtn) {
             payBtn.addEventListener('click', async () => {
-                alert("Payment processing requires a backend server (e.g., Firebase Cloud Functions) to securely handle transactions. This is a front-end demonstration.");
+                alert("Payment processing requires a backend server. This is a front-end demonstration.");
             });
         }
     } catch (e) {
@@ -264,29 +307,31 @@ function setupStripe() {
 
 document.addEventListener('DOMContentLoaded', async () => {
     const currentPage = document.body.dataset.currentPage;
-    const gridContainer = document.getElementById('product-grid-container');
-
-    if (currentPage === 'store' && gridContainer) {
-        gridContainer.innerHTML = `<p style="text-align: center;">Loading products...</p>`;
-    }
-
+    
     await fetchProducts();
 
     if (currentPage === 'store') {
-        populateProductGrid();
-        setupCartSidebar();
-        updateCartDisplay();
+        const gridContainer = document.getElementById('product-grid-container');
+        const publishedProducts = products.filter(p => p.isPublished === true);
+        populateProductGrid(gridContainer, publishedProducts);
+        populateYouMayAlsoLike();
     } else if (currentPage === 'product-single') {
-        setupCartSidebar();
-        updateCartDisplay();
         displaySingleProduct();
     } else if (currentPage === 'checkout') {
         displayCheckoutSummary();
         setupStripe();
     }
 
+    setupCartSidebar();
+    updateCartDisplay();
+
     document.addEventListener('languageChanged', () => {
-        if (currentPage === 'store') populateProductGrid();
+        if (currentPage === 'store') {
+            const gridContainer = document.getElementById('product-grid-container');
+            const publishedProducts = products.filter(p => p.isPublished === true);
+            populateProductGrid(gridContainer, publishedProducts);
+            populateYouMayAlsoLike();
+        }
         if (currentPage === 'product-single') displaySingleProduct();
         if (currentPage === 'checkout') displayCheckoutSummary();
         updateCartDisplay();
