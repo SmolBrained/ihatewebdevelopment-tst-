@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="https://i.imgur.com/WPy5YDY.png">
+    <title>Checkout | Literary Speaking</title>
+    <link rel="stylesheet" href="../styles/style.css">
+    <style>
+        .checkout-layout{display:grid;grid-template-columns:1.5fr 1fr;gap:60px;padding:60px 0;align-items:flex-start}
+        .checkout-form h2{font-size:1.8rem;margin-bottom:25px;border-bottom:1px solid #eee;padding-bottom:15px}
+        .form-group{margin-bottom:20px}
+        .form-group label{display:block;margin-bottom:8px;font-weight:600;font-size:.9rem}
+        .form-group input{width:100%;padding:12px;border:1px solid #ccc;border-radius:5px;font-size:1rem}
+        .order-summary{background-color:#f7f7ff;padding:30px;border-radius:16px;position:sticky;top:100px}
+        .order-summary h2{font-size:1.8rem;margin-bottom:25px;border-bottom:1px solid #ddd;padding-bottom:15px}
+        .summary-item{display:flex;justify-content:space-between;margin-bottom:15px}
+        .summary-total{display:flex;justify-content:space-between;font-size:1.3rem;font-weight:700;margin-top:20px;padding-top:20px;border-top:1px solid #ddd}
+        #card-element{padding:12px;border:1px solid #ccc;border-radius:5px;background-color:white}
+        .pay-btn{width:100%;padding:18px;background-color:var(--color-purple-dark);color:#fff;font-size:1.2rem;font-weight:700;border-radius:8px;border:0;cursor:pointer;margin-top:20px}
+        @media(max-width:900px){.checkout-layout{grid-template-columns:1fr}.order-summary{position:static;margin-top:40px}}
+    </style>
+</head>
+<body data-current-page="checkout">
+    <header class="site-header" id="header"></header>
+    <main>
+        <div class="container">
+            <div class="checkout-layout">
+                <div class="checkout-form">
+                    <section id="contact-info">
+                        <h2>Contact Information</h2>
+                        <div class="form-group"><label for="email">Email</label><input type="email" id="email" name="email"></div>
+                    </section>
+                    <section id="delivery-info">
+                        <h2>Delivery</h2>
+                        <div class="form-group"><label for="name">Full Name</label><input type="text" id="name" name="name"></div>
+                        <div class="form-group"><label for="address">Address</label><input type="text" id="address" name="address"></div>
+                        <div class="form-group"><label for="city">City</label><input type="text" id="city" name="city"></div>
+                    </section>
+                    <section id="payment-info">
+                        <h2>Payment</h2>
+                        <p>All transactions are secure and encrypted.</p>
+                        <div id="card-element"></div>
+                        <button class="pay-btn" id="pay-btn">Pay Now</button>
+                    </section>
+                </div>
+                <aside class="order-summary">
+                    <h2>Order Summary</h2>
+                    <div id="summary-items-container"></div>
+                    <div class="summary-total">
+                        <span>Total</span>
+                        <span id="summary-total-price">$0.00</span>
+                    </div>
+                </aside>
+            </div>
+        </div>
+    </main>
+    <footer class="site-footer"></footer>
+    <script src="https://js.stripe.com/v3/"></script>
+    <script src="../router.js"></script>
+    <script type="module" src="../store.js"></script>
+</body>
+</html>
