@@ -98,20 +98,30 @@ const removeFromCart = (productId) => {
 
 const populateProductGrid = () => {
     const gridContainer = document.getElementById('product-grid-container');
-    if (!gridContainer) return;
+    if (!gridContainer) {
+        console.error("Fatal Error: Product grid container not found in HTML.");
+        return;
+    }
     const lang = document.documentElement.lang || 'en';
-
     gridContainer.innerHTML = '';
-    products.forEach(product => {
+    
+    const publishedProducts = products.filter(p => p.isPublished === true);
+
+    if (publishedProducts.length === 0) {
+        gridContainer.innerHTML = `<p>No products are currently available. Please check back later.</p>`;
+        return;
+    }
+
+    publishedProducts.forEach(product => {
         const card = document.createElement('div');
         card.className = 'product-card';
         card.dataset.pageId = 'product-single';
         card.dataset.productId = product.id;
         card.innerHTML = `
-            <img src="${product.imageUrl}" alt="${product[`name_${lang}`]}" class="product-card-image">
+            <img src="${product.imageUrl || 'https://i.imgur.com/3Yj6bA1.png'}" alt="${product[`name_${lang}`]}" class="product-card-image">
             <div class="product-card-content">
                 <h3 class="product-card-name">${product[`name_${lang}`]}</h3>
-                <p class="product-card-price">$${product.price.toFixed(2)}</p>
+                <p class="product-card-price">$${(product.price || 0).toFixed(2)}</p>
             </div>
         `;
         card.addEventListener('click', () => siteRouter.navigateTo('product-single', product.id));
@@ -121,8 +131,17 @@ const populateProductGrid = () => {
 
 async function fetchProducts() {
     if (products.length > 0) return;
-    const querySnapshot = await getDocs(collection(db, "products"));
-    products = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    try {
+        const querySnapshot = await getDocs(collection(db, "products"));
+        products = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        console.log("Products fetched successfully from Firestore:", products);
+    } catch (error) {
+        console.error("Error fetching products from Firestore:", error);
+        const gridContainer = document.getElementById('product-grid-container');
+        if (gridContainer) {
+            gridContainer.innerHTML = `<p style="color: red; text-align: center;">Error: Could not load products. Please ensure your Firestore database is set up correctly and check the browser console for more details.</p>`;
+        }
+    }
 }
 
 async function displaySingleProduct() {
@@ -147,11 +166,11 @@ async function displaySingleProduct() {
             <a class="back-link nav-link" data-page-id="store">← <span class="lang-switch" data-en="Back to store" data-es="Volver a la tienda"></span></a>
             <div class="product-detail-layout">
                 <div class="product-image-gallery">
-                    <img src="${product.imageUrl}" alt="${product[`name_${lang}`]}">
+                    <img src="${product.imageUrl || 'https://i.imgur.com/3Yj6bA1.png'}" alt="${product[`name_${lang}`]}">
                 </div>
                 <div class="product-info">
                     <h1>${product[`name_${lang}`]}</h1>
-                    <p class="price">$${product.price.toFixed(2)}</p>
+                    <p class="price">$${(product.price || 0).toFixed(2)}</p>
                     <p class="description">${product[`description_${lang}`]}</p>
                     <button class="add-to-cart-btn" data-id="${product.id}">${lang === 'es' ? 'Añadir al Carrito' : 'Add to Cart'}</button>
                 </div>
@@ -223,26 +242,35 @@ function displayCheckoutSummary() {
 }
 
 function setupStripe() {
-    const stripe = Stripe('pk_test_YOUR_PUBLISHABLE_KEY');
-    const elements = stripe.elements();
-    const cardElement = elements.create('card');
-    const cardElementContainer = document.getElementById('card-element');
-    if (cardElementContainer) {
-        cardElement.mount('#card-element');
-    }
+    try {
+        const stripe = Stripe('pk_test_YOUR_PUBLISHABLE_KEY');
+        const elements = stripe.elements();
+        const cardElement = elements.create('card');
+        const cardElementContainer = document.getElementById('card-element');
+        if (cardElementContainer) {
+            cardElement.mount('#card-element');
+        }
 
-    const payBtn = document.getElementById('pay-btn');
-    if (payBtn) {
-        payBtn.addEventListener('click', async () => {
-            alert("Payment processing requires a backend server (e.g., Firebase Cloud Functions) to securely handle transactions. This is a front-end demonstration.");
-        });
+        const payBtn = document.getElementById('pay-btn');
+        if (payBtn) {
+            payBtn.addEventListener('click', async () => {
+                alert("Payment processing requires a backend server (e.g., Firebase Cloud Functions) to securely handle transactions. This is a front-end demonstration.");
+            });
+        }
+    } catch (e) {
+        console.error("Stripe.js has not loaded. This is expected if you are using an ad-blocker or are offline.");
     }
 }
 
-
 document.addEventListener('DOMContentLoaded', async () => {
-    await fetchProducts();
     const currentPage = document.body.dataset.currentPage;
+    const gridContainer = document.getElementById('product-grid-container');
+
+    if (currentPage === 'store' && gridContainer) {
+        gridContainer.innerHTML = `<p style="text-align: center;">Loading products...</p>`;
+    }
+
+    await fetchProducts();
 
     if (currentPage === 'store') {
         populateProductGrid();
@@ -260,6 +288,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     document.addEventListener('languageChanged', () => {
         if (currentPage === 'store') populateProductGrid();
         if (currentPage === 'product-single') displaySingleProduct();
+        if (currentPage === 'checkout') displayCheckoutSummary();
         updateCartDisplay();
     });
 });
