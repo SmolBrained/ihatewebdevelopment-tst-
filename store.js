@@ -44,7 +44,7 @@ const updateCartDisplay = () => {
                             <p class="cart-item-price">$${(product.price || 0).toFixed(2)}</p>
                             <div class="cart-item-quantity">
                                 <button data-id="${item.id}" class="quantity-change decrease">-</button>
-                                <input type="text" value="${item.quantity}" readonly>
+                                <span>${item.quantity}</span>
                                 <button data-id="${item.id}" class="quantity-change increase">+</button>
                             </div>
                         </div>
@@ -319,7 +319,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         const gridContainer = document.getElementById('product-grid-container');
         const publishedProducts = products.filter(p => p.isPublished === true);
         populateProductGrid(gridContainer, publishedProducts);
-        populateYouMayAlsoLike();
     } else if (currentPage === 'product-single') {
         displaySingleProduct();
     } else if (currentPage === 'checkout') {
@@ -335,7 +334,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             const gridContainer = document.getElementById('product-grid-container');
             const publishedProducts = products.filter(p => p.isPublished === true);
             populateProductGrid(gridContainer, publishedProducts);
-            populateYouMayAlsoLike();
         }
         if (currentPage === 'product-single') displaySingleProduct();
         if (currentPage === 'checkout') displayCheckoutSummary();
