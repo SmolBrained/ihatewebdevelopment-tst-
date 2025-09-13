@@ -42,7 +42,12 @@
         .summary-line{display:flex;justify-content:space-between;margin-bottom:8px}
         .summary-total{display:flex;justify-content:space-between;font-size:1.3rem;font-weight:700;margin-top:20px;padding-top:20px;border-top:1px solid var(--color-border)}
         #card-element{padding:12px;border:1px solid #ccc;border-radius:5px;background-color:white}
-        .pay-btn{width:100%;padding:18px;background-color:var(--color-primary);color:#fff;font-size:1.2rem;font-weight:700;border-radius:8px;border:0;cursor:pointer;margin-top:20px}
+        .pay-btn{width:100%;padding:18px;background-color:var(--color-primary);color:#fff;font-size:1.2rem;font-weight:700;border-radius:8px;border:0;cursor:pointer;margin-top:20px;position:relative}
+        .pay-btn .spinner{display:none;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:20px;height:20px;border:3px solid rgba(255,255,255,0.3);border-top-color:#fff;border-radius:50%;animation:spin 1s linear infinite}
+        .pay-btn.processing .spinner{display:block}
+        .pay-btn.processing .pay-btn-text{visibility:hidden}
+        @keyframes spin{to{transform:rotate(360deg)}}
+        #payment-message{color:var(--color-danger);margin-top:15px;text-align:center;font-weight:bold}
         @media(max-width:992px){.checkout-layout{grid-template-columns:1fr;flex-direction:column-reverse}.checkout-main{border-right:none;padding-right:0}.order-summary{position:static;margin-top:40px}}
     </style>
 </head>
@@ -60,32 +65,33 @@
                     </div>
                     <p>OR</p>
                 </section>
-                <section id="contact-info" class="checkout-section">
-                    <h2>Contact</h2>
-                    <div class="form-group"><input type="email" id="email" name="email" placeholder="Email"></div>
-                    <div class="checkbox-group"><input type="checkbox" id="newsletter-subscribe"><label for="newsletter-subscribe">Email me with news and offers</label></div>
-                </section>
-                <section id="delivery-info" class="checkout-section">
-                    <h2>Delivery</h2>
-                    <div class="form-group"><select id="country" name="country"><option>United States</option></select></div>
-                    <div class="form-row">
-                        <div class="form-group"><input type="text" id="first-name" name="first-name" placeholder="First name"></div>
-                        <div class="form-group"><input type="text" id="last-name" name="last-name" placeholder="Last name"></div>
-                    </div>
-                    <div class="form-group"><input type="text" id="address" name="address" placeholder="Address"></div>
-                    <div class="form-group"><input type="text" id="apartment" name="apartment" placeholder="Apartment, suite, etc. (optional)"></div>
-                    <div class="form-row">
-                        <div class="form-group"><input type="text" id="city" name="city" placeholder="City"></div>
-                        <div class="form-group"><input type="text" id="state" name="state" placeholder="State"></div>
-                        <div class="form-group"><input type="text" id="zip" name="zip" placeholder="ZIP code"></div>
-                    </div>
-                </section>
-                <section id="payment-info" class="checkout-section">
-                    <h2>Payment</h2>
-                    <p>All transactions are secure and encrypted.</p>
-                    <div id="card-element"></div>
-                    <button class="pay-btn" id="pay-btn">Pay Now</button>
-                </section>
+                <form id="payment-form">
+                    <section id="contact-info" class="checkout-section">
+                        <h2>Contact</h2>
+                        <div class="form-group"><input type="email" id="email" name="email" placeholder="Email" required></div>
+                    </section>
+                    <section id="delivery-info" class="checkout-section">
+                        <h2>Delivery</h2>
+                        <div class="form-group"><select id="country" name="country"><option>United States</option></select></div>
+                        <div class="form-group"><input type="text" id="name" name="name" placeholder="Full name" required></div>
+                        <div class="form-group"><input type="text" id="address" name="address" placeholder="Address" required></div>
+                        <div class="form-row">
+                            <div class="form-group"><input type="text" id="city" name="city" placeholder="City" required></div>
+                            <div class="form-group"><input type="text" id="state" name="state" placeholder="State" required></div>
+                            <div class="form-group"><input type="text" id="zip" name="zip" placeholder="ZIP code" required></div>
+                        </div>
+                    </section>
+                    <section id="payment-info" class="checkout-section">
+                        <h2>Payment</h2>
+                        <p>All transactions are secure and encrypted.</p>
+                        <div id="card-element"></div>
+                        <button class="pay-btn" id="pay-btn">
+                            <span class="pay-btn-text">Pay Now</span>
+                            <div class="spinner"></div>
+                        </button>
+                        <div id="payment-message" class="hidden"></div>
+                    </section>
+                </form>
             </div>
             <aside class="order-summary">
                 <h2>Order Summary</h2>
